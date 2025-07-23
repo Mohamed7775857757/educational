@@ -109,3 +109,261 @@
             position: relative;
         }
         .option:hover, .game-button:hover {
+            transform: scale(1.15);
+            background: linear-gradient(to bottom, #0288d1, #01579b);
+        }
+        #result, #memory-result, #timeline-result {
+            font-size: 1.4em;
+            margin-top: 20px;
+            animation: popIn 0.5s ease;
+        }
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        #memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 15px;
+            justify-content: center;
+        }
+        .memory-card {
+            width: 100px;
+            height: 100px;
+            background: #ffab91;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        .memory-card:hover {
+            transform: rotate(5deg);
+        }
+        .memory-card.matched {
+            background: #81c784;
+            animation: pulse 0.5s;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        #timeline {
+            margin: 20px;
+            padding: 15px;
+            background: #fff9c4;
+            border-radius: 15px;
+        }
+        canvas#confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">🌟 Shia Islamic Learning Hub 🌟</div>
+    <div class="nav">
+        <button class="nav-button" onclick="showSection('kindergarten')">Kindergarten</button>
+        <button class="nav-button" onclick="showSection('primary')">Primary School</button>
+        <button class="nav-button" onclick="showSection('highschool')">High School</button>
+    </div>
+
+    <!-- Kindergarten Game: Quiz -->
+    <div id="kindergarten" class="game-section active">
+        <div class="game-title">Kindergarten Quiz: Learn About Allah!</div>
+        <div class="question" id="kinder-question">Who is the Creator of everything?</div>
+        <button class="option" onclick="checkKinderAnswer('Allah')">Allah</button>
+        <button class="option" onclick="checkKinderAnswer('Sun')">Sun</button>
+        <button class="option" onclick="checkKinderAnswer('Moon')">Moon</button>
+        <div id="result"></div>
+    </div>
+
+    <!-- Primary School Game: Memory Match -->
+    <div id="primary" class="game-section">
+        <div class="game-title">Primary School Memory Game: Shia Figures</div>
+        <div id="memory-board"></div>
+        <div id="memory-result"></div>
+    </div>
+
+    <!-- High School Game: Timeline Sort -->
+    <div id="highschool" class="game-section">
+        <div class="game-title">High School Timeline: Shia History</div>
+        <div id="timeline">
+            <p>Drag these events to sort them in order:</p>
+            <button class="game-button" draggable="true" ondragstart="drag(event)" id="event1">Birth of Imam Ali (599 CE)</button>
+            <button class="game-button" draggable="true" ondragstart="drag(event)" id="event2">Battle of Karbala (680 CE)</button>
+            <button class="game-button" draggable="true" ondragstart="drag(event)" id="event3">Prophet Muhammad's Migration (622 CE)</button>
+        </div>
+        <button class="game-button" onclick="checkTimeline()">Check Order</button>
+        <div id="timeline-result"></div>
+    </div>
+
+    <canvas id="confetti"></canvas>
+
+    <script>
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.game-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Kindergarten Quiz
+        function checkKinderAnswer(answer) {
+            const result = document.getElementById('result');
+            if (answer === 'Allah') {
+                result.innerHTML = 'Correct! Allah is the Creator of everything! 🎉';
+                result.style.color = '#2e7d32';
+                triggerConfetti();
+            } else {
+                result.innerHTML = 'Try again! Hint: Allah is One and created everything.';
+                result.style.color = '#d32f2f';
+            }
+        }
+
+        // Primary School Memory Game
+        const cards = [
+            { name: 'Imam Ali', id: 1 }, { name: 'Imam Ali', id: 2 },
+            { name: 'Prophet Muhammad', id: 3 }, { name: 'Prophet Muhammad', id: 4 }
+        ];
+        let flippedCards = [];
+        let matchedCards = [];
+
+        function createMemoryBoard() {
+            const board = document.getElementById('memory-board');
+            cards.sort(() => Math.random() - 0.5);
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('memory-card');
+                cardElement.dataset.name = card.name;
+                cardElement.dataset.id = card.id;
+                cardElement.innerHTML = '⭐';
+                cardElement.onclick = () => flipCard(cardElement);
+                board.appendChild(cardElement);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !flippedCards.includes(card) && !matchedCards.includes(card.dataset.id)) {
+                card.innerHTML = card.dataset.name;
+                flippedCards.push(card);
+                if (flippedCards.length === 2) {
+                    setTimeout(checkMatch, 1000);
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            const result = document.getElementById('memory-result');
+            if (card1.dataset.name === card2.dataset.name) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedCards.push(card1.dataset.id, card2.dataset.id);
+                result.innerHTML = 'Match found! Great job! 🎉';
+                result.style.color = '#2e7d32';
+                triggerConfetti();
+                if (matchedCards.length === cards.length) {
+                    result.innerHTML = 'You won the game! 🎈';
+                }
+            } else {
+                card1.innerHTML = '⭐';
+                card2.innerHTML = '⭐';
+                result.innerHTML = 'No match. Try again!';
+                result.style.color = '#d32f2f';
+            }
+            flippedCards = [];
+        }
+
+        // High School Timeline Game
+        let dragged;
+        function drag(event) {
+            dragged = event.target;
+        }
+
+        document.getElementById('timeline').addEventListener('dragover', (e) => e.preventDefault());
+        document.getElementById('timeline').addEventListener('drop', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.game-button');
+            if (target) {
+                target.parentNode.insertBefore(dragged, target.nextSibling);
+            } else {
+                e.target.appendChild(dragged);
+            }
+        });
+
+        function checkTimeline() {
+            const events = document.querySelectorAll('#timeline .game-button');
+            const correctOrder = ['event1', 'event3', 'event2'];
+            let isCorrect = true;
+            events.forEach((event, index) => {
+                if (event.id !== correctOrder[index]) {
+                    isCorrect = false;
+                }
+            });
+            const result = document.getElementById('timeline-result');
+            if (isCorrect) {
+                result.innerHTML = 'Correct! You sorted the timeline perfectly! 🎉';
+                result.style.color = '#2e7d32';
+                triggerConfetti();
+            } else {
+                result.innerHTML = 'Incorrect. Try again! Hint: Check the years.';
+                result.style.color = '#d32f2f';
+            }
+        }
+
+        // Confetti Animation
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const confetti = [];
+            const colors = ['#ff6f61', '#42a5f5', '#ffca28', '#81c784'];
+
+            for (let i = 0; i < 100; i++) {
+                confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 10 + 5,
+                    speed: Math.random() * 5 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                confetti.forEach(c => {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+                    ctx.fillStyle = c.color;
+                    ctx.fill();
+                    c.y += c.speed;
+                    if (c.y > canvas.height) c.y = -c.size;
+                });
+                if (confetti.some(c => c.y < canvas.height)) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            animate();
+            setTimeout(() => ctx.clearRect(0, 0, canvas.width, canvas.height), 3000);
+        }
+
+        // Initialize Memory Game
+        createMemoryBoard();
+
+        // Window Resize Handler
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('confetti');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
