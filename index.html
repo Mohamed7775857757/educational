@@ -1,91 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shia Learning Kids</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shia Islamic Learning Hub</title>
     <style>
-      body {
-        margin: 0;
-        font-family: 'Comic Sans MS', cursive, sans-serif;
-        background-color: #e0ffe0;
-        color: #333;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-      }
-      header {
-        background-color: #2e7d32;
-        color: white;
-        width: 100%;
-        padding: 10px;
-        text-align: center;
-        border-radius: 10px;
-        margin-bottom: 20px;
-      }
-      .game-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        width: 100%;
-        max-width: 1000px;
-      }
-      .card {
-        background-color: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: transform 0.2s;
-      }
-      .card:hover {
-        transform: scale(1.05);
-      }
-      .card h3 {
-        margin-bottom: 10px;
-        color: #2e7d32;
-      }
-      .footer {
-        margin-top: 40px;
-        font-size: 0.9rem;
-        color: #666;
-      }
+        body {
+            background-color: #e6f3ff;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #00cc99;
+            padding: 20px;
+            color: white;
+            font-size: 2.5em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .nav {
+            background-color: #ffcc00;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .nav-button {
+            background-color: #ff6699;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .nav-button:hover {
+            transform: scale(1.1);
+        }
+        .game-section {
+            display: none;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff0f5;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .active {
+            display: block;
+        }
+        .question, .game-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #0066cc;
+        }
+        .option, .game-button {
+            background-color: #66ccff;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .option:hover, .game-button:hover {
+            transform: scale(1.1);
+        }
+        #result, #memory-result, #timeline-result {
+            font-size: 1.3em;
+            margin-top: 20px;
+        }
+        #memory-board {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .memory-card {
+            width: 80px;
+            height: 80px;
+            background-color: #ff9966;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+        .memory-card.matched {
+            background-color: #99ff99;
+        }
+        #timeline {
+            margin: 20px;
+            padding: 10px;
+            background-color: #f0e68c;
+            border-radius: 10px;
+        }
     </style>
-  </head>
-  <body>
-    <header>
-      <h1>Welcome to ShiaLearningKids.com!</h1>
-      <p>Fun Islamic games and quizzes about Shia teachings</p>
-    </header>
-
-    <section class="game-grid">
-      <div class="card" onclick="alert('Coming Soon: Prophet Muhammad (s) Game!')">
-        <h3>Prophet Muhammad (s)</h3>
-        <p>Learn about the greatest messenger!</p>
-      </div>
-      <div class="card" onclick="alert('Coming Soon: Sayeda Fatima (as) Quiz!')">
-        <h3>Sayeda Fatima (as)</h3>
-        <p>Test your knowledge with fun facts</p>
-      </div>
-      <div class="card" onclick="alert('Coming Soon: Ahlul Kisa (as) Memory Match!')">
-        <h3>Ahlul Kisa (as)</h3>
-        <p>Interactive memory matching game</p>
-      </div>
-      <div class="card" onclick="alert('Coming Soon: Tawheed vs Shirk Adventure!')">
-        <h3>Tawheed vs Shirk</h3>
-        <p>Can you spot what's right?</p>
-      </div>
-      <div class="card" onclick="alert('Coming Soon: Ghadir Trivia Challenge!')">
-        <h3>Ghadir</h3>
-        <p>Discover the truth of leadership</p>
-      </div>
-    </section>
-
-    <div class="footer">
-      &copy; 2025 ShiaLearningKids.com | Educational fun for children
+</head>
+<body>
+    <div class="header">Shia Islamic Learning Hub</div>
+    <div class="nav">
+        <button class="nav-button" onclick="showSection('kindergarten')">Kindergarten</button>
+        <button class="nav-button" onclick="showSection('primary')">Primary School</button>
+        <button class="nav-button" onclick="showSection('highschool')">High School</button>
     </div>
-  </body>
-</html>
 
+    <!-- Kindergarten Game: Quiz -->
+    <div id="kindergarten" class="game-section active">
+        <div class="game-title">Kindergarten Quiz: Learn About Allah!</div>
+        <div class="question" id="kinder-question">Who is the Creator of everything?</div>
+        <button class="option" onclick="checkKinderAnswer('Allah')">Allah</button>
+        <button class="option" onclick="checkKinderAnswer('Sun')">Sun</button>
+        <button class="option" onclick="checkKinderAnswer('Moon')">Moon</button>
+        <div id="result"></div>
+    </div>
+
+    <!-- Primary School Game: Memory Match -->
+    <div id="primary" class="game-section">
+        <div class="game-title">Primary School Memory Game: Shia Figures</div>
+        <div id="memory-board"></div>
+        <div id="memory-result"></div>
+    </div>
+
+    <!-- High School Game: Timeline Sort -->
+    <div id="highschool" class="game-section">
+        <div class="game-title">High School Timeline: Shia History</div>
+        <div id="timeline">
+            <p>Drag these events to sort them in order:</p>
+            <button class="game-button" draggable="true" ondragstart="drag(event)" id="event1">Birth of Imam Ali (599 CE)</button>
+            <button class="game-button" draggable="true" ondragstart="drag(event)" id="event2">Battle of Karbala (680 CE)</button>
+            <button class="game-button" draggable="true" ondragstart="drag(event)" id="event3">Prophet Muhammad's Migration (622 CE)</button>
+        </div>
+        <button class="game-button" onclick="checkTimeline()">Check Order</button>
+        <div id="timeline-result"></div>
+    </div>
+
+    <script>
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.game-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Kindergarten Quiz
+        function checkKinderAnswer(answer) {
+            const result = document.getElementById('result');
+            if (answer === 'Allah') {
+                result.innerHTML = 'Correct! Allah is the Creator of everything! 🎉';
+                result.style.color = 'green';
+            } else {
+                result.innerHTML = 'Try again! Hint: Allah is One and created everything.';
+                result.style.color = 'red';
+            }
+        }
+
+        // Primary School Memory Game
+        const cards = [
+            { name: 'Imam Ali', id: 1 }, { name: 'Imam Ali', id: 2 },
+            { name: 'Prophet Muhammad', id: 3 }, { name: 'Prophet Muhammad', id: 4 }
+        ];
+        let flippedCards = [];
+        let matchedCards = [];
+
+        function createMemoryBoard() {
+            const board = document.getElementById('memory-board');
+            cards.sort(() => Math.random() - 0.5); // Shuffle
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('memory-card');
+                cardElement.dataset.name = card.name;
+                cardElement.dataset.id = card.id;
+                cardElement.innerHTML = '?';
+                cardElement.onclick = () => flipCard(cardElement);
+                board.appendChild(cardElement);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !flippedCards.includes(card) && !matchedCards.includes(card.dataset.id)) {
+                card.innerHTML = card.dataset.name;
+                flippedCards.push(card);
+                if (flippedCards.length === 2) {
+                    setTimeout(checkMatch, 1000);
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            const result = document.getElementById('memory-result');
+            if (card1.dataset.name === card2.dataset.name) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedCards.push(card1.dataset.id, card2.dataset.id);
+                result.innerHTML = 'Match found! Great job! 🎉';
+                result.style.color = 'green';
+                if (matchedCards.length === cards.length) {
+                    result.innerHTML = 'You won the game! 🎈';
+                }
+            } else {
+                card1.innerHTML = '?';
+                card2.innerHTML = '?';
+                result.innerHTML = 'No match. Try again!';
+                result.style.color = 'red';
+            }
+            flippedCards = [];
+        }
+
+        // High School Timeline Game
+        let dragged;
+        function drag(event) {
+            dragged = event.target;
+        }
+
+        document.getElementById('timeline').addEventListener('dragover', (e) => e.preventDefault());
+        document.getElementById('timeline').addEventListener('drop', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.game-button');
+            if (target) {
+                target.parentNode.insertBefore(dragged, target.nextSibling);
+            } else {
+                e.target.appendChild(dragged);
+            }
+        });
+
+        function checkTimeline() {
+            const events = document.querySelectorAll('#timeline .game-button');
+            const correctOrder = ['event1', 'event3', 'event2'];
+            let isCorrect = true;
+            events.forEach((event, index) => {
+                if (event.id !== correctOrder[index]) {
+                    isCorrect = false;
+                }
+            });
+            const result = document.getElementById('timeline-result');
+            if (isCorrect) {
+                result.innerHTML = 'Correct! You sorted the timeline perfectly! 🎉';
+                result.style.color = 'green';
+            } else {
+                result.innerHTML = 'Incorrect. Try again! Hint: Check the years.';
+                result.style.color = 'red';
+            }
+        }
+
+        // Initialize Memory Game
+        createMemoryBoard();
+    </script>
+</body>
+</html>
