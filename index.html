@@ -66,7 +66,7 @@
             font-size: 1.2em;
             margin: 10px;
         }
-        .button, .option, .submit-button, .mission-button, .story-option {
+        .button, .option, .submit-button, .mission-button, .story-option, .category-button {
             background: linear-gradient(to bottom, #ff6f61, #ff8a65);
             color: white;
             padding: 12px 25px;
@@ -77,7 +77,7 @@
             transition: transform 0.3s;
             margin: 10px;
         }
-        .button:hover, .option:hover, .submit-button:hover, .mission-button:hover, .story-option:hover {
+        .button:hover, .option:hover, .submit-button:hover, .mission-button:hover, .story-option:hover, .category-button:hover {
             transform: scale(1.1);
         }
         .character-container {
@@ -108,12 +108,12 @@
             border-radius: 10px;
             animation: float 3s infinite ease-in-out;
         }
-        .question, .mission-text, .story-text {
+        .question, .mission-text, .story-text, .wudhu-instruction {
             font-size: 1.6em;
             color: #0288d1;
             margin-bottom: 20px;
         }
-        #result, #score, #mission-result, #memory-result, #wudhu-result, #story-result {
+        #result, #score, #mission-result, #memory-result, #wudhu-result, #story-result, #art-result {
             font-size: 1.4em;
             margin-top: 20px;
             animation: popIn 0.5s ease;
@@ -188,6 +188,35 @@
         .wudhu-step {
             draggable: true;
         }
+        .wudhu-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+        .wudhu-obligatory, .wudhu-mustahab {
+            width: 45%;
+            padding: 10px;
+            border: 2px solid #42a5f5;
+            border-radius: 10px;
+            min-height: 200px;
+        }
+        #art-canvas {
+            border: 2px solid #42a5f5;
+            border-radius: 10px;
+            background: white;
+        }
+        .art-tools {
+            margin: 20px;
+        }
+        .art-image {
+            width: 100px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        .art-image.selected {
+            border: 3px solid #81c784;
+        }
     </style>
 </head>
 <body>
@@ -230,6 +259,7 @@
         <button class="button" onclick="showSection('year1')">Memory Game</button>
         <button class="button" onclick="showSection('year2')">Wudhu Puzzle</button>
         <button class="button" onclick="showSection('year3')">Karbala Quest</button>
+        <button class="button" onclick="showSection('year4')">Islamic Art Zone</button>
         <button class="button" onclick="showSection('missions')">Daily Missions</button>
     </div>
 
@@ -265,17 +295,25 @@
         <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
 
-    <!-- Year 2: Wudhu Drag-and-Drop -->
+    <!-- Year 2: Wudhu Puzzle -->
     <div id="year2" class="section">
         <div class="game-title">Year 2: Wudhu Puzzle</div>
         <div class="image-container">
             <img src="https://yourusername.github.io/your-repo/images/wudhu_scene.jpg" alt="Wudhu Scene" class="karbala-img">
         </div>
+        <div class="wudhu-instruction">Drag the Wudhu steps to sort them in order, then categorize as Obligatory or Mustahab:</div>
         <div id="wudhu-area">
-            <p>Drag these steps to sort them in order:</p>
             <div id="wudhu-board"></div>
+            <div class="wudhu-container">
+                <div class="wudhu-obligatory" id="obligatory-area">
+                    <h3>Obligatory</h3>
+                </div>
+                <div class="wudhu-mustahab" id="mustahab-area">
+                    <h3>Mustahab</h3>
+                </div>
+            </div>
         </div>
-        <button class="button" onclick="checkWudhu()">Check Order</button>
+        <button class="button" onclick="checkWudhu()">Check Order & Categories</button>
         <div id="wudhu-result"></div>
         <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
@@ -293,6 +331,34 @@
         <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
 
+    <!-- Year 4: Islamic Art Zone -->
+    <div id="year4" class="section">
+        <div class="game-title">Year 4: Islamic Art Zone</div>
+        <div class="image-container">
+            <img src="https://yourusername.github.io/your-repo/images/art_zone.jpg" alt="Art Zone" class="karbala-img">
+        </div>
+        <p>Choose an image to color:</p>
+        <div class="character-container">
+            <img src="https://yourusername.github.io/your-repo/images/kaaba_lineart.jpg" alt="Kaaba" class="art-image" onclick="selectArtImage('kaaba_lineart.jpg')">
+            <img src="https://yourusername.github.io/your-repo/images/nabawi_lineart.jpg" alt="Masjid al-Nabawi" class="art-image" onclick="selectArtImage('nabawi_lineart.jpg')">
+            <img src="https://yourusername.github.io/your-repo/images/kufa_lineart.jpg" alt="Masjid al-Kufa" class="art-image" onclick="selectArtImage('kufa_lineart.jpg')">
+            <img src="https://yourusername.github.io/your-repo/images/ali_shrine_lineart.jpg" alt="Imam Ali Shrine" class="art-image" onclick="selectArtImage('ali_shrine_lineart.jpg')">
+        </div>
+        <div class="art-tools">
+            <input type="color" id="color-picker" value="#ff0000">
+            <select id="brush-size">
+                <option value="5">Small</option>
+                <option value="10" selected>Medium</option>
+                <option value="20">Large</option>
+            </select>
+            <button class="button" onclick="clearCanvas()">Clear Canvas</button>
+            <button class="button" onclick="saveArtwork()">Save Artwork</button>
+        </div>
+        <canvas id="art-canvas" width="400" height="400"></canvas>
+        <div id="art-result"></div>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
+    </div>
+
     <!-- Daily Missions -->
     <div id="missions" class="section">
         <div class="mission-title">Daily Missions</div>
@@ -305,11 +371,6 @@
     </div>
 
     <!-- Placeholder Sections for Other Years -->
-    <div id="year4" class="section">
-        <div class="game-title">Year 4: Coming Soon!</div>
-        <p>More games will be added for Year 4.</p>
-        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
-    </div>
     <div id="year5" class="section">
         <div class="game-title">Year 5: Coming Soon!</div>
         <p>More games will be added for Year 5.</p>
@@ -330,7 +391,7 @@
     </div>
 
     <script>
-        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, completed: [], missions: {} };
+        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, completed: [], missions: {}, artwork: {} };
         let currentQuestion = 0;
         let score = 0;
         const questions = [
@@ -393,17 +454,20 @@
             { name: 'Final Messenger', match: 'Prophet Muhammad', id: 8 }
         ];
         const wudhuSteps = [
-            { name: 'Wash hands', id: 1 },
-            { name: 'Rinse mouth', id: 2 },
-            { name: 'Wash face', id: 3 },
-            { name: 'Wash arms', id: 4 },
-            { name: 'Wipe the head', id: 5 },
-            { name: 'Wipe the right foot', id: 6 },
-            { name: 'Wipe the left foot', id: 7 }
+            { name: 'Wash hands', id: 1, category: 'mustahab' },
+            { name: 'Rinse mouth', id: 2, category: 'mustahab' },
+            { name: 'Rinse nose', id: 3, category: 'mustahab' },
+            { name: 'Wash face', id: 4, category: 'obligatory' },
+            { name: 'Wash right arm', id: 5, category: 'obligatory' },
+            { name: 'Wash left arm', id: 6, category: 'obligatory' },
+            { name: 'Wipe the head', id: 7, category: 'obligatory' },
+            { name: 'Wipe the right foot', id: 8, category: 'obligatory' },
+            { name: 'Wipe the left foot', id: 9, category: 'obligatory' }
         ];
         let flippedCards = [];
         let matchedCards = [];
         let dragged;
+        let currentArtImage = '';
 
         // Load User Data
         function loadUserData() {
@@ -420,6 +484,7 @@
                 document.getElementById('avatar-display').src = userData.character;
                 document.getElementById('avatar-display').style.display = 'block';
                 updateStarCounter();
+                loadArtwork();
             }
         }
 
@@ -488,6 +553,11 @@
                     document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'none');
                 }
             }
+            if (sectionId === 'year4') {
+                currentArtImage = '';
+                clearCanvas();
+                document.getElementById('art-result').innerHTML = userData.artwork[currentArtImage] ? 'Your artwork is saved!' : '';
+            }
             if (sectionId === 'missions') {
                 showMission();
             }
@@ -497,13 +567,18 @@
         function showProfile() {
             showSection('profile');
             const profileInfo = document.getElementById('profile-info');
+            let artworkHtml = '';
+            for (let img in userData.artwork) {
+                artworkHtml += `<p>Saved Artwork: <img src="${userData.artwork[img]}" alt="${img}" width="100"></p>`;
+            }
             profileInfo.innerHTML = `
                 Name: ${userData.name}<br>
                 Gender: ${userData.gender === 'boy' ? 'Boy' : 'Girl in Hijab'}<br>
                 Year: ${userData.year.replace('year', 'Year ').replace('kindergarten', 'Kindergarten')}<br>
                 Stars: ${userData.stars} ⭐<br>
                 Completed: ${userData.completed.length > 0 ? userData.completed.join(', ') : 'None'}<br>
-                Missions Completed: ${Object.keys(userData.missions).length > 0 ? Object.keys(userData.missions).join(', ') : 'None'}
+                Missions Completed: ${Object.keys(userData.missions).length > 0 ? Object.keys(userData.missions).join(', ') : 'None'}<br>
+                ${artworkHtml}
             `;
         }
 
@@ -628,15 +703,20 @@
             flippedCards = [];
         }
 
-        // Wudhu Drag-and-Drop (Year 2)
+        // Wudhu Puzzle (Year 2)
         function createWudhuBoard() {
             const board = document.getElementById('wudhu-board');
+            const obligatoryArea = document.getElementById('obligatory-area');
+            const mustahabArea = document.getElementById('mustahab-area');
             board.innerHTML = '';
+            obligatoryArea.innerHTML = '<h3>Obligatory</h3>';
+            mustahabArea.innerHTML = '<h3>Mustahab</h3>';
             wudhuSteps.sort(() => Math.random() - 0.5);
             wudhuSteps.forEach(step => {
                 const stepElement = document.createElement('div');
                 stepElement.classList.add('wudhu-step');
                 stepElement.dataset.id = step.id;
+                stepElement.dataset.category = step.category;
                 stepElement.innerHTML = step.name;
                 stepElement.draggable = true;
                 stepElement.ondragstart = drag;
@@ -648,37 +728,60 @@
             dragged = event.target;
         }
 
-        document.getElementById('wudhu-area').addEventListener('dragover', (e) => e.preventDefault());
-        document.getElementById('wudhu-area').addEventListener('drop', (e) => {
-            e.preventDefault();
-            const target = e.target.closest('.wudhu-step');
-            if (target) {
-                target.parentNode.insertBefore(dragged, target.nextSibling);
-            } else {
-                e.target.appendChild(dragged);
-            }
+        ['wudhu-board', 'obligatory-area', 'mustahab-area'].forEach(id => {
+            const area = document.getElementById(id);
+            area.addEventListener('dragover', (e) => e.preventDefault());
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const target = e.target.closest('.wudhu-step');
+                if (target) {
+                    target.parentNode.insertBefore(dragged, target.nextSibling);
+                } else {
+                    e.target.appendChild(dragged);
+                }
+            });
         });
 
         function checkWudhu() {
-            const steps = document.querySelectorAll('#wudhu-board .wudhu-step');
-            const correctOrder = ['1', '2', '3', '4', '5', '6', '7'];
-            let isCorrect = true;
-            steps.forEach((step, index) => {
-                if (step.dataset.id !== correctOrder[index]) {
-                    isCorrect = false;
+            const obligatorySteps = document.querySelectorAll('#obligatory-area .wudhu-step');
+            const mustahabSteps = document.querySelectorAll('#mustahab-area .wudhu-step');
+            const obligatoryOrder = ['4', '5', '6', '7', '8', '9'];
+            const mustahabOrder = ['1', '2', '3'];
+            let isOrderCorrect = true;
+            let isCategoryCorrect = true;
+
+            // Check Obligatory Order
+            obligatorySteps.forEach((step, index) => {
+                if (step.dataset.id !== obligatoryOrder[index]) {
+                    isOrderCorrect = false;
+                }
+                if (step.dataset.category !== 'obligatory') {
+                    isCategoryCorrect = false;
                 }
             });
+
+            // Check Mustahab Order
+            mustahabSteps.forEach((step, index) => {
+                if (step.dataset.id !== mustahabOrder[index]) {
+                    isOrderCorrect = false;
+                }
+                if (step.dataset.category !== 'mustahab') {
+                    isCategoryCorrect = false;
+                }
+            });
+
             const result = document.getElementById('wudhu-result');
-            if (isCorrect) {
+            if (isOrderCorrect && isCategoryCorrect && obligatorySteps.length === 6 && mustahabSteps.length === 3) {
                 userData.stars++;
                 userData.completed.push('year2');
-                result.innerHTML = `Correct! You sorted the Wudhu steps! Earned a <span class="star">⭐</span> Gold Star!`;
+                result.innerHTML = `Correct! You sorted and categorized the Wudhu steps! Earned a <span class="star">⭐</span> Gold Star!`;
                 result.style.color = '#2e7d32';
-                steps.forEach(step => step.classList.add('correct'));
+                obligatorySteps.forEach(step => step.classList.add('correct'));
+                mustahabSteps.forEach(step => step.classList.add('correct'));
                 saveUserData();
                 updateStarCounter();
             } else {
-                result.innerHTML = 'Incorrect. Try again! Hint: Start with hands, end with feet.';
+                result.innerHTML = 'Incorrect. Try again! Hint: Obligatory steps start with face, end with feet; Mustahab includes hands, mouth, nose.';
                 result.style.color = '#d32f2f';
             }
         }
@@ -697,6 +800,77 @@
             } else {
                 result.innerHTML = 'Reflect and try again. Loyalty is key in Karbala.';
                 result.style.color = '#d32f2f';
+            }
+        }
+
+        // Islamic Art Zone (Year 4)
+        const canvas = document.getElementById('art-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        function selectArtImage(image) {
+            currentArtImage = `https://yourusername.github.io/your-repo/images/${image}`;
+            document.querySelectorAll('.art-image').forEach(img => img.classList.remove('selected'));
+            document.querySelector(`img[src="https://yourusername.github.io/your-repo/images/${image}"]`).classList.add('selected');
+            const img = new Image();
+            img.src = currentArtImage;
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                if (userData.artwork[image]) {
+                    const savedImg = new Image();
+                    savedImg.src = userData.artwork[image];
+                    savedImg.onload = () => ctx.drawImage(savedImg, 0, 0, canvas.width, canvas.height);
+                }
+            };
+            document.getElementById('art-result').innerHTML = userData.artwork[image] ? 'Your artwork is saved!' : '';
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            draw(e);
+        });
+
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+
+        function draw(e) {
+            if (!isDrawing || !currentArtImage) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            ctx.beginPath();
+            ctx.arc(x, y, document.getElementById('brush-size').value / 2, 0, Math.PI * 2);
+            ctx.fillStyle = document.getElementById('color-picker').value;
+            ctx.fill();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (currentArtImage) {
+                const img = new Image();
+                img.src = currentArtImage;
+                img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            }
+            document.getElementById('art-result').innerHTML = '';
+        }
+
+        function saveArtwork() {
+            if (!currentArtImage) {
+                document.getElementById('art-result').innerHTML = 'Please select an image to color!';
+                return;
+            }
+            userData.artwork[currentArtImage.split('/').pop()] = canvas.toDataURL();
+            saveUserData();
+            document.getElementById('art-result').innerHTML = 'Artwork saved! Check your profile!';
+        }
+
+        function loadArtwork() {
+            if (currentArtImage && userData.artwork[currentArtImage.split('/').pop()]) {
+                const img = new Image();
+                img.src = userData.artwork[currentArtImage.split('/').pop()];
+                img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             }
         }
 
