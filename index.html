@@ -6,13 +6,14 @@
     <title>Shia Islamic Learning Hub</title>
     <style>
         body {
-            background: linear-gradient(135deg, #e0f7fa, #b2fef7);
+            background: linear-gradient(135deg, #b2fef7, #f3e5f5);
             font-family: 'Bubblegum Sans', 'Comic Sans MS', cursive, sans-serif;
             text-align: center;
             color: #333;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            position: relative;
         }
         .header {
             background: linear-gradient(to right, #00c4b4, #7b61ff);
@@ -20,19 +21,25 @@
             color: white;
             font-size: 3em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            animation: slideIn 1s ease-out;
+            animation: slideIn 1s ease-out, glow 2s infinite alternate;
         }
         @keyframes slideIn {
             from { transform: translateY(-100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }
+            to { text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.8); }
+        }
         .nav {
             background: #ffca28;
             padding: 15px;
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in;
         }
         .nav-button {
             background: linear-gradient(to bottom, #ff6f61, #ff8a65);
@@ -47,11 +54,11 @@
             overflow: hidden;
         }
         .nav-button:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) rotate(2deg);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
         .nav-button::after {
-            content: '✨';
+            content: '🌟';
             position: absolute;
             font-size: 1.5em;
             top: -10px;
@@ -68,14 +75,14 @@
             padding: 30px;
             background: #ffffffcc;
             border-radius: 20px;
-            max-width: 800px;
+            max-width: 900px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 0.5s ease-in;
+            animation: popIn 0.5s ease-in;
         }
         .active {
             display: block;
         }
-        @keyframes fadeIn {
+        @keyframes popIn {
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
@@ -91,12 +98,12 @@
             40% { transform: translateY(-10px); }
             60% { transform: translateY(-5px); }
         }
-        .question {
+        .question, .story-text {
             font-size: 1.6em;
             color: #0288d1;
             margin-bottom: 20px;
         }
-        .option, .game-button {
+        .option, .game-button, .story-option {
             background: linear-gradient(to bottom, #42a5f5, #0288d1);
             color: white;
             padding: 12px 25px;
@@ -106,43 +113,38 @@
             font-size: 1.2em;
             cursor: pointer;
             transition: transform 0.2s, background 0.3s;
-            position: relative;
         }
-        .option:hover, .game-button:hover {
+        .option:hover, .game-button:hover, .story-option:hover {
             transform: scale(1.15);
             background: linear-gradient(to bottom, #0288d1, #01579b);
         }
-        #result, #memory-result, #timeline-result {
+        #result, #memory-result, #timeline-result, #wudu-result, #story-result {
             font-size: 1.4em;
             margin-top: 20px;
             animation: popIn 0.5s ease;
         }
-        @keyframes popIn {
-            from { transform: scale(0); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        #memory-board {
+        #memory-board, #wudu-board {
             display: grid;
             grid-template-columns: repeat(4, 100px);
             gap: 15px;
             justify-content: center;
         }
-        .memory-card {
+        .memory-card, .wudu-step {
             width: 100px;
             height: 100px;
             background: #ffab91;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1em;
+            font-size: 1em;
             cursor: pointer;
             border-radius: 10px;
             transition: transform 0.3s;
         }
-        .memory-card:hover {
+        .memory-card:hover, .wudu-step:hover {
             transform: rotate(5deg);
         }
-        .memory-card.matched {
+        .memory-card.matched, .wudu-step.correct {
             background: #81c784;
             animation: pulse 0.5s;
         }
@@ -151,31 +153,74 @@
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
-        #timeline {
+        #timeline, #wudu-area, #story-area {
             margin: 20px;
             padding: 15px;
             background: #fff9c4;
             border-radius: 15px;
+        }
+        .image-container {
+            margin: 20px auto;
+            max-width: 300px;
+            position: relative;
+        }
+        .karbala-img {
+            width: 100%;
+            border-radius: 15px;
+            animation: float 3s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
         }
         canvas#confetti {
             position: fixed;
             top: 0;
             left: 0;
             pointer-events: none;
+            z-index: 1000;
+        }
+        .sparkle-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #ffffff, transparent);
+            border-radius: 50%;
+            animation: sparkle 2s infinite;
+        }
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 0.8; transform: scale(1.5); }
+            100% { opacity: 0; transform: scale(0); }
         }
     </style>
 </head>
 <body>
-    <div class="header">🌟 Shia Islamic Learning Hub 🌟</div>
+    <div class="sparkle-bg" id="sparkle-bg"></div>
+    <div class="header">🌙 Shia Islamic Learning Hub 🌟</div>
     <div class="nav">
         <button class="nav-button" onclick="showSection('kindergarten')">Kindergarten</button>
         <button class="nav-button" onclick="showSection('primary')">Primary School</button>
+        <button class="nav-button" onclick="showSection('middle')">Middle School</button>
         <button class="nav-button" onclick="showSection('highschool')">High School</button>
     </div>
 
     <!-- Kindergarten Game: Quiz -->
     <div id="kindergarten" class="game-section active">
         <div class="game-title">Kindergarten Quiz: Learn About Allah!</div>
+        <div class="image-container">
+            <img src="allah_symbol.jpg" alt="Islamic Symbol" class="karbala-img">
+        </div>
         <div class="question" id="kinder-question">Who is the Creator of everything?</div>
         <button class="option" onclick="checkKinderAnswer('Allah')">Allah</button>
         <button class="option" onclick="checkKinderAnswer('Sun')">Sun</button>
@@ -186,13 +231,33 @@
     <!-- Primary School Game: Memory Match -->
     <div id="primary" class="game-section">
         <div class="game-title">Primary School Memory Game: Shia Figures</div>
+        <div class="image-container">
+            <img src="imam_ali_symbol.jpg" alt="Imam Ali Symbol" class="karbala-img">
+        </div>
         <div id="memory-board"></div>
         <div id="memory-result"></div>
+    </div>
+
+    <!-- Middle School Game: Wudu Puzzle -->
+    <div id="middle" class="game-section">
+        <div class="game-title">Middle School Puzzle: Steps of Wudu</div>
+        <div class="image-container">
+            <img src="wudu_image.jpg" alt="Wudu Scene" class="karbala-img">
+        </div>
+        <div id="wudu-area">
+            <p>Drag these steps to sort them in order:</p>
+            <div id="wudu-board"></div>
+        </div>
+        <button class="game-button" onclick="checkWudu()">Check Order</button>
+        <div id="wudu-result"></div>
     </div>
 
     <!-- High School Game: Timeline Sort -->
     <div id="highschool" class="game-section">
         <div class="game-title">High School Timeline: Shia History</div>
+        <div class="image-container">
+            <img src="battle_karbala.jpg" alt="Battle of Karbala" class="karbala-img">
+        </div>
         <div id="timeline">
             <p>Drag these events to sort them in order:</p>
             <button class="game-button" draggable="true" ondragstart="drag(event)" id="event1">Birth of Imam Ali (599 CE)</button>
@@ -203,15 +268,42 @@
         <div id="timeline-result"></div>
     </div>
 
+    <!-- Story-Based Choice Game (Grades 7–9) -->
+    <div id="story" class="game-section">
+        <div class="game-title">Story Quest: Courage in Karbala</div>
+        <div class="image-container">
+            <img src="imam_hussain_dua.jpg" alt="Imam Hussain Dua" class="karbala-img">
+        </div>
+        <div class="story-text" id="story-text">You are at Karbala with Imam Hussain. The enemy offers you safety if you abandon him. What do you do?</div>
+        <button class="story-option" onclick="makeChoice('stay')">Stay with Imam Hussain</button>
+        <button class="story-option" onclick="makeChoice('leave')">Leave for safety</button>
+        <div id="story-result"></div>
+    </div>
+
     <canvas id="confetti"></canvas>
 
     <script>
+        // Sparkle Background
+        function createSparkles() {
+            const sparkleBg = document.getElementById('sparkle-bg');
+            for (let i = 0; i < 20; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                sparkle.style.left = Math.random() * 100 + 'vw';
+                sparkle.style.top = Math.random() * 100 + 'vh';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                sparkleBg.appendChild(sparkle);
+            }
+        }
+        createSparkles();
+
         // Navigation
         function showSection(sectionId) {
             document.querySelectorAll('.game-section').forEach(section => {
                 section.classList.remove('active');
             });
             document.getElementById(sectionId).classList.add('active');
+            triggerConfetti();
         }
 
         // Kindergarten Quiz
@@ -281,6 +373,59 @@
             flippedCards = [];
         }
 
+        // Middle School Wudu Puzzle
+        const wuduSteps = [
+            { name: 'Wash hands', id: 1 },
+            { name: 'Rinse mouth', id: 2 },
+            { name: 'Wash face', id: 3 },
+            { name: 'Wash arms', id: 4 }
+        ];
+        function createWuduBoard() {
+            const board = document.getElementById('wudu-board');
+            wuduSteps.sort(() => Math.random() - 0.5);
+            wuduSteps.forEach(step => {
+                const stepElement = document.createElement('div');
+                stepElement.classList.add('wudu-step');
+                stepElement.dataset.id = step.id;
+                stepElement.innerHTML = step.name;
+                stepElement.draggable = true;
+                stepElement.ondragstart = drag;
+                board.appendChild(stepElement);
+            });
+        }
+
+        document.getElementById('wudu-area').addEventListener('dragover', (e) => e.preventDefault());
+        document.getElementById('wudu-area').addEventListener('drop', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.wudu-step');
+            if (target) {
+                target.parentNode.insertBefore(dragged, target.nextSibling);
+            } else {
+                e.target.appendChild(dragged);
+            }
+        });
+
+        function checkWudu() {
+            const steps = document.querySelectorAll('#wudu-board .wudu-step');
+            const correctOrder = ['1', '2', '3', '4'];
+            let isCorrect = true;
+            steps.forEach((step, index) => {
+                if (step.dataset.id !== correctOrder[index]) {
+                    isCorrect = false;
+                }
+            });
+            const result = document.getElementById('wudu-result');
+            if (isCorrect) {
+                result.innerHTML = 'Correct! You sorted the Wudu steps! 🎉';
+                result.style.color = '#2e7d32';
+                steps.forEach(step => step.classList.add('correct'));
+                triggerConfetti();
+            } else {
+                result.innerHTML = 'Incorrect. Try again! Hint: Start with hands.';
+                result.style.color = '#d32f2f';
+            }
+        }
+
         // High School Timeline Game
         let dragged;
         function drag(event) {
@@ -314,6 +459,19 @@
                 triggerConfetti();
             } else {
                 result.innerHTML = 'Incorrect. Try again! Hint: Check the years.';
+                result.style.color = '#d32f2f';
+            }
+        }
+
+        // Story-Based Choice Game
+        function makeChoice(choice) {
+            const result = document.getElementById('story-result');
+            if (choice === 'stay') {
+                result.innerHTML = 'You chose courage! Imam Hussain is proud! 🎉';
+                result.style.color = '#2e7d32';
+                triggerConfetti();
+            } else {
+                result.innerHTML = 'Reflect and try again. Loyalty is key in Karbala.';
                 result.style.color = '#d32f2f';
             }
         }
@@ -355,8 +513,9 @@
             setTimeout(() => ctx.clearRect(0, 0, canvas.width, canvas.height), 3000);
         }
 
-        // Initialize Memory Game
+        // Initialize Boards
         createMemoryBoard();
+        createWuduBoard();
 
         // Window Resize Handler
         window.addEventListener('resize', () => {
