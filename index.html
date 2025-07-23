@@ -396,7 +396,10 @@
             { name: 'Wash hands', id: 1 },
             { name: 'Rinse mouth', id: 2 },
             { name: 'Wash face', id: 3 },
-            { name: 'Wash arms', id: 4 }
+            { name: 'Wash arms', id: 4 },
+            { name: 'Wipe the head', id: 5 },
+            { name: 'Wipe the right foot', id: 6 },
+            { name: 'Wipe the left foot', id: 7 }
         ];
         let flippedCards = [];
         let matchedCards = [];
@@ -658,7 +661,7 @@
 
         function checkWudhu() {
             const steps = document.querySelectorAll('#wudhu-board .wudhu-step');
-            const correctOrder = ['1', '2', '3', '4'];
+            const correctOrder = ['1', '2', '3', '4', '5', '6', '7'];
             let isCorrect = true;
             steps.forEach((step, index) => {
                 if (step.dataset.id !== correctOrder[index]) {
@@ -675,7 +678,7 @@
                 saveUserData();
                 updateStarCounter();
             } else {
-                result.innerHTML = 'Incorrect. Try again! Hint: Start with hands.';
+                result.innerHTML = 'Incorrect. Try again! Hint: Start with hands, end with feet.';
                 result.style.color = '#d32f2f';
             }
         }
