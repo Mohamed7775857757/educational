@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,7 +43,7 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
-        .welcome-title, .game-title {
+        .welcome-title, .game-title, .mission-title {
             font-size: 2em;
             color: #d81b60;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
@@ -67,7 +66,7 @@
             font-size: 1.2em;
             margin: 10px;
         }
-        .button, .option, .submit-button {
+        .button, .option, .submit-button, .mission-button {
             background: linear-gradient(to bottom, #ff6f61, #ff8a65);
             color: white;
             padding: 12px 25px;
@@ -78,7 +77,7 @@
             transition: transform 0.3s;
             margin: 10px;
         }
-        .button:hover, .option:hover, .submit-button:hover {
+        .button:hover, .option:hover, .submit-button:hover, .mission-button:hover {
             transform: scale(1.1);
         }
         .character-container {
@@ -100,12 +99,21 @@
         .character.selected {
             border: 3px solid #81c784;
         }
-        .question {
+        .avatar-display {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            animation: float 3s infinite ease-in-out;
+        }
+        .question, .mission-text {
             font-size: 1.6em;
             color: #0288d1;
             margin-bottom: 20px;
         }
-        #result, #score {
+        #result, #score, #mission-result {
             font-size: 1.4em;
             margin-top: 20px;
             animation: popIn 0.5s ease;
@@ -143,17 +151,22 @@
             padding: 10px;
             border-radius: 10px;
         }
+        .profile-info {
+            font-size: 1.2em;
+            margin: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="header">🌙 Shia Islamic Learning Hub 🌟</div>
     <div class="star-counter" id="star-counter">Stars: <span id="star-count">0</span> ⭐</div>
+    <img id="avatar-display" src="" alt="Your Avatar" class="avatar-display" style="display: none;">
 
     <!-- Welcome Screen -->
     <div id="welcome" class="section active">
-        <div class="welcome-title">Welcome, Young Scholar!</div>
+        <div class="welcome-title" id="welcome-title">Welcome, Young Scholar!</div>
         <div class="image-container">
-            <img src="yourwebsite.com/images/welcome_islamic.jpg" alt="Islamic Welcome" class="karbala-img">
+            <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Islamic Welcome" class="karbala-img">
         </div>
         <p>Enter your name:</p>
         <input type="text" id="name-input" class="input-field" placeholder="Your Name">
@@ -173,57 +186,89 @@
         </select>
         <p>Choose your character:</p>
         <div class="character-container" id="character-container">
-            <!-- Placeholders for characters -->
-            <img src="yourwebsite.com/images/boy1.jpg" alt="Boy 1" class="character" data-gender="boy">
-            <img src="yourwebsite.com/images/boy2.jpg" alt="Boy 2" class="character" data-gender="boy">
-            <img src="yourwebsite.com/images/girl1_hijab.jpg" alt="Girl 1" class="character" data-gender="girl">
-            <img src="yourwebsite.com/images/girl2_hijab.jpg" alt="Girl 2" class="character" data-gender="girl">
+            <img src="https://yourusername.github.io/your-repo/images/boy1.jpg" alt="Boy 1" class="character" data-gender="boy">
+            <img src="https://yourusername.github.io/your-repo/images/boy2.jpg" alt="Boy 2" class="character" data-gender="boy">
+            <img src="https://yourusername.github.io/your-repo/images/girl1_hijab.jpg" alt="Girl 1 in Hijab" class="character" data-gender="girl">
+            <img src="https://yourusername.github.io/your-repo/images/girl2_hijab.jpg" alt="Girl 2 in Hijab" class="character" data-gender="girl">
         </div>
         <button class="button" onclick="startLearning()">Start Learning!</button>
+        <button class="button" onclick="showProfile()">View Profile</button>
+    </div>
+
+    <!-- Profile Screen -->
+    <div id="profile" class="section">
+        <div class="welcome-title">Your Profile</div>
+        <div class="image-container">
+            <img src="https://yourusername.github.io/your-repo/images/profile_islamic.jpg" alt="Profile Islamic" class="karbala-img">
+        </div>
+        <div class="profile-info" id="profile-info"></div>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
 
     <!-- Kindergarten Quiz -->
     <div id="kindergarten" class="section">
         <div class="game-title" id="kinder-title">Kindergarten Quiz: Islamic Basics</div>
         <div class="image-container">
-            <img src="yourwebsite.com/images/allah_symbol.jpg" alt="Islamic Symbol" class="karbala-img">
+            <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Islamic Symbol" class="karbala-img">
         </div>
         <div id="quiz-container"></div>
         <div id="score"></div>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
+    </div>
+
+    <!-- Daily Missions -->
+    <div id="missions" class="section">
+        <div class="mission-title">Daily Missions</div>
+        <div class="image-container">
+            <img src="https://yourusername.github.io/your-repo/images/mission_hadith.jpg" alt="Hadith Book" class="karbala-img">
+        </div>
+        <div id="mission-container"></div>
+        <div id="mission-result"></div>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
 
     <!-- Placeholder Sections for Other Years -->
     <div id="year1" class="section">
         <div class="game-title">Year 1: Coming Soon!</div>
         <p>More games will be added for Year 1.</p>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
     <div id="year2" class="section">
         <div class="game-title">Year 2: Coming Soon!</div>
         <p>More games will be added for Year 2.</p>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
     <div id="year3" class="section">
         <div class="game-title">Year 3: Coming Soon!</div>
         <p>More games will be added for Year 3.</p>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
     <div id="year4" class="section">
         <div class="game-title">Year 4: Coming Soon!</div>
         <p>More games will be added for Year 4.</p>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
     <div id="year5" class="section">
         <div class="game-title">Year 5: Coming Soon!</div>
         <p>More games will be added for Year 5.</p>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
     <div id="year6" class="section">
         <div class="game-title">Year 6: Coming Soon!</div>
         <p>More games will be added for Year 6.</p>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
     <div id="year7" class="section">
         <div class="game-title">Year 7: Coming Soon!</div>
+        <div class="image-container">
+            <img src="https://yourusername.github.io/your-repo/images/imam_hussain_dua.jpg" alt="Imam Hussain Dua" class="karbala-img">
+        </div>
         <p>More games will be added for Year 7.</p>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
 
     <script>
-        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0 };
+        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, completed: [], missions: {} };
         let currentQuestion = 0;
         let score = 0;
         const questions = [
@@ -257,6 +302,47 @@
                 answer: 'Islam'
             }
         ];
+        const missions = [
+            {
+                id: 'hadith',
+                title: 'Learn a New Hadith',
+                question: 'What does this hadith mean: "The best of you are those who are best to their families"?',
+                type: 'multiple',
+                options: ['Be kind to your family', 'Study hard', 'Pray alone'],
+                answer: 'Be kind to your family'
+            },
+            {
+                id: 'zaynab',
+                title: 'Help Zaynab Find the Prayer Direction',
+                question: 'Which direction should Zaynab face to pray?',
+                type: 'multiple',
+                options: ['North', 'Qibla', 'West'],
+                answer: 'Qibla'
+            }
+        ];
+
+        // Load User Data
+        function loadUserData() {
+            const savedData = localStorage.getItem('userData');
+            if (savedData) {
+                userData = JSON.parse(savedData);
+                document.getElementById('welcome-title').innerHTML = `Welcome Back, ${userData.name}!`;
+                document.getElementById('name-input').value = userData.name;
+                document.querySelector(`input[name="gender"][value="${userData.gender}"]`).checked = true;
+                document.getElementById('year-select').value = userData.year;
+                document.querySelectorAll('.character').forEach(img => {
+                    if (img.src === userData.character) img.classList.add('selected');
+                });
+                document.getElementById('avatar-display').src = userData.character;
+                document.getElementById('avatar-display').style.display = 'block';
+                updateStarCounter();
+            }
+        }
+
+        // Save User Data
+        function saveUserData() {
+            localStorage.setItem('userData', JSON.stringify(userData));
+        }
 
         // Character Selection
         document.querySelectorAll('.character').forEach(img => {
@@ -264,8 +350,47 @@
                 document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
                 img.classList.add('selected');
                 userData.character = img.src;
+                document.getElementById('avatar-display').src = userData.character;
+                document.getElementById('avatar-display').style.display = 'block';
+                saveUserData();
             });
         });
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            if (sectionId === 'kindergarten') {
+                document.getElementById('kinder-title').innerHTML = `Kindergarten Quiz: Islamic Basics, ${userData.name}!`;
+                if (!userData.completed.includes('kindergarten')) {
+                    currentQuestion = 0;
+                    score = 0;
+                    showQuestion();
+                } else {
+                    document.getElementById('quiz-container').innerHTML = 'You already completed this quiz!';
+                    document.getElementById('score').innerHTML = '';
+                }
+            }
+            if (sectionId === 'missions') {
+                showMission();
+            }
+        }
+
+        // Profile Screen
+        function showProfile() {
+            showSection('profile');
+            const profileInfo = document.getElementById('profile-info');
+            profileInfo.innerHTML = `
+                Name: ${userData.name}<br>
+                Gender: ${userData.gender === 'boy' ? 'Boy' : 'Girl in Hijab'}<br>
+                Year: ${userData.year.replace('year', 'Year ').replace('kindergarten', 'Kindergarten')}<br>
+                Stars: ${userData.stars} ⭐<br>
+                Completed: ${userData.completed.length > 0 ? userData.completed.join(', ') : 'None'}<br>
+                Missions Completed: ${Object.keys(userData.missions).length > 0 ? Object.keys(userData.missions).join(', ') : 'None'}
+            `;
+        }
 
         // Start Learning
         function startLearning() {
@@ -275,13 +400,15 @@
             if (!userData.character) {
                 userData.character = document.querySelector('.character').src;
             }
-            document.getElementById('welcome').classList.remove('active');
-            document.getElementById(userData.year).classList.add('active');
-            if (userData.year === 'kindergarten') {
-                document.getElementById('kinder-title').innerHTML = `Kindergarten Quiz: Islamic Basics, ${userData.name}!`;
-                showQuestion();
-            }
-            updateStarCounter();
+            document.getElementById('avatar-display').src = userData.character;
+            document.getElementById('avatar-display').style.display = 'block';
+            saveUserData();
+            showSection('welcome');
+            document.getElementById('welcome-title').innerHTML = `Welcome Back, ${userData.name}!`;
+            document.getElementById('welcome').innerHTML += `
+                <button class="button" onclick="showSection('kindergarten')">Play Quiz</button>
+                <button class="button" onclick="showSection('missions')">Daily Missions</button>
+            `;
         }
 
         // Kindergarten Quiz
@@ -329,17 +456,56 @@
             result.innerHTML = `Quiz Complete, ${userData.name}! Final Score: ${score}/${questions.length}`;
             if (score >= 4) {
                 userData.stars++;
+                userData.completed.push('kindergarten');
                 result.innerHTML += `<br>Congratulations! You earned a <span class="star">⭐</span> Gold Star!`;
+                saveUserData();
                 updateStarCounter();
             } else {
                 result.innerHTML += `<br>Try again to earn a Gold Star!`;
             }
         }
 
+        // Daily Missions
+        function showMission() {
+            const today = new Date().toISOString().split('T')[0];
+            if (userData.missions[today]) {
+                document.getElementById('mission-container').innerHTML = 'You completed today’s mission!';
+                document.getElementById('mission-result').innerHTML = '';
+                return;
+            }
+            const mission = missions[new Date().getDay() % missions.length]; // Rotate missions
+            const container = document.getElementById('mission-container');
+            let html = `<div class="mission-text">${mission.title}: ${mission.question}</div>`;
+            mission.options.forEach(opt => {
+                html += `<button class="mission-button" onclick="checkMission('${opt}', '${mission.id}')">${opt}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function checkMission(answer, missionId) {
+            const mission = missions.find(m => m.id === missionId);
+            const result = document.getElementById('mission-result');
+            const today = new Date().toISOString().split('T')[0];
+            if (answer === mission.answer) {
+                userData.stars++;
+                userData.missions[today] = mission.id;
+                result.innerHTML = `Correct! You earned a <span class="star">⭐</span> Gold Star!`;
+                result.style.color = '#2e7d32';
+                saveUserData();
+                updateStarCounter();
+                document.getElementById('mission-container').innerHTML = 'Mission complete! Come back tomorrow!';
+            } else {
+                result.innerHTML = `Incorrect. Try again!`;
+                result.style.color = '#d32f2f';
+            }
+        }
+
         function updateStarCounter() {
             document.getElementById('star-count').innerText = userData.stars;
         }
+
+        // Initialize
+        loadUserData();
     </script>
 </body>
 </html>
-
