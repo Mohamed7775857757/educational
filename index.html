@@ -66,7 +66,7 @@
             font-size: 1.2em;
             margin: 10px;
         }
-        .button, .option, .submit-button, .mission-button {
+        .button, .option, .submit-button, .mission-button, .story-option {
             background: linear-gradient(to bottom, #ff6f61, #ff8a65);
             color: white;
             padding: 12px 25px;
@@ -77,7 +77,7 @@
             transition: transform 0.3s;
             margin: 10px;
         }
-        .button:hover, .option:hover, .submit-button:hover, .mission-button:hover {
+        .button:hover, .option:hover, .submit-button:hover, .mission-button:hover, .story-option:hover {
             transform: scale(1.1);
         }
         .character-container {
@@ -108,12 +108,12 @@
             border-radius: 10px;
             animation: float 3s infinite ease-in-out;
         }
-        .question, .mission-text {
+        .question, .mission-text, .story-text {
             font-size: 1.6em;
             color: #0288d1;
             margin-bottom: 20px;
         }
-        #result, #score, #mission-result {
+        #result, #score, #mission-result, #memory-result, #wudhu-result, #story-result {
             font-size: 1.4em;
             margin-top: 20px;
             animation: popIn 0.5s ease;
@@ -155,6 +155,39 @@
             font-size: 1.2em;
             margin: 20px;
         }
+        #memory-board, #wudhu-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 15px;
+            justify-content: center;
+        }
+        .memory-card, .wudhu-step {
+            width: 100px;
+            height: 100px;
+            background: #ffab91;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        .memory-card:hover, .wudhu-step:hover {
+            transform: rotate(5deg);
+        }
+        .memory-card.matched, .wudhu-step.correct {
+            background: #81c784;
+            animation: pulse 0.5s;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .wudhu-step {
+            draggable: true;
+        }
     </style>
 </head>
 <body>
@@ -193,6 +226,11 @@
         </div>
         <button class="button" onclick="startLearning()">Start Learning!</button>
         <button class="button" onclick="showProfile()">View Profile</button>
+        <button class="button" onclick="showSection('kindergarten')">Play Quiz</button>
+        <button class="button" onclick="showSection('year1')">Memory Game</button>
+        <button class="button" onclick="showSection('year2')">Wudhu Puzzle</button>
+        <button class="button" onclick="showSection('year3')">Karbala Quest</button>
+        <button class="button" onclick="showSection('missions')">Daily Missions</button>
     </div>
 
     <!-- Profile Screen -->
@@ -216,6 +254,45 @@
         <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
     </div>
 
+    <!-- Year 1: Memory Game -->
+    <div id="year1" class="section">
+        <div class="game-title">Year 1: Imam Memory Game</div>
+        <div class="image-container">
+            <img src="https://yourusername.github.io/your-repo/images/memory_imam.jpg" alt="Imam Symbol" class="karbala-img">
+        </div>
+        <div id="memory-board"></div>
+        <div id="memory-result"></div>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
+    </div>
+
+    <!-- Year 2: Wudhu Drag-and-Drop -->
+    <div id="year2" class="section">
+        <div class="game-title">Year 2: Wudhu Puzzle</div>
+        <div class="image-container">
+            <img src="https://yourusername.github.io/your-repo/images/wudhu_scene.jpg" alt="Wudhu Scene" class="karbala-img">
+        </div>
+        <div id="wudhu-area">
+            <p>Drag these steps to sort them in order:</p>
+            <div id="wudhu-board"></div>
+        </div>
+        <button class="button" onclick="checkWudhu()">Check Order</button>
+        <div id="wudhu-result"></div>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
+    </div>
+
+    <!-- Year 3: Imam Hussain Story Mode -->
+    <div id="year3" class="section">
+        <div class="game-title">Year 3: Karbala Quest</div>
+        <div class="image-container">
+            <img src="https://yourusername.github.io/your-repo/images/karbala_quest.jpg" alt="Karbala Quest" class="karbala-img">
+        </div>
+        <div class="story-text" id="story-text">You are at Karbala with Imam Hussain (AS). The enemy offers you safety if you abandon him. What do you do?</div>
+        <button class="story-option" onclick="makeChoice('stay')">Stay with Imam Hussain</button>
+        <button class="story-option" onclick="makeChoice('leave')">Leave for safety</button>
+        <div id="story-result"></div>
+        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
+    </div>
+
     <!-- Daily Missions -->
     <div id="missions" class="section">
         <div class="mission-title">Daily Missions</div>
@@ -228,21 +305,6 @@
     </div>
 
     <!-- Placeholder Sections for Other Years -->
-    <div id="year1" class="section">
-        <div class="game-title">Year 1: Coming Soon!</div>
-        <p>More games will be added for Year 1.</p>
-        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
-    </div>
-    <div id="year2" class="section">
-        <div class="game-title">Year 2: Coming Soon!</div>
-        <p>More games will be added for Year 2.</p>
-        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
-    </div>
-    <div id="year3" class="section">
-        <div class="game-title">Year 3: Coming Soon!</div>
-        <p>More games will be added for Year 3.</p>
-        <button class="button" onclick="showSection('welcome')">Back to Welcome</button>
-    </div>
     <div id="year4" class="section">
         <div class="game-title">Year 4: Coming Soon!</div>
         <p>More games will be added for Year 4.</p>
@@ -320,6 +382,25 @@
                 answer: 'Qibla'
             }
         ];
+        const memoryCards = [
+            { name: 'Imam Ali', match: 'First Imam', id: 1 },
+            { name: 'First Imam', match: 'Imam Ali', id: 2 },
+            { name: 'Imam Hussain', match: 'Karbala', id: 3 },
+            { name: 'Karbala', match: 'Imam Hussain', id: 4 },
+            { name: 'Imam Hassan', match: 'Second Imam', id: 5 },
+            { name: 'Second Imam', match: 'Imam Hassan', id: 6 },
+            { name: 'Prophet Muhammad', match: 'Final Messenger', id: 7 },
+            { name: 'Final Messenger', match: 'Prophet Muhammad', id: 8 }
+        ];
+        const wudhuSteps = [
+            { name: 'Wash hands', id: 1 },
+            { name: 'Rinse mouth', id: 2 },
+            { name: 'Wash face', id: 3 },
+            { name: 'Wash arms', id: 4 }
+        ];
+        let flippedCards = [];
+        let matchedCards = [];
+        let dragged;
 
         // Load User Data
         function loadUserData() {
@@ -373,6 +454,37 @@
                     document.getElementById('score').innerHTML = '';
                 }
             }
+            if (sectionId === 'year1') {
+                if (!userData.completed.includes('year1')) {
+                    flippedCards = [];
+                    matchedCards = [];
+                    createMemoryBoard();
+                    document.getElementById('memory-result').innerHTML = '';
+                } else {
+                    document.getElementById('memory-board').innerHTML = 'You already completed this game!';
+                    document.getElementById('memory-result').innerHTML = '';
+                }
+            }
+            if (sectionId === 'year2') {
+                if (!userData.completed.includes('year2')) {
+                    createWudhuBoard();
+                    document.getElementById('wudhu-result').innerHTML = '';
+                } else {
+                    document.getElementById('wudhu-area').innerHTML = 'You already completed this puzzle!';
+                    document.getElementById('wudhu-result').innerHTML = '';
+                }
+            }
+            if (sectionId === 'year3') {
+                if (!userData.completed.includes('year3')) {
+                    document.getElementById('story-text').innerHTML = 'You are at Karbala with Imam Hussain (AS). The enemy offers you safety if you abandon him. What do you do?';
+                    document.getElementById('story-result').innerHTML = '';
+                    document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'inline-block');
+                } else {
+                    document.getElementById('story-text').innerHTML = 'You already completed this quest!';
+                    document.getElementById('story-result').innerHTML = '';
+                    document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'none');
+                }
+            }
             if (sectionId === 'missions') {
                 showMission();
             }
@@ -405,10 +517,6 @@
             saveUserData();
             showSection('welcome');
             document.getElementById('welcome-title').innerHTML = `Welcome Back, ${userData.name}!`;
-            document.getElementById('welcome').innerHTML += `
-                <button class="button" onclick="showSection('kindergarten')">Play Quiz</button>
-                <button class="button" onclick="showSection('missions')">Daily Missions</button>
-            `;
         }
 
         // Kindergarten Quiz
@@ -465,6 +573,130 @@
             }
         }
 
+        // Memory Game (Year 1)
+        function createMemoryBoard() {
+            const board = document.getElementById('memory-board');
+            board.innerHTML = '';
+            memoryCards.sort(() => Math.random() - 0.5);
+            memoryCards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('memory-card');
+                cardElement.dataset.name = card.name;
+                cardElement.dataset.match = card.match;
+                cardElement.dataset.id = card.id;
+                cardElement.innerHTML = '⭐';
+                cardElement.onclick = () => flipCard(cardElement);
+                board.appendChild(cardElement);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !flippedCards.includes(card) && !matchedCards.includes(card.dataset.id)) {
+                card.innerHTML = card.dataset.name;
+                flippedCards.push(card);
+                if (flippedCards.length === 2) {
+                    setTimeout(checkMatch, 1000);
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            const result = document.getElementById('memory-result');
+            if (card1.dataset.name === card2.dataset.match || card2.dataset.name === card1.dataset.match) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedCards.push(card1.dataset.id, card2.dataset.id);
+                result.innerHTML = 'Match found! Great job! 🎉';
+                result.style.color = '#2e7d32';
+                if (matchedCards.length === memoryCards.length) {
+                    userData.stars++;
+                    userData.completed.push('year1');
+                    result.innerHTML = `You won the game! Earned a <span class="star">⭐</span> Gold Star!`;
+                    saveUserData();
+                    updateStarCounter();
+                }
+            } else {
+                card1.innerHTML = '⭐';
+                card2.innerHTML = '⭐';
+                result.innerHTML = 'No match. Try again!';
+                result.style.color = '#d32f2f';
+            }
+            flippedCards = [];
+        }
+
+        // Wudhu Drag-and-Drop (Year 2)
+        function createWudhuBoard() {
+            const board = document.getElementById('wudhu-board');
+            board.innerHTML = '';
+            wudhuSteps.sort(() => Math.random() - 0.5);
+            wudhuSteps.forEach(step => {
+                const stepElement = document.createElement('div');
+                stepElement.classList.add('wudhu-step');
+                stepElement.dataset.id = step.id;
+                stepElement.innerHTML = step.name;
+                stepElement.draggable = true;
+                stepElement.ondragstart = drag;
+                board.appendChild(stepElement);
+            });
+        }
+
+        function drag(event) {
+            dragged = event.target;
+        }
+
+        document.getElementById('wudhu-area').addEventListener('dragover', (e) => e.preventDefault());
+        document.getElementById('wudhu-area').addEventListener('drop', (e) => {
+            e.preventDefault();
+            const target = e.target.closest('.wudhu-step');
+            if (target) {
+                target.parentNode.insertBefore(dragged, target.nextSibling);
+            } else {
+                e.target.appendChild(dragged);
+            }
+        });
+
+        function checkWudhu() {
+            const steps = document.querySelectorAll('#wudhu-board .wudhu-step');
+            const correctOrder = ['1', '2', '3', '4'];
+            let isCorrect = true;
+            steps.forEach((step, index) => {
+                if (step.dataset.id !== correctOrder[index]) {
+                    isCorrect = false;
+                }
+            });
+            const result = document.getElementById('wudhu-result');
+            if (isCorrect) {
+                userData.stars++;
+                userData.completed.push('year2');
+                result.innerHTML = `Correct! You sorted the Wudhu steps! Earned a <span class="star">⭐</span> Gold Star!`;
+                result.style.color = '#2e7d32';
+                steps.forEach(step => step.classList.add('correct'));
+                saveUserData();
+                updateStarCounter();
+            } else {
+                result.innerHTML = 'Incorrect. Try again! Hint: Start with hands.';
+                result.style.color = '#d32f2f';
+            }
+        }
+
+        // Imam Hussain Story Mode (Year 3)
+        function makeChoice(choice) {
+            const result = document.getElementById('story-result');
+            if (choice === 'stay') {
+                userData.stars++;
+                userData.completed.push('year3');
+                result.innerHTML = `You chose courage! Imam Hussain (AS) is proud! Earned a <span class="star">⭐</span> Gold Star!`;
+                result.style.color = '#2e7d32';
+                document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'none');
+                saveUserData();
+                updateStarCounter();
+            } else {
+                result.innerHTML = 'Reflect and try again. Loyalty is key in Karbala.';
+                result.style.color = '#d32f2f';
+            }
+        }
+
         // Daily Missions
         function showMission() {
             const today = new Date().toISOString().split('T')[0];
@@ -473,7 +705,7 @@
                 document.getElementById('mission-result').innerHTML = '';
                 return;
             }
-            const mission = missions[new Date().getDay() % missions.length]; // Rotate missions
+            const mission = missions[new Date().getDay() % missions.length];
             const container = document.getElementById('mission-container');
             let html = `<div class="mission-text">${mission.title}: ${mission.question}</div>`;
             mission.options.forEach(opt => {
