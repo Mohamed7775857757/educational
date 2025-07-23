@@ -391,7 +391,7 @@
     </div>
 
     <script>
-        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, completed: [], missions: {}, artwork: {} };
+        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, missions: {}, artwork: {} };
         let currentQuestion = 0;
         let score = 0;
         const questions = [
@@ -454,9 +454,9 @@
             { name: 'Final Messenger', match: 'Prophet Muhammad', id: 8 }
         ];
         const wudhuSteps = [
-            { name: 'Wash hands', id: 1, category: 'mustahab' },
-            { name: 'Rinse mouth', id: 2, category: 'mustahab' },
-            { name: 'Rinse nose', id: 3, category: 'mustahab' },
+            { name: 'Rinse mouth', id: 1, category: 'mustahab' },
+            { name: 'Rinse nose', id: 2, category: 'mustahab' },
+            { name: 'Wash hands', id: 3, category: 'mustahab' },
             { name: 'Wash face', id: 4, category: 'obligatory' },
             { name: 'Wash right arm', id: 5, category: 'obligatory' },
             { name: 'Wash left arm', id: 6, category: 'obligatory' },
@@ -513,45 +513,25 @@
             document.getElementById(sectionId).classList.add('active');
             if (sectionId === 'kindergarten') {
                 document.getElementById('kinder-title').innerHTML = `Kindergarten Quiz: Islamic Basics, ${userData.name}!`;
-                if (!userData.completed.includes('kindergarten')) {
-                    currentQuestion = 0;
-                    score = 0;
-                    showQuestion();
-                } else {
-                    document.getElementById('quiz-container').innerHTML = 'You already completed this quiz!';
-                    document.getElementById('score').innerHTML = '';
-                }
+                currentQuestion = 0;
+                score = 0;
+                showQuestion();
+                document.getElementById('score').innerHTML = '';
             }
             if (sectionId === 'year1') {
-                if (!userData.completed.includes('year1')) {
-                    flippedCards = [];
-                    matchedCards = [];
-                    createMemoryBoard();
-                    document.getElementById('memory-result').innerHTML = '';
-                } else {
-                    document.getElementById('memory-board').innerHTML = 'You already completed this game!';
-                    document.getElementById('memory-result').innerHTML = '';
-                }
+                flippedCards = [];
+                matchedCards = [];
+                createMemoryBoard();
+                document.getElementById('memory-result').innerHTML = '';
             }
             if (sectionId === 'year2') {
-                if (!userData.completed.includes('year2')) {
-                    createWudhuBoard();
-                    document.getElementById('wudhu-result').innerHTML = '';
-                } else {
-                    document.getElementById('wudhu-area').innerHTML = 'You already completed this puzzle!';
-                    document.getElementById('wudhu-result').innerHTML = '';
-                }
+                createWudhuBoard();
+                document.getElementById('wudhu-result').innerHTML = '';
             }
             if (sectionId === 'year3') {
-                if (!userData.completed.includes('year3')) {
-                    document.getElementById('story-text').innerHTML = 'You are at Karbala with Imam Hussain (AS). The enemy offers you safety if you abandon him. What do you do?';
-                    document.getElementById('story-result').innerHTML = '';
-                    document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'inline-block');
-                } else {
-                    document.getElementById('story-text').innerHTML = 'You already completed this quest!';
-                    document.getElementById('story-result').innerHTML = '';
-                    document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'none');
-                }
+                document.getElementById('story-text').innerHTML = 'You are at Karbala with Imam Hussain (AS). The enemy offers you safety if you abandon him. What do you do?';
+                document.getElementById('story-result').innerHTML = '';
+                document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'inline-block');
             }
             if (sectionId === 'year4') {
                 currentArtImage = '';
@@ -576,7 +556,6 @@
                 Gender: ${userData.gender === 'boy' ? 'Boy' : 'Girl in Hijab'}<br>
                 Year: ${userData.year.replace('year', 'Year ').replace('kindergarten', 'Kindergarten')}<br>
                 Stars: ${userData.stars} ⭐<br>
-                Completed: ${userData.completed.length > 0 ? userData.completed.join(', ') : 'None'}<br>
                 Missions Completed: ${Object.keys(userData.missions).length > 0 ? Object.keys(userData.missions).join(', ') : 'None'}<br>
                 ${artworkHtml}
             `;
@@ -642,7 +621,6 @@
             result.innerHTML = `Quiz Complete, ${userData.name}! Final Score: ${score}/${questions.length}`;
             if (score >= 4) {
                 userData.stars++;
-                userData.completed.push('kindergarten');
                 result.innerHTML += `<br>Congratulations! You earned a <span class="star">⭐</span> Gold Star!`;
                 saveUserData();
                 updateStarCounter();
@@ -689,7 +667,6 @@
                 result.style.color = '#2e7d32';
                 if (matchedCards.length === memoryCards.length) {
                     userData.stars++;
-                    userData.completed.push('year1');
                     result.innerHTML = `You won the game! Earned a <span class="star">⭐</span> Gold Star!`;
                     saveUserData();
                     updateStarCounter();
@@ -773,7 +750,6 @@
             const result = document.getElementById('wudhu-result');
             if (isOrderCorrect && isCategoryCorrect && obligatorySteps.length === 6 && mustahabSteps.length === 3) {
                 userData.stars++;
-                userData.completed.push('year2');
                 result.innerHTML = `Correct! You sorted and categorized the Wudhu steps! Earned a <span class="star">⭐</span> Gold Star!`;
                 result.style.color = '#2e7d32';
                 obligatorySteps.forEach(step => step.classList.add('correct'));
@@ -781,7 +757,7 @@
                 saveUserData();
                 updateStarCounter();
             } else {
-                result.innerHTML = 'Incorrect. Try again! Hint: Obligatory steps start with face, end with feet; Mustahab includes hands, mouth, nose.';
+                result.innerHTML = 'Incorrect. Try again! Hint: Obligatory steps start with face, end with feet; Mustahab starts with mouth, ends with hands.';
                 result.style.color = '#d32f2f';
             }
         }
@@ -791,7 +767,6 @@
             const result = document.getElementById('story-result');
             if (choice === 'stay') {
                 userData.stars++;
-                userData.completed.push('year3');
                 result.innerHTML = `You chose courage! Imam Hussain (AS) is proud! Earned a <span class="star">⭐</span> Gold Star!`;
                 result.style.color = '#2e7d32';
                 document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'none');
