@@ -7,108 +7,108 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swatch" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            color: #1f2937;
+            background-color: #f5f7fa; /* Light background like Night Zookeeper */
+            color: #333;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
         }
-        .section {
-            display: none;
-            margin: 2rem auto;
-            max-width: 900px;
+        nav {
+            background-color: #2d3748;
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 20;
         }
-        .section.active {
-            display: block;
+        nav a, nav button {
+            color: #fff;
+            margin: 0 1rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        nav a:hover, nav button:hover {
+            color: #facc15;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 6rem auto 2rem;
+            padding: 0 1rem;
         }
         .card {
-            background: rgba(255, 255, 255, 0.95); /* White background for better visibility */
+            background: #fff;
             border-radius: 1rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 2rem;
+            margin-bottom: 2rem;
         }
         .btn {
             background: linear-gradient(to bottom, #facc15, #f59e0b);
-            color: white;
+            color: #fff;
             padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-size: 1.1rem;
+            border-radius: 0.5rem;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s;
         }
         .btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(250, 204, 21, 0.5);
+        }
+        .star-counter {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            z-index: 30;
         }
         .avatar-display {
             position: fixed;
             top: 6rem;
-            left: 1.5rem;
+            left: 1rem;
             width: 80px;
             height: 80px;
-            border-radius: 0.75rem;
+            border-radius: 0.5rem;
+            border: 2px solid #10b981;
         }
-        .star-counter {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 0.5rem 1rem;
-            border-radius: 0.75rem;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 20; /* Ensure stars are above banner */
-        }
-        .karbala-img {
-            width: 100%;
-            max-width: 300px;
-            border-radius: 1rem;
-        }
-        .character-container {
+        .character-container, .art-container {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
             justify-content: center;
         }
-        .character {
+        .character, .art-image {
             width: 100px;
             height: 100px;
-            border-radius: 0.75rem;
+            border-radius: 0.5rem;
             cursor: pointer;
             transition: transform 0.3s;
+            border: 2px solid #fff;
         }
-        .character:hover {
+        .character:hover, .art-image:hover {
             transform: scale(1.1);
+            border-color: #10b981;
         }
-        .character.selected {
-            border: 3px solid #10b981;
+        .character.selected, .art-image.selected {
+            border-color: #10b981;
         }
-        .memory-card, .wudhu-step {
-            width: 100px;
-            height: 100px;
-            background: #fed7aa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            cursor: pointer;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s;
+        .karbala-img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 0.5rem;
         }
-        .memory-card:hover, .wudhu-step:hover {
-            transform: rotate(5deg);
-        }
-        .memory-card.matched, .wudhu-step.correct {
-            background: #10b981;
-        }
-        .wudhu-step.correct {
-            border: 3px solid #facc15;
+        #art-canvas {
+            border: 2px solid #3b82f6;
+            border-radius: 0.5rem;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .wudhu-container {
             display: flex;
@@ -119,65 +119,64 @@
             width: 48%;
             padding: 1rem;
             border: 2px solid #3b82f6;
-            border-radius: 0.75rem;
-            min-height: 200px;
-            background: rgba(255, 255, 255, 0.95); /* White background for visibility */
+            border-radius: 0.5rem;
+            background: #fff;
+        }
+        .memory-card, .wudhu-step {
+            width: 100px;
+            height: 100px;
+            background: #fed7aa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .memory-card:hover, .wudhu-step:hover {
+            transform: rotate(5deg);
+        }
+        .memory-card.matched, .wudhu-step.correct {
+            background: #10b981;
+        }
+        .wudhu-step.correct {
+            border: 2px solid #facc15;
         }
         .art-tools {
             display: flex;
             gap: 0.5rem;
             justify-content: center;
-            align-items: center;
             margin: 1rem 0;
-        }
-        .art-image {
-            width: 100px;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        .art-image:hover {
-            transform: scale(1.1);
-        }
-        .art-image.selected {
-            border: 3px solid #10b981;
-        }
-        #art-canvas {
-            border: 2px solid #3b82f6;
-            border-radius: 0.75rem;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        nav {
-            z-index: 10; /* Ensure nav is below star-counter */
         }
     </style>
 </head>
 <body>
-    <nav class="fixed top-0 w-full bg-gray-900 bg-opacity-80 text-white z-10">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="text-2xl font-semibold">🌙 Shia Islamic Learning Hub</div>
+    <nav>
+        <div class="container flex justify-between items-center">
+            <div class="text-xl font-bold text-white">🌙 Shia Islamic Learning Hub</div>
             <div class="space-x-4 hidden md:flex">
-                <a href="#" class="hover:text-yellow-400" onclick="showSection('welcome')">Home</a>
-                <a href="#" class="hover:text-yellow-400" onclick="showSection('profile')">Profile</a>
-                <a href="#" class="hover:text-yellow-400" onclick="showSection('kindergarten')">Quiz</a>
-                <a href="#" class="hover:text-yellow-400" onclick="showSection('year1')">Memory Game</a>
-                <a href="#" class="hover:text-yellow-400" onclick="showSection('year2')">Wudhu Puzzle</a>
-                <a href="#" class="hover:text-yellow-400" onclick="showSection('year3')">Karbala Quest</a>
-                <a href="#" class="hover:text-yellow-400" onclick="showSection('year4')">Art Zone</a>
-                <a href="#" class="hover:text-yellow-400" onclick="showSection('missions')">Missions</a>
+                <a href="#" onclick="showSection('welcome')">Home</a>
+                <a href="#" onclick="showSection('profile')">Profile</a>
+                <a href="#" onclick="showSection('kindergarten')">Quiz</a>
+                <a href="#" onclick="showSection('year1')">Memory Game</a>
+                <a href="#" onclick="showSection('year2')">Wudhu Puzzle</a>
+                <a href="#" onclick="showSection('year3')">Karbala Quest</a>
+                <a href="#" onclick="showSection('year4')">Art Zone</a>
+                <a href="#" onclick="showSection('missions')">Missions</a>
             </div>
             <button class="md:hidden" onclick="toggleMobileMenu()">☰</button>
         </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-gray-900 bg-opacity-80 px-4 py-2">
-            <a href="#" class="block py-1 hover:text-yellow-400" onclick="showSection('welcome')">Home</a>
-            <a href="#" class="block py-1 hover:text-yellow-400" onclick="showSection('profile')">Profile</a>
-            <a href="#" class="block py-1 hover:text-yellow-400" onclick="showSection('kindergarten')">Quiz</a>
-            <a href="#" class="block py-1 hover:text-yellow-400" onclick="showSection('year1')">Memory Game</a>
-            <a href="#" class="block py-1 hover:text-yellow-400" onclick="showSection('year2')">Wudhu Puzzle</a>
-            <a href="#" class="block py-1 hover:text-yellow-400" onclick="showSection('year3')">Karbala Quest</a>
-            <a href="#" class="block py-1 hover:text-yellow-400" onclick="showSection('year4')">Art Zone</a>
-            <a href="#" class="block py-1 hover:text-yellow-400" onclick="showSection('missions')">Missions</a>
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 p-2 mt-2">
+            <a href="#" class="block py-1 text-white" onclick="showSection('welcome')">Home</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('profile')">Profile</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('kindergarten')">Quiz</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year1')">Memory Game</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu Puzzle</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala Quest</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art Zone</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
         </div>
     </nav>
     <div class="star-counter" id="star-counter">Stars: <span id="star-count">0</span> ⭐</div>
@@ -186,20 +185,20 @@
     <!-- Intro Screen -->
     <div id="intro" class="section active container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Welcome, Young Scholar!</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Welcome, Young Scholar!</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Islamic Welcome" class="karbala-img">
             </div>
             <div class="space-y-4">
                 <p class="text-lg">Enter your name:</p>
-                <input type="text" id="name-input" class="input-field border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs" placeholder="Your Name">
+                <input type="text" id="name-input" class="border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs">
                 <p class="text-lg">Are you a boy or a girl?</p>
-                <div class="flex justify-center gap-4">
+                <div class="flex gap-4">
                     <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
                     <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
                 </div>
                 <p class="text-lg">Which year are you in?</p>
-                <select id="year-select" class="input-field border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs">
+                <select id="year-select" class="border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs">
                     <option value="kindergarten">Kindergarten</option>
                     <option value="year1">Year 1</option>
                     <option value="year2">Year 2</option>
@@ -224,8 +223,8 @@
     <!-- Welcome Screen -->
     <div id="welcome" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6" id="welcome-title">Welcome, Young Scholar!</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4" id="welcome-title">Welcome, Young Scholar!</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Islamic Welcome" class="karbala-img">
             </div>
             <div class="grid grid-cols-2 gap-4">
@@ -243,8 +242,8 @@
     <!-- Profile Screen -->
     <div id="profile" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Your Profile</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Your Profile</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/profile_islamic.jpg" alt="Profile Islamic" class="karbala-img">
             </div>
             <div class="profile-info text-lg" id="profile-info"></div>
@@ -255,8 +254,8 @@
     <!-- Kindergarten Quiz -->
     <div id="kindergarten" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6" id="kinder-title">Kindergarten Quiz: Islamic Basics</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4" id="kinder-title">Kindergarten Quiz: Islamic Basics</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Islamic Symbol" class="karbala-img">
             </div>
             <div id="quiz-container" class="space-y-4"></div>
@@ -268,11 +267,11 @@
     <!-- Year 1: Memory Game -->
     <div id="year1" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Year 1: Imam Memory Game</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 1: Imam Memory Game</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/memory_imam.jpg" alt="Imam Symbol" class="karbala-img">
             </div>
-            <div id="memory-board" class="grid grid-cols-4 gap-3 justify-center"></div>
+            <div id="memory-board" class="grid grid-cols-4 gap-3"></div>
             <div id="memory-result" class="text-lg mt-4"></div>
             <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
         </div>
@@ -281,13 +280,13 @@
     <!-- Year 2: Wudhu Puzzle -->
     <div id="year2" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Year 2: Wudhu Puzzle</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 2: Wudhu Puzzle</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/wudhu_scene.jpg" alt="Wudhu Scene" class="karbala-img">
             </div>
-            <div class="wudhu-instruction text-lg mb-4">Drag the Wudhu steps to sort them in order, then categorize as Obligatory or Mustahab:</div>
+            <div class="wudhu-instruction text-lg mb-4">Drag the Wudhu steps to sort them, then categorize as Obligatory or Mustahab:</div>
             <div id="wudhu-area">
-                <div id="wudhu-board" class="grid grid-cols-4 gap-3 justify-center mb-4"></div>
+                <div id="wudhu-board" class="grid grid-cols-4 gap-3 mb-4"></div>
                 <div class="wudhu-container">
                     <div class="wudhu-obligatory" id="obligatory-area">
                         <h3 class="text-xl font-semibold">Obligatory</h3>
@@ -303,11 +302,11 @@
         </div>
     </div>
 
-    <!-- Year 3: Imam Hussain Story Mode -->
+    <!-- Year 3: Karbala Quest -->
     <div id="year3" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Year 3: Karbala Quest</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 3: Karbala Quest</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/karbala_quest.jpg" alt="Karbala Quest" class="karbala-img">
             </div>
             <div class="story-text text-lg mb-4" id="story-text">You are at Karbala with Imam Hussain (AS). The enemy offers you safety if you abandon him. What do you do?</div>
@@ -321,12 +320,12 @@
     <!-- Year 4: Islamic Art Zone -->
     <div id="year4" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Year 4: Islamic Art Zone</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 4: Islamic Art Zone</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/art_zone.jpg" alt="Art Zone" class="karbala-img">
             </div>
             <p class="text-lg mb-4">Choose an image to color:</p>
-            <div class="character-container">
+            <div class="art-container">
                 <img src="https://yourusername.github.io/your-repo/images/kaaba_lineart.jpg" alt="Kaaba" class="art-image" onclick="selectArtImage('kaaba_lineart.jpg')">
                 <img src="https://yourusername.github.io/your-repo/images/nabawi_lineart.jpg" alt="Masjid al-Nabawi" class="art-image" onclick="selectArtImage('nabawi_lineart.jpg')">
                 <img src="https://yourusername.github.io/your-repo/images/kufa_lineart.jpg" alt="Masjid al-Kufa" class="art-image" onclick="selectArtImage('kufa_lineart.jpg')">
@@ -352,8 +351,8 @@
     <!-- Daily Missions -->
     <div id="missions" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Daily Missions</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Daily Missions</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/mission_hadith.jpg" alt="Hadith Book" class="karbala-img">
             </div>
             <div id="mission-container" class="space-y-4"></div>
@@ -365,22 +364,22 @@
     <!-- Placeholder Sections for Other Years -->
     <div id="year5" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Year 5: Coming Soon!</h1>
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 5: Coming Soon!</h1>
             <p class="text-lg">More games will be added for Year 5.</p>
             <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
         </div>
     </div>
     <div id="year6" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Year 6: Coming Soon!</h1>
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 6: Coming Soon!</h1>
             <p class="text-lg">More games will be added for Year 6.</p>
             <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
         </div>
     </div>
     <div id="year7" class="section container">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-6">Year 7: Coming Soon!</h1>
-            <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 7: Coming Soon!</h1>
+            <div class="flex justify-center mb-4">
                 <img src="https://yourusername.github.io/your-repo/images/imam_hussain_dua.jpg" alt="Imam Hussain Dua" class="karbala-img">
             </div>
             <p class="text-lg">More games will be added for Year 7.</p>
@@ -452,7 +451,6 @@
                 document.getElementById('avatar-display').style.display = 'block';
                 updateStarCounter();
                 loadArtwork();
-                gsap.from('.card', { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
             } else {
                 showSection('intro'); // Ensure intro is shown for new users
             }
@@ -472,7 +470,6 @@
                 document.getElementById('avatar-display').src = userData.character;
                 document.getElementById('avatar-display').style.display = 'block';
                 saveUserData();
-                gsap.to(img, { scale: 1.2, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1 });
             });
         });
 
@@ -484,12 +481,9 @@
 
         // Navigation
         function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
             const section = document.getElementById(sectionId);
             section.classList.add('active');
-            gsap.from(section.querySelector('.card'), { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
             if (sectionId === 'kindergarten') {
                 document.getElementById('kinder-title').innerHTML = `Kindergarten Quiz: Islamic Basics, ${userData.name}!`;
                 currentQuestion = 0;
@@ -555,24 +549,22 @@
                 Missions Completed: ${Object.keys(userData.missions).length > 0 ? Object.keys(userData.missions).join(', ') : 'None'}<br>
                 ${artworkHtml}
             `;
-            gsap.from('.profile-info', { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out' });
         }
 
         // Kindergarten Quiz
         function showQuestion() {
             const container = document.getElementById('quiz-container');
             const q = questions[currentQuestion];
-            let html = `<div class="question text-lg text-blue-600">${q.question}</div>`;
+            let html = `<div class="text-lg text-blue-600">${q.question}</div>`;
             if (q.type === 'text') {
-                html += `<input type="text" id="answer-input" class="input-field border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs" placeholder="Type your answer">`;
+                html += `<input type="text" id="answer-input" class="border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs mt-2" placeholder="Type your answer">`;
                 html += `<button class="btn mt-2" onclick="checkAnswer()">Submit</button>`;
             } else {
                 q.options.forEach(opt => {
-                    html += `<button class="btn option mt-2" onclick="checkAnswer('${opt}')">${opt}</button>`;
+                    html += `<button class="btn mt-2" onclick="checkAnswer('${opt}')">${opt}</button>`;
                 });
             }
             container.innerHTML = html;
-            gsap.from(container.children, { opacity: 0, y: 20, stagger: 0.1, duration: 0.5, ease: 'power2.out' });
         }
 
         function checkAnswer(answer) {
@@ -586,12 +578,10 @@
                 result.innerHTML = `Correct! Score: ${score}/${questions.length}`;
                 result.style.color = '#10b981';
                 sounds.correct.play();
-                gsap.to(result, { scale: 1.2, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1 });
             } else {
                 result.innerHTML = `Incorrect. The answer is ${q.answer}. Score: ${score}/${questions.length}`;
                 result.style.color = '#ef4444';
                 sounds.incorrect.play();
-                gsap.to(result, { x: [-10, 10, 0], duration: 0.3, ease: 'power2.out' });
             }
             currentQuestion++;
             if (currentQuestion < questions.length) {
@@ -608,7 +598,7 @@
             result.innerHTML = `Quiz Complete, ${userData.name}! Final Score: ${score}/${questions.length}`;
             if (score >= 4) {
                 userData.stars++;
-                result.innerHTML += `<br>Congratulations! You earned a <span class="star text-yellow-400">⭐</span> Gold Star!`;
+                result.innerHTML += `<br>Congratulations! You earned a ⭐ Gold Star!`;
                 sounds.star.play();
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
                 saveUserData();
@@ -616,7 +606,6 @@
             } else {
                 result.innerHTML += `<br>Try again to earn a Gold Star!`;
             }
-            gsap.from(result, { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out' });
         }
 
         // Memory Game (Year 1)
@@ -633,7 +622,6 @@
                 cardElement.innerHTML = '⭐';
                 cardElement.onclick = () => flipCard(cardElement);
                 board.appendChild(cardElement);
-                gsap.from(cardElement, { opacity: 0, scale: 0.8, duration: 0.5, ease: 'power2.out' });
             });
         }
 
@@ -641,7 +629,6 @@
             if (flippedCards.length < 2 && !flippedCards.includes(card) && !matchedCards.includes(card.dataset.id)) {
                 card.innerHTML = card.dataset.name;
                 flippedCards.push(card);
-                gsap.to(card, { rotationY: 180, duration: 0.5, ease: 'power2.out' });
                 if (flippedCards.length === 2) {
                     setTimeout(checkMatch, 1000);
                 }
@@ -658,10 +645,9 @@
                 result.innerHTML = 'Match found! Great job! 🎉';
                 result.style.color = '#10b981';
                 sounds.correct.play();
-                gsap.to([card1, card2], { scale: 1.2, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1 });
                 if (matchedCards.length === memoryCards.length) {
                     userData.stars++;
-                    result.innerHTML = `You won the game! Earned a <span class="star text-yellow-400">⭐</span> Gold Star!`;
+                    result.innerHTML = `You won! Earned a ⭐ Gold Star!`;
                     sounds.star.play();
                     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
                     saveUserData();
@@ -673,10 +659,8 @@
                 result.innerHTML = 'No match. Try again!';
                 result.style.color = '#ef4444';
                 sounds.incorrect.play();
-                gsap.to([card1, card2], { rotationY: 0, duration: 0.5, ease: 'power2.out' });
             }
             flippedCards = [];
-            gsap.from(result, { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out' });
         }
 
         // Wudhu Puzzle (Year 2)
@@ -697,13 +681,11 @@
                 stepElement.draggable = true;
                 stepElement.ondragstart = drag;
                 board.appendChild(stepElement);
-                gsap.from(stepElement, { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out' });
             });
         }
 
         function drag(event) {
             dragged = event.target;
-            gsap.to(dragged, { scale: 1.1, duration: 0.2, ease: 'power2.out' });
         }
 
         ['wudhu-board', 'obligatory-area', 'mustahab-area'].forEach(id => {
@@ -717,7 +699,6 @@
                 } else {
                     e.target.appendChild(dragged);
                 }
-                gsap.to(dragged, { scale: 1, duration: 0.2, ease: 'power2.out' });
             });
         });
 
@@ -730,56 +711,37 @@
             let isCategoryCorrect = true;
 
             obligatorySteps.forEach((step, index) => {
-                if (step.dataset.id !== obligatoryOrder[index]) {
-                    isOrderCorrect = false;
-                }
-                if (step.dataset.category !== 'obligatory') {
-                    isCategoryCorrect = false;
-                }
+                if (step.dataset.id !== obligatoryOrder[index]) isOrderCorrect = false;
+                if (step.dataset.category !== 'obligatory') isCategoryCorrect = false;
             });
 
             mustahabSteps.forEach((step, index) => {
-                if (step.dataset.id !== mustahabOrder[index]) {
-                    isOrderCorrect = false;
-                }
-                if (step.dataset.category !== 'mustahab') {
-                    isCategoryCorrect = false;
-                }
+                if (step.dataset.id !== mustahabOrder[index]) isOrderCorrect = false;
+                if (step.dataset.category !== 'mustahab') isCategoryCorrect = false;
             });
 
             const result = document.getElementById('wudhu-result');
             if (isOrderCorrect && isCategoryCorrect && obligatorySteps.length === 6 && mustahabSteps.length === 3) {
                 userData.stars++;
-                result.innerHTML = `Correct! You sorted and categorized the Wudhu steps! Earned a <span class="star text-yellow-400">⭐</span> Gold Star!`;
+                result.innerHTML = `Correct! Earned a ⭐ Gold Star!`;
                 result.style.color = '#10b981';
                 sounds.star.play();
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                obligatorySteps.forEach(step => {
-                    step.classList.add('correct');
-                    gsap.to(step, { scale: 1.2, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1 });
-                });
-                mustahabSteps.forEach(step => {
-                    step.classList.add('correct');
-                    gsap.to(step, { scale: 1.2, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1 });
-                });
                 saveUserData();
                 updateStarCounter();
             } else {
-                result.innerHTML = 'Incorrect. Try again! Hint: Obligatory steps start with face, end with feet; Mustahab starts with mouth, ends with hands.';
+                result.innerHTML = 'Incorrect. Try again!';
                 result.style.color = '#ef4444';
                 sounds.incorrect.play();
-                gsap.to(obligatorySteps, { x: [-10, 10, 0], duration: 0.3, ease: 'power2.out' });
-                gsap.to(mustahabSteps, { x: [-10, 10, 0], duration: 0.3, ease: 'power2.out' });
             }
-            gsap.from(result, { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out' });
         }
 
-        // Imam Hussain Story Mode (Year 3)
+        // Karbala Quest (Year 3)
         function makeChoice(choice) {
             const result = document.getElementById('story-result');
             if (choice === 'stay') {
                 userData.stars++;
-                result.innerHTML = `You chose courage! Imam Hussain (AS) is proud! Earned a <span class="star text-yellow-400">⭐</span> Gold Star!`;
+                result.innerHTML = `You chose courage! Earned a ⭐ Gold Star!`;
                 result.style.color = '#10b981';
                 sounds.star.play();
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
@@ -787,11 +749,10 @@
                 saveUserData();
                 updateStarCounter();
             } else {
-                result.innerHTML = 'Reflect and try again. Loyalty is key in Karbala.';
+                result.innerHTML = 'Reflect and try again.';
                 result.style.color = '#ef4444';
                 sounds.incorrect.play();
             }
-            gsap.from(result, { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out' });
         }
 
         // Islamic Art Zone (Year 4)
@@ -816,7 +777,6 @@
                 }
             };
             document.getElementById('art-result').innerHTML = userData.artwork[image] ? 'Your artwork is saved!' : '';
-            gsap.to(`.art-image[src="https://yourusername.github.io/your-repo/images/${image}"]`, { scale: 1.2, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1 });
         }
 
         canvas.addEventListener('mousedown', (e) => {
@@ -839,15 +799,11 @@
             ctx.fillStyle = document.getElementById('color-picker').value;
             ctx.fill();
             sounds.correct.play();
-            gsap.to(canvas, { scale: 1.02, duration: 0.2, ease: 'power2.out', yoyo: true, repeat: 1 });
         }
 
         function undoStroke() {
-            if (strokeHistory.length > 0) {
-                ctx.putImageData(strokeHistory.pop(), 0, 0);
-            } else {
-                clearCanvas();
-            }
+            if (strokeHistory.length > 0) ctx.putImageData(strokeHistory.pop(), 0, 0);
+            else clearCanvas();
         }
 
         function clearCanvas() {
@@ -869,7 +825,6 @@
             userData.artwork[currentArtImage.split('/').pop()] = canvas.toDataURL();
             saveUserData();
             document.getElementById('art-result').innerHTML = 'Artwork saved! Check your profile!';
-            gsap.from('#art-result', { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out' });
         }
 
         function loadArtwork() {
@@ -890,12 +845,11 @@
             }
             const mission = missions[new Date().getDay() % missions.length];
             const container = document.getElementById('mission-container');
-            let html = `<div class="mission-text text-lg text-blue-600">${mission.title}: ${mission.question}</div>`;
+            let html = `<div class="text-lg text-blue-600">${mission.title}: ${mission.question}</div>`;
             mission.options.forEach(opt => {
-                html += `<button class="btn mission-button mt-2" onclick="checkMission('${opt}', '${mission.id}')">${opt}</button>`;
+                html += `<button class="btn mt-2" onclick="checkMission('${opt}', '${mission.id}')">${opt}</button>`;
             });
             container.innerHTML = html;
-            gsap.from(container.children, { opacity: 0, y: 20, stagger: 0.1, duration: 0.5, ease: 'power2.out' });
         }
 
         function checkMission(answer, missionId) {
@@ -905,7 +859,7 @@
             if (answer === mission.answer) {
                 userData.stars++;
                 userData.missions[today] = mission.id;
-                result.innerHTML = `Correct! You earned a <span class="star text-yellow-400">⭐</span> Gold Star!`;
+                result.innerHTML = `Correct! Earned a ⭐ Gold Star!`;
                 result.style.color = '#10b981';
                 sounds.star.play();
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
@@ -917,13 +871,10 @@
                 result.style.color = '#ef4444';
                 sounds.incorrect.play();
             }
-            gsap.from(result, { opacity: 0, y: 20, duration: 0.5, ease: 'power2.out' });
         }
 
         function updateStarCounter() {
-            const starCount = document.getElementById('star-count');
-            starCount.innerText = userData.stars;
-            gsap.to(starCount, { scale: 1.2, duration: 0.3, ease: 'power2.out', yoyo: true, repeat: 1 });
+            document.getElementById('star-count').innerText = userData.stars;
         }
 
         // Initialize
