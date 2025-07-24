@@ -33,7 +33,7 @@
             background: linear-gradient(135deg, #00A3E0, #A100F2);
             color: #fff;
             text-align: center;
-            padding-top: 10rem; /* Moved text down */
+            padding-top: 10rem;
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -90,7 +90,7 @@
         .btn {
             background: linear-gradient(90deg, #FF6F00, #A100F2);
             color: #fff;
-            padding: 1rem 2.5rem; /* Consistent size with Begin Journey */
+            padding: 1rem 2.5rem;
             border-radius: 0.5rem;
             font-weight: 600;
             font-size: 1.2rem;
@@ -352,8 +352,6 @@
         </div>
     </div>
 
-    <!-- Add similar card structures for year1, year2, year3, year4, missions, year5, year6, year7 with appropriate content -->
-
     <script>
         let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, missions: {}, artwork: {} };
         let currentQuestion = 0;
@@ -400,12 +398,26 @@
 
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(sectionId).classList.remove('hidden');
-            gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.remove('hidden');
+                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
+                console.log(`Switched to section: ${sectionId}`); // Debug log
+            } else {
+                console.error(`Section ${sectionId} not found!`);
+            }
         }
 
-        function openModal() { document.getElementById('intro-modal').style.display = 'flex'; }
-        function closeModal(e) { if (e.target.id === 'intro-modal') document.getElementById('intro-modal').style.display = 'none'; }
+        function openModal() { 
+            document.getElementById('intro-modal').style.display = 'flex';
+            console.log('Modal opened'); // Debug log
+        }
+        function closeModal(e) { 
+            if (e.target.id === 'intro-modal') {
+                document.getElementById('intro-modal').style.display = 'none';
+                console.log('Modal closed'); // Debug log
+            }
+        }
 
         function startLearning() {
             userData.name = document.getElementById('name-input').value || 'Young Scholar';
@@ -415,9 +427,9 @@
             document.getElementById('avatar-display').src = userData.character;
             document.getElementById('avatar-display').style.display = 'block';
             saveUserData();
-            closeModal();
-            showSection('welcome'); // Explicitly navigate to welcome section
-            console.log('Transitioning to welcome section with data:', userData); // Debug log
+            closeModal(event); // Ensure modal closes
+            showSection('welcome'); // Force transition to welcome section
+            console.log('Begin Journey clicked, transitioning to welcome with data:', userData); // Debug log
         }
 
         function showProfile() {
