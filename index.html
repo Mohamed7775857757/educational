@@ -33,7 +33,7 @@
             background: linear-gradient(135deg, #00A3E0, #A100F2);
             color: #fff;
             text-align: center;
-            padding-top: 5rem; /* Reverted to original padding */
+            padding-top: 10rem;
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -231,6 +231,128 @@
     </style>
 </head>
 <body>
+    <script>
+        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, missions: {}, artwork: {} };
+        let currentQuestion = 0;
+        let score = 0;
+        let strokeHistory = [];
+        const questions = [
+            { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
+            { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
+        ];
+        const missions = [{ id: 'hadith', title: 'Learn Hadith', question: 'Be kind to family?', type: 'multiple', options: ['Yes', 'No'], answer: 'Yes' }];
+        const memoryCards = [{ name: 'Imam Ali', match: 'First Imam', id: 1 }, { name: 'First Imam', match: 'Imam Ali', id: 2 }];
+        const wudhuSteps = [{ name: 'Wash face', id: 1, category: 'obligatory' }];
+        let flippedCards = [], matchedCards = [], dragged, currentArtImage = '';
+        const sounds = { correct: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/success.mp3'] }) };
+
+        function loadUserData() {
+            const saved = localStorage.getItem('userData');
+            if (saved) {
+                userData = JSON.parse(saved);
+                document.getElementById('avatar-display').src = userData.character;
+                document.getElementById('avatar-display').style.display = 'block';
+                updateStarCounter();
+                showSection('welcome');
+            } else {
+                openModal();
+            }
+        }
+
+        function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); }
+
+        document.querySelectorAll('.character').forEach(img => {
+            img.addEventListener('click', () => {
+                document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
+                img.classList.add('selected');
+                userData.character = img.src;
+                document.getElementById('avatar-display').src = userData.character;
+                saveUserData();
+            });
+        });
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.remove('hidden');
+                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
+                console.log(`Switched to section: ${sectionId}`);
+            } else {
+                console.error(`Section ${sectionId} not found!`);
+            }
+        }
+
+        function openModal() { 
+            document.getElementById('intro-modal').style.display = 'flex';
+            console.log('Modal opened');
+        }
+        function closeModal() { 
+            document.getElementById('intro-modal').style.display = 'none';
+            console.log('Modal closed');
+        }
+
+        function startLearning() {
+            userData.name = document.getElementById('name-input').value || 'Young Scholar';
+            userData.gender = document.querySelector('input[name="gender"]:checked').value;
+            userData.year = document.getElementById('year-select').value;
+            if (!userData.character) userData.character = document.querySelector('.character').src;
+            document.getElementById('avatar-display').src = userData.character;
+            document.getElementById('avatar-display').style.display = 'block';
+            saveUserData();
+            closeModal();
+            showSection('welcome');
+            console.log('Begin Journey clicked, transitioning to welcome with data:', userData);
+        }
+
+        // Add event listener directly to the button after DOM loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const beginButton = document.querySelector('#intro-modal .btn');
+            if (beginButton) {
+                beginButton.addEventListener('click', startLearning);
+                console.log('Event listener added to Begin Journey button');
+            } else {
+                console.error('Begin Journey button not found!');
+            }
+        });
+
+        function showProfile() {
+            document.getElementById('profile-info').innerHTML = `Name: ${userData.name}<br>Year: ${userData.year}<br>Stars: ${userData.stars} ⭐`;
+            showSection('profile');
+        }
+
+        function showQuestion() {
+            const container = document.getElementById('quiz-container');
+            const q = questions[currentQuestion];
+            container.innerHTML = `<div>${q.question}</div>` + (q.type === 'text' ? `<input id="answer-input" class="border rounded p-1"><button class="btn ml-2" onclick="checkAnswer()">Submit</button>` : q.options.map(o => `<button class="btn ml-2" onclick="checkAnswer('${o}')">${o}</button>`).join(''));
+        }
+
+        function checkAnswer(answer) {
+            const q = questions[currentQuestion];
+            if (q.type === 'text') answer = document.getElementById('answer-input').value;
+            if (answer.toLowerCase() === q.answer.toLowerCase()) {
+                score++;
+                document.getElementById('score').innerHTML = `Correct! Score: ${score}/${questions.length}`;
+                sounds.correct.play();
+            } else document.getElementById('score').innerHTML = `Wrong! Answer: ${q.answer}`;
+            currentQuestion++;
+            if (currentQuestion < questions.length) showQuestion(); else document.getElementById('score').innerHTML += '<br>Quiz Done!';
+        }
+
+        function updateStarCounter() { document.getElementById('star-count').textContent = userData.stars; }
+
+        // Initialize animations
+        gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
+        gsap.from('.hero p', { opacity: 0, y: 50, duration: 1, delay: 1 });
+        gsap.from('.hero .btn', { opacity: 0, scale: 0.5, duration: 1, delay: 1.5 });
+
+        loadUserData();
+    </script>
+
     <div class="nav">
         <div class="container flex justify-between items-center">
             <div class="text-xl font-bold">🌙 Shia Islamic Hub</div>
@@ -294,7 +416,7 @@
                     <img src="https://yourusername.github.io/your-repo/images/girl1_hijab.jpg" alt="Girl 1" class="character" data-gender="girl">
                     <img src="https://yourusername.github.io/your-repo/images/girl2_hijab.jpg" alt="Girl 2" class="character" data-gender="girl">
                 </div>
-                <button class="btn" id="begin-journey-btn">Begin Journey</button>
+                <button class="btn" id="begin-journey-btn">Begin Journey</button> <!-- Added ID for explicit targeting -->
             </div>
         </div>
     </div>
@@ -351,132 +473,5 @@
             <button class="btn mt-4" onclick="showSection('welcome')">Back</button>
         </div>
     </div>
-
-    <script>
-        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, missions: {}, artwork: {} };
-        let currentQuestion = 0;
-        let score = 0;
-        let strokeHistory = [];
-        const questions = [
-            { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
-            { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
-        ];
-        const missions = [{ id: 'hadith', title: 'Learn Hadith', question: 'Be kind to family?', type: 'multiple', options: ['Yes', 'No'], answer: 'Yes' }];
-        const memoryCards = [{ name: 'Imam Ali', match: 'First Imam', id: 1 }, { name: 'First Imam', match: 'Imam Ali', id: 2 }];
-        const wudhuSteps = [{ name: 'Wash face', id: 1, category: 'obligatory' }];
-        let flippedCards = [], matchedCards = [], dragged, currentArtImage = '';
-        const sounds = { correct: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/success.mp3'] }) };
-
-        function loadUserData() {
-            const saved = localStorage.getItem('userData');
-            if (saved) {
-                userData = JSON.parse(saved);
-                document.getElementById('avatar-display').src = userData.character;
-                document.getElementById('avatar-display').style.display = 'block';
-                updateStarCounter();
-                showSection('welcome'); // Show welcome if data exists
-            }
-            // Do not show hero or modal on load if data exists
-        }
-
-        function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); }
-
-        document.querySelectorAll('.character').forEach(img => {
-            img.addEventListener('click', () => {
-                document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
-                img.classList.add('selected');
-                userData.character = img.src;
-                document.getElementById('avatar-display').src = userData.character;
-                saveUserData();
-            });
-        });
-
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        }
-
-        function showSection(sectionId) {
-            document.querySelectorAll('.section, .hero').forEach(el => el.classList.add('hidden'));
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.classList.remove('hidden');
-                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                console.log(`Switched to section: ${sectionId}`);
-            } else {
-                console.error(`Section ${sectionId} not found!`);
-            }
-        }
-
-        function openModal() { 
-            document.getElementById('intro-modal').style.display = 'flex';
-            console.log('Modal opened');
-        }
-        function closeModal(e) { 
-            if (e.target.id === 'intro-modal') {
-                document.getElementById('intro-modal').style.display = 'none';
-                console.log('Modal closed');
-            }
-        }
-
-        function startLearning() {
-            userData.name = document.getElementById('name-input').value || 'Young Scholar';
-            userData.gender = document.querySelector('input[name="gender"]:checked').value;
-            userData.year = document.getElementById('year-select').value;
-            if (!userData.character) userData.character = document.querySelector('.character').src;
-            document.getElementById('avatar-display').src = userData.character;
-            document.getElementById('avatar-display').style.display = 'block';
-            saveUserData();
-            closeModal({ target: { id: 'intro-modal' } }); // Explicitly close modal
-            showSection('welcome'); // Force transition to welcome
-            console.log('Begin Journey clicked, transitioning to welcome with data:', userData);
-        }
-
-        // Add event listener directly to the button after DOM loads
-        document.addEventListener('DOMContentLoaded', () => {
-            const beginButton = document.querySelector('#begin-journey-btn');
-            if (beginButton) {
-                beginButton.addEventListener('click', startLearning);
-                console.log('Event listener added to Begin Journey button');
-            } else {
-                console.error('Begin Journey button not found!');
-            }
-            // Show hero on initial load if no data
-            if (!localStorage.getItem('userData')) {
-                document.querySelector('.hero').classList.remove('hidden');
-            }
-        });
-
-        function showProfile() {
-            document.getElementById('profile-info').innerHTML = `Name: ${userData.name}<br>Year: ${userData.year}<br>Stars: ${userData.stars} ⭐`;
-            showSection('profile');
-        }
-
-        function showQuestion() {
-            const container = document.getElementById('quiz-container');
-            const q = questions[currentQuestion];
-            container.innerHTML = `<div>${q.question}</div>` + (q.type === 'text' ? `<input id="answer-input" class="border rounded p-1"><button class="btn ml-2" onclick="checkAnswer()">Submit</button>` : q.options.map(o => `<button class="btn ml-2" onclick="checkAnswer('${o}')">${o}</button>`).join(''));
-        }
-
-        function checkAnswer(answer) {
-            const q = questions[currentQuestion];
-            if (q.type === 'text') answer = document.getElementById('answer-input').value;
-            if (answer.toLowerCase() === q.answer.toLowerCase()) {
-                score++;
-                document.getElementById('score').innerHTML = `Correct! Score: ${score}/${questions.length}`;
-                sounds.correct.play();
-            } else document.getElementById('score').innerHTML = `Wrong! Answer: ${q.answer}`;
-            currentQuestion++;
-            if (currentQuestion < questions.length) showQuestion(); else document.getElementById('score').innerHTML += '<br>Quiz Done!';
-        }
-
-        function updateStarCounter() { document.getElementById('star-count').textContent = userData.stars; }
-
-        // Initialize animations
-        gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
-        gsap.from('.hero p', { opacity: 0, y: 50, duration: 1, delay: 1 });
-        gsap.from('.hero .btn', { opacity: 0, scale: 0.5, duration: 1, delay: 1.5 });
-
-        loadUserData();
-    </script>
 </body>
 </html>
