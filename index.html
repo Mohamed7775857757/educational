@@ -22,6 +22,7 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            min-height: 100vh;
         }
         h1, h2, h3 {
             font-family: 'Poppins', sans-serif;
@@ -71,10 +72,11 @@
             margin: 0 auto;
         }
         .section {
-            background: linear-gradient(135deg, #00A3E0, #A100F2); /* Match hero background */
+            background: linear-gradient(135deg, #00A3E0, #A100F2);
             color: #fff;
             min-height: 100vh;
             padding: 2rem;
+            overflow: auto;
         }
         .card {
             background: #fff;
@@ -234,6 +236,12 @@
             from { transform: translateY(50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+        .centered {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+        }
     </style>
 </head>
 <body>
@@ -258,6 +266,10 @@
             { name: 'Wipe head', id: 3, category: 'obligatory' },
             { name: 'Wash feet', id: 4, category: 'obligatory' },
             { name: 'Rinse mouth', id: 5, category: 'mustahab' }
+        ];
+        const missions = [
+            { id: 'hadith', title: 'Learn Hadith', question: 'Be kind to family?', type: 'multiple', options: ['Yes', 'No'], answer: 'Yes' },
+            { id: 'prayer', title: 'Daily Prayer', description: 'Perform your daily prayers.' }
         ];
         const sounds = { correct: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/success.mp3'] }) };
 
@@ -300,6 +312,8 @@
                 if (sectionId === 'kindergarten') showQuestion();
                 if (sectionId === 'year1') initMemoryGame();
                 if (sectionId === 'year2') initWudhuPuzzle();
+                if (sectionId === 'missions') showMissions();
+                if (sectionId === 'year4') initArtZone();
             } else {
                 console.error(`Section ${sectionId} not found!`);
             }
@@ -346,10 +360,11 @@
 
         function showQuestion() {
             const container = document.getElementById('quiz-container');
+            container.className = 'centered';
             const q = questions[currentQuestion];
-            container.innerHTML = `<div class="text-white">${q.question}</div>` +
-                (q.type === 'text' ? `<input id="answer-input" class="border rounded p-1 bg-white text-black"><button class="btn ml-2" onclick="checkAnswer()">Submit</button>` :
-                q.options.map(o => `<button class="btn ml-2" onclick="checkAnswer('${o}')">${o}</button>`).join(''));
+            container.innerHTML = `<div class="text-white text-center">${q.question}</div>` +
+                (q.type === 'text' ? `<input id="answer-input" class="border rounded p-2 bg-white text-black mx-auto block mt-4" style="width: 200px;"><button class="btn ml-2" onclick="checkAnswer()">Submit</button>` :
+                q.options.map(o => `<button class="btn ml-2 mt-2" onclick="checkAnswer('${o}')">${o}</button>`).join(''));
         }
 
         function checkAnswer(answer) {
@@ -357,23 +372,24 @@
             if (q.type === 'text') answer = document.getElementById('answer-input').value;
             if (answer.toLowerCase() === q.answer.toLowerCase()) {
                 score++;
-                document.getElementById('score').innerHTML = `<span class="text-white">Correct! Score: ${score}/${questions.length}</span>`;
+                document.getElementById('score').innerHTML = `<span class="text-white text-center">Correct! Score: ${score}/${questions.length}</span>`;
                 sounds.correct.play();
-            } else document.getElementById('score').innerHTML = `<span class="text-white">Wrong! Answer: ${q.answer}</span>`;
+            } else document.getElementById('score').innerHTML = `<span class="text-white text-center">Wrong! Answer: ${q.answer}</span>`;
             currentQuestion++;
             if (currentQuestion < questions.length) showQuestion();
-            else document.getElementById('score').innerHTML += '<br><span class="text-white">Quiz Done!</span>';
+            else document.getElementById('score').innerHTML += '<br><span class="text-white text-center">Quiz Done!</span>';
         }
 
         function initMemoryGame() {
             const container = document.getElementById('year1');
-            container.innerHTML = '<div id="memory-game" class="grid grid-cols-2 gap-4 p-4"></div>';
+            container.innerHTML = '<div id="memory-game" class="centered grid grid-cols-2 md:grid-cols-4 gap-4 p-4"></div>';
             const gameContainer = document.getElementById('memory-game');
             const shuffledCards = [...memoryCards].sort(() => Math.random() - 0.5);
             shuffledCards.forEach(card => {
                 const cardElement = document.createElement('div');
                 cardElement.className = 'memory-card bg-white text-black p-2 rounded cursor-pointer';
                 cardElement.dataset.name = card.name;
+                cardElement.dataset.match = card.match;
                 cardElement.textContent = '?';
                 cardElement.addEventListener('click', () => flipCard(cardElement));
                 gameContainer.appendChild(cardElement);
@@ -392,7 +408,7 @@
 
         function checkMatch() {
             const [card1, card2] = flippedCards;
-            if (card1.dataset.name === card2.dataset.name) {
+            if (card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
                 card1.classList.add('matched');
                 card2.classList.add('matched');
                 matchedCards.push(card1, card2);
@@ -405,7 +421,7 @@
             }
             flippedCards = [];
             if (matchedCards.length === memoryCards.length) {
-                document.getElementById('year1').innerHTML += '<p class="text-white">Game Completed!</p>';
+                document.getElementById('year1').innerHTML += '<p class="text-white text-center mt-4">Game Completed!</p>';
             }
         }
 
@@ -463,6 +479,62 @@
                     sounds.correct.play();
                 }
             }
+        }
+
+        function showMissions() {
+            const container = document.getElementById('missions');
+            container.innerHTML = '<div class="centered"><div class="space-y-4">' +
+                missions.map(mission => `
+                    <div class="bg-white p-4 rounded shadow">
+                        <h3 class="text-purple-700">${mission.title}</h3>
+                        ${mission.question ? `<p>${mission.question}</p><button class="btn mt-2" onclick="checkMission('${mission.id}', '${mission.answer}')">${mission.options ? mission.options.join('/') : 'Submit'}</button>` : `<p>${mission.description}</p>`}
+                    </div>
+                `).join('') + '</div></div>';
+        }
+
+        function checkMission(id, answer) {
+            const mission = missions.find(m => m.id === id);
+            const input = prompt(`Enter your answer for ${mission.question}`);
+            if (input.toLowerCase() === answer.toLowerCase()) {
+                userData.stars++;
+                updateStarCounter();
+                alert('Mission completed! +1 Star');
+                sounds.correct.play();
+            } else {
+                alert('Try again!');
+            }
+        }
+
+        function initArtZone() {
+            const container = document.getElementById('year4');
+            container.innerHTML = `
+                <div class="centered">
+                    <canvas id="art-canvas" width="400" height="300"></canvas>
+                    <div class="art-tools mt-4">
+                        <button class="btn" onclick="changeColor('red')">Red</button>
+                        <button class="btn" onclick="changeColor('blue')">Blue</button>
+                        <button class="btn" onclick="clearCanvas()">Clear</button>
+                    </div>
+                </div>
+            `;
+            const canvas = document.getElementById('art-canvas');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            let color = 'black';
+
+            canvas.addEventListener('mousedown', () => drawing = true);
+            canvas.addEventListener('mouseup', () => drawing = false);
+            canvas.addEventListener('mousemove', (e) => {
+                if (drawing) {
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(e.offsetX, e.offsetY, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            window.changeColor = (newColor) => { color = newColor; };
+            window.clearCanvas = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); };
         }
 
         function updateStarCounter() { document.getElementById('star-count').textContent = userData.stars; }
@@ -589,7 +661,7 @@
         <div class="card">
             <h2 class="text-2xl text-white mb-2">Kindergarten Quiz</h2>
             <img src=https://yourusername.github.io/your-repo/images/allah_symbol.jpg alt="Quiz" class="karbala-img mx-auto mb-4">
-            <div id="quiz-container" class="space-y-4"></div>
+            <div id="quiz-container"></div>
             <div id="score" class="text-lg"></div>
             <button class="btn mt-4" onclick="showSection('welcome')">Back</button>
         </div>
@@ -622,7 +694,7 @@
     <div id="year4" class="section container hidden">
         <div class="card">
             <h2 class="text-2xl text-white mb-2">Art Zone</h2>
-            <p class="text-white">Coming Soon!</p>
+            <div id="art-zone-container"></div>
             <button class="btn mt-4" onclick="showSection('welcome')">Back</button>
         </div>
     </div>
@@ -630,7 +702,7 @@
     <div id="missions" class="section container hidden">
         <div class="card">
             <h2 class="text-2xl text-white mb-2">Daily Missions</h2>
-            <p class="text-white">Coming Soon!</p>
+            <div id="missions-container"></div>
             <button class="btn mt-4" onclick="showSection('welcome')">Back</button>
         </div>
     </div>
