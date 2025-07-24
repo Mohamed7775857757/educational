@@ -33,7 +33,7 @@
             background: linear-gradient(135deg, #00A3E0, #A100F2);
             color: #fff;
             text-align: center;
-            padding-top: 5rem;
+            padding-top: 10rem; /* Increased padding to move text down */
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -90,9 +90,10 @@
         .btn {
             background: linear-gradient(90deg, #FF6F00, #A100F2);
             color: #fff;
-            padding: 0.75rem 1.5rem;
+            padding: 1rem 2.5rem; /* Enlarged padding */
             border-radius: 0.5rem;
             font-weight: 600;
+            font-size: 1.2rem; /* Increased font size */
             transition: transform 0.3s, background 0.3s;
         }
         .btn:hover {
@@ -299,7 +300,7 @@
     </div>
 
     <!-- Content Sections -->
-    <div id="welcome" class="section container">
+    <div id="welcome" class="section container hidden">
         <div class="card-grid">
             <div class="card" onclick="showSection('profile')">
                 <h3>View Profile</h3>
@@ -415,7 +416,7 @@
             document.getElementById('avatar-display').style.display = 'block';
             saveUserData();
             closeModal();
-            showSection('welcome');
+            showSection('welcome'); // Ensure transition to welcome section
         }
 
         function showProfile() {
