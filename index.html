@@ -33,7 +33,7 @@
             background: linear-gradient(135deg, #00A3E0, #A100F2);
             color: #fff;
             text-align: center;
-            padding-top: 10rem; /* Increased padding to move text down */
+            padding-top: 10rem; /* Moved text down */
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -90,10 +90,10 @@
         .btn {
             background: linear-gradient(90deg, #FF6F00, #A100F2);
             color: #fff;
-            padding: 1rem 2.5rem; /* Enlarged padding */
+            padding: 1rem 2.5rem; /* Consistent size with Begin Journey */
             border-radius: 0.5rem;
             font-weight: 600;
-            font-size: 1.2rem; /* Increased font size */
+            font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
         }
         .btn:hover {
@@ -416,7 +416,8 @@
             document.getElementById('avatar-display').style.display = 'block';
             saveUserData();
             closeModal();
-            showSection('welcome'); // Ensure transition to welcome section
+            showSection('welcome'); // Explicitly navigate to welcome section
+            console.log('Transitioning to welcome section with data:', userData); // Debug log
         }
 
         function showProfile() {
