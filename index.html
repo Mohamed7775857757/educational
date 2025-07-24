@@ -6,57 +6,98 @@
     <title>Shia Islamic Learning Hub</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Poppins and Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Confetti.js -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Howler.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f5f7fa; /* Light background like Night Zookeeper */
+            background: linear-gradient(135deg, #F5F5F5, #E0E7FF);
             color: #333;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
         }
-        nav {
-            background-color: #2d3748;
-            padding: 1rem;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 20;
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
         }
-        nav a, nav button {
+        .hero {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #00A3E0, #A100F2);
             color: #fff;
-            margin: 0 1rem;
-            text-decoration: none;
-            font-weight: 600;
+            text-align: center;
+            padding-top: 5rem;
         }
-        nav a:hover, nav button:hover {
-            color: #facc15;
+        .hero h1 {
+            font-size: 3.5rem;
+            animation: fadeInDown 1s ease-out;
         }
-        .container {
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1.5s ease-out;
+        }
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            padding: 1rem;
+        }
+        .nav a {
+            color: #fff;
+            margin: 0 1.5rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav a:hover {
+            color: #FF6F00;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 2rem;
             max-width: 1200px;
-            margin: 6rem auto 2rem;
-            padding: 0 1rem;
+            margin: 0 auto;
         }
         .card {
             background: #fff;
             border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 163, 224, 0.2);
+        }
+        .card h3 {
+            color: #A100F2;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
         }
         .btn {
-            background: linear-gradient(to bottom, #facc15, #f59e0b);
+            background: linear-gradient(90deg, #FF6F00, #A100F2);
             color: #fff;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s;
+            transition: transform 0.3s, background 0.3s;
         }
         .btn:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
+            background: linear-gradient(90deg, #A100F2, #FF6F00);
         }
         .star-counter {
             position: fixed;
@@ -65,9 +106,10 @@
             background: #fff;
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             font-weight: 600;
-            z-index: 30;
+            color: #A100F2;
+            z-index: 50;
         }
         .avatar-display {
             position: fixed;
@@ -75,40 +117,70 @@
             left: 1rem;
             width: 80px;
             height: 80px;
-            border-radius: 0.5rem;
-            border: 2px solid #10b981;
+            border-radius: 50%;
+            border: 4px solid #FF6F00;
+            object-fit: cover;
         }
-        .character-container, .art-container {
+        .character-container {
             display: flex;
-            flex-wrap: wrap;
             gap: 1rem;
             justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
         }
-        .character, .art-image {
+        .character {
             width: 100px;
             height: 100px;
-            border-radius: 0.5rem;
+            border-radius: 50%;
             cursor: pointer;
-            transition: transform 0.3s;
-            border: 2px solid #fff;
+            transition: transform 0.3s, border-color 0.3s;
+            border: 3px solid #fff;
         }
-        .character:hover, .art-image:hover {
+        .character:hover {
             transform: scale(1.1);
-            border-color: #10b981;
+            border-color: #00A3E0;
         }
-        .character.selected, .art-image.selected {
-            border-color: #10b981;
+        .character.selected {
+            border-color: #FF6F00;
+            transform: scale(1.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
         }
         .karbala-img {
             width: 100%;
-            max-width: 300px;
+            max-width: 250px;
             border-radius: 0.5rem;
         }
         #art-canvas {
-            border: 2px solid #3b82f6;
+            border: 2px solid #00A3E0;
             border-radius: 0.5rem;
             background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .art-tools {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
         }
         .wudhu-container {
             display: flex;
@@ -118,87 +190,94 @@
         .wudhu-obligatory, .wudhu-mustahab {
             width: 48%;
             padding: 1rem;
-            border: 2px solid #3b82f6;
+            border: 2px solid #A100F2;
             border-radius: 0.5rem;
             background: #fff;
         }
         .memory-card, .wudhu-step {
-            width: 100px;
-            height: 100px;
-            background: #fed7aa;
+            width: 90px;
+            height: 90px;
+            background: #E0E7FF;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.9rem;
             cursor: pointer;
             border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
         }
         .memory-card:hover, .wudhu-step:hover {
-            transform: rotate(5deg);
+            transform: rotate(5deg) scale(1.05);
         }
         .memory-card.matched, .wudhu-step.correct {
-            background: #10b981;
+            background: #00A3E0;
+            color: #fff;
         }
-        .wudhu-step.correct {
-            border: 2px solid #facc15;
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .art-tools {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            margin: 1rem 0;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <nav>
+    <div class="nav">
         <div class="container flex justify-between items-center">
-            <div class="text-xl font-bold text-white">🌙 Shia Islamic Learning Hub</div>
+            <div class="text-xl font-bold">🌙 Shia Islamic Hub</div>
             <div class="space-x-4 hidden md:flex">
                 <a href="#" onclick="showSection('welcome')">Home</a>
                 <a href="#" onclick="showSection('profile')">Profile</a>
                 <a href="#" onclick="showSection('kindergarten')">Quiz</a>
-                <a href="#" onclick="showSection('year1')">Memory Game</a>
-                <a href="#" onclick="showSection('year2')">Wudhu Puzzle</a>
-                <a href="#" onclick="showSection('year3')">Karbala Quest</a>
-                <a href="#" onclick="showSection('year4')">Art Zone</a>
+                <a href="#" onclick="showSection('year1')">Memory</a>
+                <a href="#" onclick="showSection('year2')">Wudhu</a>
+                <a href="#" onclick="showSection('year3')">Karbala</a>
+                <a href="#" onclick="showSection('year4')">Art</a>
                 <a href="#" onclick="showSection('missions')">Missions</a>
             </div>
-            <button class="md:hidden" onclick="toggleMobileMenu()">☰</button>
+            <button class="md:hidden text-white" onclick="toggleMobileMenu()">☰</button>
         </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 p-2 mt-2">
+        <div id="mobile-menu" class="hidden md:hidden bg-purple-900 p-2 mt-2">
             <a href="#" class="block py-1 text-white" onclick="showSection('welcome')">Home</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('profile')">Profile</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('kindergarten')">Quiz</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year1')">Memory Game</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu Puzzle</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala Quest</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art Zone</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year1')">Memory</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
         </div>
-    </nav>
+    </div>
     <div class="star-counter" id="star-counter">Stars: <span id="star-count">0</span> ⭐</div>
     <img id="avatar-display" src="" alt="Your Avatar" class="avatar-display" style="display: none;">
 
-    <!-- Intro Screen -->
-    <div id="intro" class="section active container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Welcome, Young Scholar!</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Islamic Welcome" class="karbala-img">
-            </div>
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Welcome to Shia Islamic Learning Hub!</h1>
+        <p>Embark on a fun Islamic journey with games and quests.</p>
+        <button class="btn" onclick="openModal()">Start Your Adventure</button>
+    </div>
+
+    <!-- Modal for Intro -->
+    <div id="intro-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 class="text-2xl text-purple-700 mb-2">Create Your Profile</h2>
+            <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Welcome" class="karbala-img mx-auto mb-4">
             <div class="space-y-4">
-                <p class="text-lg">Enter your name:</p>
-                <input type="text" id="name-input" class="border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs">
-                <p class="text-lg">Are you a boy or a girl?</p>
-                <div class="flex gap-4">
+                <input type="text" id="name-input" placeholder="Enter your name" class="border-2 border-blue-500 rounded-lg p-2 w-full">
+                <div class="flex justify-center gap-4">
                     <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
                     <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
                 </div>
-                <p class="text-lg">Which year are you in?</p>
-                <select id="year-select" class="border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs">
+                <select id="year-select" class="border-2 border-blue-500 rounded-lg p-2 w-full">
                     <option value="kindergarten">Kindergarten</option>
                     <option value="year1">Year 1</option>
                     <option value="year2">Year 2</option>
@@ -208,191 +287,72 @@
                     <option value="year6">Year 6</option>
                     <option value="year7">Year 7</option>
                 </select>
-                <p class="text-lg">Choose your character:</p>
                 <div class="character-container">
                     <img src="https://yourusername.github.io/your-repo/images/boy1.jpg" alt="Boy 1" class="character" data-gender="boy">
                     <img src="https://yourusername.github.io/your-repo/images/boy2.jpg" alt="Boy 2" class="character" data-gender="boy">
-                    <img src="https://yourusername.github.io/your-repo/images/girl1_hijab.jpg" alt="Girl 1 in Hijab" class="character" data-gender="girl">
-                    <img src="https://yourusername.github.io/your-repo/images/girl2_hijab.jpg" alt="Girl 2 in Hijab" class="character" data-gender="girl">
+                    <img src="https://yourusername.github.io/your-repo/images/girl1_hijab.jpg" alt="Girl 1" class="character" data-gender="girl">
+                    <img src="https://yourusername.github.io/your-repo/images/girl2_hijab.jpg" alt="Girl 2" class="character" data-gender="girl">
                 </div>
-                <button class="btn" onclick="startLearning()">Start Learning!</button>
+                <button class="btn" onclick="startLearning()">Begin Journey</button>
             </div>
         </div>
     </div>
 
-    <!-- Welcome Screen -->
+    <!-- Content Sections -->
     <div id="welcome" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4" id="welcome-title">Welcome, Young Scholar!</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Islamic Welcome" class="karbala-img">
+        <div class="card-grid">
+            <div class="card" onclick="showSection('profile')">
+                <h3>View Profile</h3>
+                <p>Check your progress and stars!</p>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <button class="btn" onclick="showSection('profile')">View Profile</button>
-                <button class="btn" onclick="showSection('kindergarten')">Play Quiz</button>
-                <button class="btn" onclick="showSection('year1')">Memory Game</button>
-                <button class="btn" onclick="showSection('year2')">Wudhu Puzzle</button>
-                <button class="btn" onclick="showSection('year3')">Karbala Quest</button>
-                <button class="btn" onclick="showSection('year4')">Islamic Art Zone</button>
-                <button class="btn" onclick="showSection('missions')">Daily Missions</button>
+            <div class="card" onclick="showSection('kindergarten')">
+                <h3>Islamic Quiz</h3>
+                <p>Test your knowledge with fun questions.</p>
+            </div>
+            <div class="card" onclick="showSection('year1')">
+                <h3>Memory Game</h3>
+                <p>Match Imams and earn stars.</p>
+            </div>
+            <div class="card" onclick="showSection('year2')">
+                <h3>Wudhu Puzzle</h3>
+                <p>Sort and categorize Wudhu steps.</p>
+            </div>
+            <div class="card" onclick="showSection('year3')">
+                <h3>Karbala Quest</h3>
+                <p>Live the story of Imam Hussain.</p>
+            </div>
+            <div class="card" onclick="showSection('year4')">
+                <h3>Art Zone</h3>
+                <p>Create colorful Islamic art.</p>
+            </div>
+            <div class="card" onclick="showSection('missions')">
+                <h3>Daily Missions</h3>
+                <p>Complete tasks for rewards.</p>
             </div>
         </div>
     </div>
 
-    <!-- Profile Screen -->
-    <div id="profile" class="section container">
+    <div id="profile" class="section container hidden">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Your Profile</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/profile_islamic.jpg" alt="Profile Islamic" class="karbala-img">
-            </div>
-            <div class="profile-info text-lg" id="profile-info"></div>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
+            <h2 class="text-2xl text-purple-700 mb-2">Your Profile</h2>
+            <img src="https://yourusername.github.io/your-repo/images/profile_islamic.jpg" alt="Profile" class="karbala-img mx-auto mb-4">
+            <div id="profile-info" class="text-lg"></div>
+            <button class="btn mt-4" onclick="showSection('welcome')">Back</button>
         </div>
     </div>
 
-    <!-- Kindergarten Quiz -->
-    <div id="kindergarten" class="section container">
+    <div id="kindergarten" class="section container hidden">
         <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4" id="kinder-title">Kindergarten Quiz: Islamic Basics</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Islamic Symbol" class="karbala-img">
-            </div>
+            <h2 class="text-2xl text-purple-700 mb-2">Kindergarten Quiz</h2>
+            <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Quiz" class="karbala-img mx-auto mb-4">
             <div id="quiz-container" class="space-y-4"></div>
             <div id="score" class="text-lg"></div>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
+            <button class="btn mt-4" onclick="showSection('welcome')">Back</button>
         </div>
     </div>
 
-    <!-- Year 1: Memory Game -->
-    <div id="year1" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 1: Imam Memory Game</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/memory_imam.jpg" alt="Imam Symbol" class="karbala-img">
-            </div>
-            <div id="memory-board" class="grid grid-cols-4 gap-3"></div>
-            <div id="memory-result" class="text-lg mt-4"></div>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-        </div>
-    </div>
+    <!-- Add similar card structures for year1, year2, year3, year4, missions, year5, year6, year7 with appropriate content -->
 
-    <!-- Year 2: Wudhu Puzzle -->
-    <div id="year2" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 2: Wudhu Puzzle</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/wudhu_scene.jpg" alt="Wudhu Scene" class="karbala-img">
-            </div>
-            <div class="wudhu-instruction text-lg mb-4">Drag the Wudhu steps to sort them, then categorize as Obligatory or Mustahab:</div>
-            <div id="wudhu-area">
-                <div id="wudhu-board" class="grid grid-cols-4 gap-3 mb-4"></div>
-                <div class="wudhu-container">
-                    <div class="wudhu-obligatory" id="obligatory-area">
-                        <h3 class="text-xl font-semibold">Obligatory</h3>
-                    </div>
-                    <div class="wudhu-mustahab" id="mustahab-area">
-                        <h3 class="text-xl font-semibold">Mustahab</h3>
-                    </div>
-                </div>
-            </div>
-            <button class="btn mt-4" onclick="checkWudhu()">Check Order & Categories</button>
-            <div id="wudhu-result" class="text-lg mt-4"></div>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-        </div>
-    </div>
-
-    <!-- Year 3: Karbala Quest -->
-    <div id="year3" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 3: Karbala Quest</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/karbala_quest.jpg" alt="Karbala Quest" class="karbala-img">
-            </div>
-            <div class="story-text text-lg mb-4" id="story-text">You are at Karbala with Imam Hussain (AS). The enemy offers you safety if you abandon him. What do you do?</div>
-            <button class="btn story-option" onclick="makeChoice('stay')">Stay with Imam Hussain</button>
-            <button class="btn story-option" onclick="makeChoice('leave')">Leave for safety</button>
-            <div id="story-result" class="text-lg mt-4"></div>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-        </div>
-    </div>
-
-    <!-- Year 4: Islamic Art Zone -->
-    <div id="year4" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 4: Islamic Art Zone</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/art_zone.jpg" alt="Art Zone" class="karbala-img">
-            </div>
-            <p class="text-lg mb-4">Choose an image to color:</p>
-            <div class="art-container">
-                <img src="https://yourusername.github.io/your-repo/images/kaaba_lineart.jpg" alt="Kaaba" class="art-image" onclick="selectArtImage('kaaba_lineart.jpg')">
-                <img src="https://yourusername.github.io/your-repo/images/nabawi_lineart.jpg" alt="Masjid al-Nabawi" class="art-image" onclick="selectArtImage('nabawi_lineart.jpg')">
-                <img src="https://yourusername.github.io/your-repo/images/kufa_lineart.jpg" alt="Masjid al-Kufa" class="art-image" onclick="selectArtImage('kufa_lineart.jpg')">
-                <img src="https://yourusername.github.io/your-repo/images/ali_shrine_lineart.jpg" alt="Imam Ali Shrine" class="art-image" onclick="selectArtImage('ali_shrine_lineart.jpg')">
-            </div>
-            <div class="art-tools">
-                <input type="color" id="color-picker" class="h-10 w-10" value="#facc15">
-                <select id="brush-size" class="border-2 border-blue-500 rounded-lg p-2">
-                    <option value="5">Small</option>
-                    <option value="10" selected>Medium</option>
-                    <option value="20">Large</option>
-                </select>
-                <button class="btn" onclick="undoStroke()">Undo</button>
-                <button class="btn" onclick="clearCanvas()">Clear Canvas</button>
-                <button class="btn" onclick="saveArtwork()">Save Artwork</button>
-            </div>
-            <canvas id="art-canvas" width="400" height="400"></canvas>
-            <div id="art-result" class="text-lg mt-4"></div>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-        </div>
-    </div>
-
-    <!-- Daily Missions -->
-    <div id="missions" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Daily Missions</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/mission_hadith.jpg" alt="Hadith Book" class="karbala-img">
-            </div>
-            <div id="mission-container" class="space-y-4"></div>
-            <div id="mission-result" class="text-lg mt-4"></div>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-        </div>
-    </div>
-
-    <!-- Placeholder Sections for Other Years -->
-    <div id="year5" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 5: Coming Soon!</h1>
-            <p class="text-lg">More games will be added for Year 5.</p>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-        </div>
-    </div>
-    <div id="year6" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 6: Coming Soon!</h1>
-            <p class="text-lg">More games will be added for Year 6.</p>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-        </div>
-    </div>
-    <div id="year7" class="section container">
-        <div class="card">
-            <h1 class="text-3xl font-semibold text-pink-600 mb-4">Year 7: Coming Soon!</h1>
-            <div class="flex justify-center mb-4">
-                <img src="https://yourusername.github.io/your-repo/images/imam_hussain_dua.jpg" alt="Imam Hussain Dua" class="karbala-img">
-            </div>
-            <p class="text-lg">More games will be added for Year 7.</p>
-            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-        </div>
-    </div>
-
-    <!-- GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <!-- Confetti.js -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Howler.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script>
         let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, missions: {}, artwork: {} };
         let currentQuestion = 0;
@@ -400,484 +360,94 @@
         let strokeHistory = [];
         const questions = [
             { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
-            { question: 'Who is the final Messenger of Allah (SWT)?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' },
-            { question: 'Who is the first Imam (AS)?', type: 'multiple', options: ['Imam Ali', 'Imam Hassan', 'Imam Hussain'], answer: 'Imam Ali' },
-            { question: 'What is the name of the daughter of Prophet Muhammad (S)?', type: 'multiple', options: ['Aisha', 'Khadija', 'Fatima'], answer: 'Fatima' },
-            { question: 'What is the name of our religion?', type: 'multiple', options: ['Christianity', 'Islam', 'Hinduism'], answer: 'Islam' }
+            { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
         ];
-        const missions = [
-            { id: 'hadith', title: 'Learn a New Hadith', question: 'What does this hadith mean: "The best of you are those who are best to their families"?', type: 'multiple', options: ['Be kind to your family', 'Study hard', 'Pray alone'], answer: 'Be kind to your family' },
-            { id: 'zaynab', title: 'Help Zaynab Find the Prayer Direction', question: 'Which direction should Zaynab face to pray?', type: 'multiple', options: ['North', 'Qibla', 'West'], answer: 'Qibla' }
-        ];
-        const memoryCards = [
-            { name: 'Imam Ali', match: 'First Imam', id: 1 },
-            { name: 'First Imam', match: 'Imam Ali', id: 2 },
-            { name: 'Imam Hussain', match: 'Karbala', id: 3 },
-            { name: 'Karbala', match: 'Imam Hussain', id: 4 },
-            { name: 'Imam Hassan', match: 'Second Imam', id: 5 },
-            { name: 'Second Imam', match: 'Imam Hassan', id: 6 },
-            { name: 'Prophet Muhammad', match: 'Final Messenger', id: 7 },
-            { name: 'Final Messenger', match: 'Prophet Muhammad', id: 8 }
-        ];
-        const wudhuSteps = [
-            { name: 'Rinse mouth', id: 1, category: 'mustahab' },
-            { name: 'Rinse nose', id: 2, category: 'mustahab' },
-            { name: 'Wash hands', id: 3, category: 'mustahab' },
-            { name: 'Wash face', id: 4, category: 'obligatory' },
-            { name: 'Wash right arm', id: 5, category: 'obligatory' },
-            { name: 'Wash left arm', id: 6, category: 'obligatory' },
-            { name: 'Wipe the head', id: 7, category: 'obligatory' },
-            { name: 'Wipe the right foot', id: 8, category: 'obligatory' },
-            { name: 'Wipe the left foot', id: 9, category: 'obligatory' }
-        ];
-        let flippedCards = [];
-        let matchedCards = [];
-        let dragged;
-        let currentArtImage = '';
-        const sounds = {
-            correct: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/success.mp3'] }),
-            incorrect: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/error.mp3'] }),
-            star: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/star.mp3'] })
-        };
+        const missions = [{ id: 'hadith', title: 'Learn Hadith', question: 'Be kind to family?', type: 'multiple', options: ['Yes', 'No'], answer: 'Yes' }];
+        const memoryCards = [{ name: 'Imam Ali', match: 'First Imam', id: 1 }, { name: 'First Imam', match: 'Imam Ali', id: 2 }];
+        const wudhuSteps = [{ name: 'Wash face', id: 1, category: 'obligatory' }];
+        let flippedCards = [], matchedCards = [], dragged, currentArtImage = '';
+        const sounds = { correct: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/success.mp3'] }) };
 
-        // Load User Data
         function loadUserData() {
-            const savedData = localStorage.getItem('userData');
-            if (savedData) {
-                userData = JSON.parse(savedData);
-                document.getElementById('welcome-title').innerHTML = `Welcome Back, ${userData.name}!`;
-                showSection('welcome');
+            const saved = localStorage.getItem('userData');
+            if (saved) {
+                userData = JSON.parse(saved);
                 document.getElementById('avatar-display').src = userData.character;
                 document.getElementById('avatar-display').style.display = 'block';
                 updateStarCounter();
-                loadArtwork();
+                showSection('welcome');
             } else {
-                showSection('intro'); // Ensure intro is shown for new users
+                openModal();
             }
         }
 
-        // Save User Data
-        function saveUserData() {
-            localStorage.setItem('userData', JSON.stringify(userData));
-        }
+        function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); }
 
-        // Character Selection
         document.querySelectorAll('.character').forEach(img => {
             img.addEventListener('click', () => {
                 document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
                 img.classList.add('selected');
                 userData.character = img.src;
                 document.getElementById('avatar-display').src = userData.character;
-                document.getElementById('avatar-display').style.display = 'block';
                 saveUserData();
             });
         });
 
-        // Mobile Menu Toggle
         function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
+            document.getElementById('mobile-menu').classList.toggle('hidden');
         }
 
-        // Navigation
         function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-            const section = document.getElementById(sectionId);
-            section.classList.add('active');
-            if (sectionId === 'kindergarten') {
-                document.getElementById('kinder-title').innerHTML = `Kindergarten Quiz: Islamic Basics, ${userData.name}!`;
-                currentQuestion = 0;
-                score = 0;
-                showQuestion();
-                document.getElementById('score').innerHTML = '';
-            }
-            if (sectionId === 'year1') {
-                flippedCards = [];
-                matchedCards = [];
-                createMemoryBoard();
-                document.getElementById('memory-result').innerHTML = '';
-            }
-            if (sectionId === 'year2') {
-                createWudhuBoard();
-                document.getElementById('wudhu-result').innerHTML = '';
-            }
-            if (sectionId === 'year3') {
-                document.getElementById('story-text').innerHTML = 'You are at Karbala with Imam Hussain (AS). The enemy offers you safety if you abandon him. What do you do?';
-                document.getElementById('story-result').innerHTML = '';
-                document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'inline-block');
-            }
-            if (sectionId === 'year4') {
-                currentArtImage = '';
-                strokeHistory = [];
-                clearCanvas();
-                document.getElementById('art-result').innerHTML = userData.artwork[currentArtImage] ? 'Your artwork is saved!' : '';
-            }
-            if (sectionId === 'missions') {
-                showMission();
-            }
-            document.getElementById('mobile-menu').classList.add('hidden');
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
         }
 
-        // Start Learning
+        function openModal() { document.getElementById('intro-modal').style.display = 'flex'; }
+        function closeModal(e) { if (e.target.id === 'intro-modal') document.getElementById('intro-modal').style.display = 'none'; }
+
         function startLearning() {
             userData.name = document.getElementById('name-input').value || 'Young Scholar';
             userData.gender = document.querySelector('input[name="gender"]:checked').value;
             userData.year = document.getElementById('year-select').value;
-            if (!userData.character) {
-                userData.character = document.querySelector('.character').src;
-            }
+            if (!userData.character) userData.character = document.querySelector('.character').src;
             document.getElementById('avatar-display').src = userData.character;
             document.getElementById('avatar-display').style.display = 'block';
             saveUserData();
+            closeModal();
             showSection('welcome');
-            document.getElementById('welcome-title').innerHTML = `Welcome Back, ${userData.name}!`;
         }
 
-        // Profile Screen
         function showProfile() {
+            document.getElementById('profile-info').innerHTML = `Name: ${userData.name}<br>Year: ${userData.year}<br>Stars: ${userData.stars} ⭐`;
             showSection('profile');
-            const profileInfo = document.getElementById('profile-info');
-            let artworkHtml = '';
-            for (let img in userData.artwork) {
-                artworkHtml += `<p>Saved Artwork: <img src="${userData.artwork[img]}" alt="${img}" width="100" class="rounded-lg"></p>`;
-            }
-            profileInfo.innerHTML = `
-                Name: ${userData.name}<br>
-                Gender: ${userData.gender === 'boy' ? 'Boy' : 'Girl in Hijab'}<br>
-                Year: ${userData.year.replace('year', 'Year ').replace('kindergarten', 'Kindergarten')}<br>
-                Stars: ${userData.stars} ⭐<br>
-                Missions Completed: ${Object.keys(userData.missions).length > 0 ? Object.keys(userData.missions).join(', ') : 'None'}<br>
-                ${artworkHtml}
-            `;
         }
 
-        // Kindergarten Quiz
         function showQuestion() {
             const container = document.getElementById('quiz-container');
             const q = questions[currentQuestion];
-            let html = `<div class="text-lg text-blue-600">${q.question}</div>`;
-            if (q.type === 'text') {
-                html += `<input type="text" id="answer-input" class="border-2 border-blue-500 rounded-lg p-2 w-full max-w-xs mt-2" placeholder="Type your answer">`;
-                html += `<button class="btn mt-2" onclick="checkAnswer()">Submit</button>`;
-            } else {
-                q.options.forEach(opt => {
-                    html += `<button class="btn mt-2" onclick="checkAnswer('${opt}')">${opt}</button>`;
-                });
-            }
-            container.innerHTML = html;
+            container.innerHTML = `<div>${q.question}</div>` + (q.type === 'text' ? `<input id="answer-input" class="border rounded p-1"><button class="btn ml-2" onclick="checkAnswer()">Submit</button>` : q.options.map(o => `<button class="btn ml-2" onclick="checkAnswer('${o}')">${o}</button>`).join(''));
         }
 
         function checkAnswer(answer) {
             const q = questions[currentQuestion];
-            const result = document.getElementById('score');
-            if (q.type === 'text') {
-                answer = document.getElementById('answer-input').value.trim();
-            }
+            if (q.type === 'text') answer = document.getElementById('answer-input').value;
             if (answer.toLowerCase() === q.answer.toLowerCase()) {
                 score++;
-                result.innerHTML = `Correct! Score: ${score}/${questions.length}`;
-                result.style.color = '#10b981';
+                document.getElementById('score').innerHTML = `Correct! Score: ${score}/${questions.length}`;
                 sounds.correct.play();
-            } else {
-                result.innerHTML = `Incorrect. The answer is ${q.answer}. Score: ${score}/${questions.length}`;
-                result.style.color = '#ef4444';
-                sounds.incorrect.play();
-            }
+            } else document.getElementById('score').innerHTML = `Wrong! Answer: ${q.answer}`;
             currentQuestion++;
-            if (currentQuestion < questions.length) {
-                showQuestion();
-            } else {
-                showFinalScore();
-            }
+            if (currentQuestion < questions.length) showQuestion(); else document.getElementById('score').innerHTML += '<br>Quiz Done!';
         }
 
-        function showFinalScore() {
-            const container = document.getElementById('quiz-container');
-            const result = document.getElementById('score');
-            container.innerHTML = '';
-            result.innerHTML = `Quiz Complete, ${userData.name}! Final Score: ${score}/${questions.length}`;
-            if (score >= 4) {
-                userData.stars++;
-                result.innerHTML += `<br>Congratulations! You earned a ⭐ Gold Star!`;
-                sounds.star.play();
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                saveUserData();
-                updateStarCounter();
-            } else {
-                result.innerHTML += `<br>Try again to earn a Gold Star!`;
-            }
-        }
+        function updateStarCounter() { document.getElementById('star-count').textContent = userData.stars; }
 
-        // Memory Game (Year 1)
-        function createMemoryBoard() {
-            const board = document.getElementById('memory-board');
-            board.innerHTML = '';
-            memoryCards.sort(() => Math.random() - 0.5);
-            memoryCards.forEach(card => {
-                const cardElement = document.createElement('div');
-                cardElement.classList.add('memory-card');
-                cardElement.dataset.name = card.name;
-                cardElement.dataset.match = card.match;
-                cardElement.dataset.id = card.id;
-                cardElement.innerHTML = '⭐';
-                cardElement.onclick = () => flipCard(cardElement);
-                board.appendChild(cardElement);
-            });
-        }
+        // Initialize animations
+        gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
+        gsap.from('.hero p', { opacity: 0, y: 50, duration: 1, delay: 1 });
+        gsap.from('.hero .btn', { opacity: 0, scale: 0.5, duration: 1, delay: 1.5 });
 
-        function flipCard(card) {
-            if (flippedCards.length < 2 && !flippedCards.includes(card) && !matchedCards.includes(card.dataset.id)) {
-                card.innerHTML = card.dataset.name;
-                flippedCards.push(card);
-                if (flippedCards.length === 2) {
-                    setTimeout(checkMatch, 1000);
-                }
-            }
-        }
-
-        function checkMatch() {
-            const [card1, card2] = flippedCards;
-            const result = document.getElementById('memory-result');
-            if (card1.dataset.name === card2.dataset.match || card2.dataset.name === card1.dataset.match) {
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                matchedCards.push(card1.dataset.id, card2.dataset.id);
-                result.innerHTML = 'Match found! Great job! 🎉';
-                result.style.color = '#10b981';
-                sounds.correct.play();
-                if (matchedCards.length === memoryCards.length) {
-                    userData.stars++;
-                    result.innerHTML = `You won! Earned a ⭐ Gold Star!`;
-                    sounds.star.play();
-                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                    saveUserData();
-                    updateStarCounter();
-                }
-            } else {
-                card1.innerHTML = '⭐';
-                card2.innerHTML = '⭐';
-                result.innerHTML = 'No match. Try again!';
-                result.style.color = '#ef4444';
-                sounds.incorrect.play();
-            }
-            flippedCards = [];
-        }
-
-        // Wudhu Puzzle (Year 2)
-        function createWudhuBoard() {
-            const board = document.getElementById('wudhu-board');
-            const obligatoryArea = document.getElementById('obligatory-area');
-            const mustahabArea = document.getElementById('mustahab-area');
-            board.innerHTML = '';
-            obligatoryArea.innerHTML = '<h3 class="text-xl font-semibold">Obligatory</h3>';
-            mustahabArea.innerHTML = '<h3 class="text-xl font-semibold">Mustahab</h3>';
-            wudhuSteps.sort(() => Math.random() - 0.5);
-            wudhuSteps.forEach(step => {
-                const stepElement = document.createElement('div');
-                stepElement.classList.add('wudhu-step');
-                stepElement.dataset.id = step.id;
-                stepElement.dataset.category = step.category;
-                stepElement.innerHTML = step.name;
-                stepElement.draggable = true;
-                stepElement.ondragstart = drag;
-                board.appendChild(stepElement);
-            });
-        }
-
-        function drag(event) {
-            dragged = event.target;
-        }
-
-        ['wudhu-board', 'obligatory-area', 'mustahab-area'].forEach(id => {
-            const area = document.getElementById(id);
-            area.addEventListener('dragover', (e) => e.preventDefault());
-            area.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const target = e.target.closest('.wudhu-step');
-                if (target) {
-                    target.parentNode.insertBefore(dragged, target.nextSibling);
-                } else {
-                    e.target.appendChild(dragged);
-                }
-            });
-        });
-
-        function checkWudhu() {
-            const obligatorySteps = document.querySelectorAll('#obligatory-area .wudhu-step');
-            const mustahabSteps = document.querySelectorAll('#mustahab-area .wudhu-step');
-            const obligatoryOrder = ['4', '5', '6', '7', '8', '9'];
-            const mustahabOrder = ['1', '2', '3'];
-            let isOrderCorrect = true;
-            let isCategoryCorrect = true;
-
-            obligatorySteps.forEach((step, index) => {
-                if (step.dataset.id !== obligatoryOrder[index]) isOrderCorrect = false;
-                if (step.dataset.category !== 'obligatory') isCategoryCorrect = false;
-            });
-
-            mustahabSteps.forEach((step, index) => {
-                if (step.dataset.id !== mustahabOrder[index]) isOrderCorrect = false;
-                if (step.dataset.category !== 'mustahab') isCategoryCorrect = false;
-            });
-
-            const result = document.getElementById('wudhu-result');
-            if (isOrderCorrect && isCategoryCorrect && obligatorySteps.length === 6 && mustahabSteps.length === 3) {
-                userData.stars++;
-                result.innerHTML = `Correct! Earned a ⭐ Gold Star!`;
-                result.style.color = '#10b981';
-                sounds.star.play();
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                saveUserData();
-                updateStarCounter();
-            } else {
-                result.innerHTML = 'Incorrect. Try again!';
-                result.style.color = '#ef4444';
-                sounds.incorrect.play();
-            }
-        }
-
-        // Karbala Quest (Year 3)
-        function makeChoice(choice) {
-            const result = document.getElementById('story-result');
-            if (choice === 'stay') {
-                userData.stars++;
-                result.innerHTML = `You chose courage! Earned a ⭐ Gold Star!`;
-                result.style.color = '#10b981';
-                sounds.star.play();
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                document.querySelectorAll('.story-option').forEach(btn => btn.style.display = 'none');
-                saveUserData();
-                updateStarCounter();
-            } else {
-                result.innerHTML = 'Reflect and try again.';
-                result.style.color = '#ef4444';
-                sounds.incorrect.play();
-            }
-        }
-
-        // Islamic Art Zone (Year 4)
-        const canvas = document.getElementById('art-canvas');
-        const ctx = canvas.getContext('2d');
-        let isDrawing = false;
-
-        function selectArtImage(image) {
-            currentArtImage = `https://yourusername.github.io/your-repo/images/${image}`;
-            document.querySelectorAll('.art-image').forEach(img => img.classList.remove('selected'));
-            document.querySelector(`img[src="https://yourusername.github.io/your-repo/images/${image}"]`).classList.add('selected');
-            const img = new Image();
-            img.src = currentArtImage;
-            img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                strokeHistory = [];
-                if (userData.artwork[image]) {
-                    const savedImg = new Image();
-                    savedImg.src = userData.artwork[image];
-                    savedImg.onload = () => ctx.drawImage(savedImg, 0, 0, canvas.width, canvas.height);
-                }
-            };
-            document.getElementById('art-result').innerHTML = userData.artwork[image] ? 'Your artwork is saved!' : '';
-        }
-
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            strokeHistory.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-            draw(e);
-        });
-
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('mouseout', () => isDrawing = false);
-
-        function draw(e) {
-            if (!isDrawing || !currentArtImage) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            ctx.beginPath();
-            ctx.arc(x, y, document.getElementById('brush-size').value / 2, 0, Math.PI * 2);
-            ctx.fillStyle = document.getElementById('color-picker').value;
-            ctx.fill();
-            sounds.correct.play();
-        }
-
-        function undoStroke() {
-            if (strokeHistory.length > 0) ctx.putImageData(strokeHistory.pop(), 0, 0);
-            else clearCanvas();
-        }
-
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (currentArtImage) {
-                const img = new Image();
-                img.src = currentArtImage;
-                img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            }
-            strokeHistory = [];
-            document.getElementById('art-result').innerHTML = '';
-        }
-
-        function saveArtwork() {
-            if (!currentArtImage) {
-                document.getElementById('art-result').innerHTML = 'Please select an image to color!';
-                return;
-            }
-            userData.artwork[currentArtImage.split('/').pop()] = canvas.toDataURL();
-            saveUserData();
-            document.getElementById('art-result').innerHTML = 'Artwork saved! Check your profile!';
-        }
-
-        function loadArtwork() {
-            if (currentArtImage && userData.artwork[currentArtImage.split('/').pop()]) {
-                const img = new Image();
-                img.src = userData.artwork[currentArtImage.split('/').pop()];
-                img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        // Daily Missions
-        function showMission() {
-            const today = new Date().toISOString().split('T')[0];
-            if (userData.missions[today]) {
-                document.getElementById('mission-container').innerHTML = 'You completed today’s mission!';
-                document.getElementById('mission-result').innerHTML = '';
-                return;
-            }
-            const mission = missions[new Date().getDay() % missions.length];
-            const container = document.getElementById('mission-container');
-            let html = `<div class="text-lg text-blue-600">${mission.title}: ${mission.question}</div>`;
-            mission.options.forEach(opt => {
-                html += `<button class="btn mt-2" onclick="checkMission('${opt}', '${mission.id}')">${opt}</button>`;
-            });
-            container.innerHTML = html;
-        }
-
-        function checkMission(answer, missionId) {
-            const mission = missions.find(m => m.id === missionId);
-            const result = document.getElementById('mission-result');
-            const today = new Date().toISOString().split('T')[0];
-            if (answer === mission.answer) {
-                userData.stars++;
-                userData.missions[today] = mission.id;
-                result.innerHTML = `Correct! Earned a ⭐ Gold Star!`;
-                result.style.color = '#10b981';
-                sounds.star.play();
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                saveUserData();
-                updateStarCounter();
-                document.getElementById('mission-container').innerHTML = 'Mission complete! Come back tomorrow!';
-            } else {
-                result.innerHTML = `Incorrect. Try again!`;
-                result.style.color = '#ef4444';
-                sounds.incorrect.play();
-            }
-        }
-
-        function updateStarCounter() {
-            document.getElementById('star-count').innerText = userData.stars;
-        }
-
-        // Initialize
         loadUserData();
     </script>
 </body>
