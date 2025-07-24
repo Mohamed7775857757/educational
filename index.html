@@ -365,24 +365,17 @@
         const memoryCards = [{ name: 'Imam Ali', match: 'First Imam', id: 1 }, { name: 'First Imam', match: 'Imam Ali', id: 2 }];
         const wudhuSteps = [{ name: 'Wash face', id: 1, category: 'obligatory' }];
         let flippedCards = [], matchedCards = [], dragged, currentArtImage = '';
-        // Temporarily disable audio due to CORS
-        // const sounds = { correct: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/success.mp3'] }) };
+        const sounds = { correct: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/success.mp3'] }) };
 
         function loadUserData() {
             const saved = localStorage.getItem('userData');
             if (saved) {
                 userData = JSON.parse(saved);
-                const avatar = document.getElementById('avatar-display');
-                if (avatar) { // Null check for TypeError
-                    avatar.src = userData.character;
-                    avatar.style.display = 'block';
-                }
+                document.getElementById('avatar-display').src = userData.character;
+                document.getElementById('avatar-display').style.display = 'block';
                 updateStarCounter();
                 showSection('welcome');
             } else {
-                // Ensure hero is visible on first load
-                const hero = document.querySelector('.hero');
-                if (hero) hero.classList.remove('hidden');
                 openModal();
             }
         }
@@ -394,11 +387,7 @@
                 document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
                 img.classList.add('selected');
                 userData.character = img.src;
-                const avatar = document.getElementById('avatar-display');
-                if (avatar) {
-                    avatar.src = userData.character;
-                    avatar.style.display = 'block';
-                }
+                document.getElementById('avatar-display').src = userData.character;
                 saveUserData();
             });
         });
@@ -408,15 +397,12 @@
         }
 
         function showSection(sectionId) {
-            // Hide all sections and hero
+            // Hide all sections and the hero
             document.querySelectorAll('.section, .hero').forEach(el => el.classList.add('hidden'));
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
-                // Only animate if the section exists
-                if (document.querySelector(`#${sectionId}`)) {
-                    gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                }
+                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
                 console.log(`Switched to section: ${sectionId}`);
             } else {
                 console.error(`Section ${sectionId} not found!`);
@@ -439,30 +425,23 @@
             userData.gender = document.querySelector('input[name="gender"]:checked').value;
             userData.year = document.getElementById('year-select').value;
             if (!userData.character) userData.character = document.querySelector('.character').src;
-            const avatar = document.getElementById('avatar-display');
-            if (avatar) {
-                avatar.src = userData.character;
-                avatar.style.display = 'block';
-            }
+            document.getElementById('avatar-display').src = userData.character;
+            document.getElementById('avatar-display').style.display = 'block';
             saveUserData();
             closeModal({ target: { id: 'intro-modal' } }); // Explicitly close modal
-            showSection('welcome'); // Transition to welcome
+            showSection('welcome');
             console.log('Begin Journey clicked, transitioning to welcome with data:', userData);
         }
 
         // Add event listener directly to the button after DOM loads
         document.addEventListener('DOMContentLoaded', () => {
-            const beginButton = document.querySelector('#begin-journey-btn'); // Use the ID you added
+            const beginButton = document.querySelector('#begin-journey-btn');
             if (beginButton) {
                 beginButton.addEventListener('click', startLearning);
                 console.log('Event listener added to Begin Journey button');
             } else {
                 console.error('Begin Journey button not found!');
             }
-            // Initialize animations after DOM is ready
-            gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
-            gsap.from('.hero p', { opacity: 0, y: 50, duration: 1, delay: 1 });
-            gsap.from('.hero .btn', { opacity: 0, scale: 0.5, duration: 1, delay: 1.5 });
         });
 
         function showProfile() {
@@ -482,13 +461,18 @@
             if (answer.toLowerCase() === q.answer.toLowerCase()) {
                 score++;
                 document.getElementById('score').innerHTML = `Correct! Score: ${score}/${questions.length}`;
-                // sounds.correct.play(); // Disabled due to CORS
+                sounds.correct.play();
             } else document.getElementById('score').innerHTML = `Wrong! Answer: ${q.answer}`;
             currentQuestion++;
             if (currentQuestion < questions.length) showQuestion(); else document.getElementById('score').innerHTML += '<br>Quiz Done!';
         }
 
         function updateStarCounter() { document.getElementById('star-count').textContent = userData.stars; }
+
+        // Initialize animations
+        gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
+        gsap.from('.hero p', { opacity: 0, y: 50, duration: 1, delay: 1 });
+        gsap.from('.hero .btn', { opacity: 0, scale: 0.5, duration: 1, delay: 1.5 });
 
         loadUserData();
     </script>
