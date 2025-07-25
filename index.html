@@ -1,10 +1,9 @@
-
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shia Islamic Adventure Hub</title>
+    <title>Shia Islamic Adventure Quest</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Comic Neue and Fredoka -->
@@ -22,21 +21,38 @@
             padding: 0;
             overflow-x: hidden;
             min-height: 100vh;
-            background: linear-gradient(135deg, #87CEEB, #32CD32);
             position: relative;
+            background: #87CEEB;
+            overflow: hidden;
         }
         h1, h2, h3 {
             font-family: 'Comic Neue', cursive;
         }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #87CEEB, #32CD32);
+            z-index: -1;
+            overflow: hidden;
+        }
+        .tree, .cloud, .star {
+            position: absolute;
+            animation: float 6s infinite ease-in-out;
+        }
+        .tree { content: '🌳'; font-size: 80px; }
+        .cloud { content: '☁️'; font-size: 50px; }
+        .star { content: '⭐'; font-size: 30px; }
         .hero {
             height: 100vh;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #FFA500, #FF69B4);
             color: #fff;
             text-align: center;
             padding-top: 10rem;
-            border-radius: 0 0 50% 50% / 0 0 20% 20%;
+            border-radius: 0 0 50px 50px;
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -74,46 +90,72 @@
             padding: 4rem 1rem;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
         .section {
-            background: linear-gradient(135deg, #87CEEB, #FF69B4);
+            background: rgba(255, 255, 255, 0.9);
             color: #000;
             min-height: 100vh;
             padding: 2rem;
-            overflow: auto;
-            border-radius: 20px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
         }
         .card {
-            background: #fff;
-            border-radius: 20px;
+            background: linear-gradient(135deg, #FF69B4, #FFA500);
+            border-radius: 30px;
             padding: 1.5rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
             text-align: center;
+            overflow: hidden;
         }
         .card:hover {
-            transform: translateY(-10px) rotate(5deg);
-            box-shadow: 0 15px 30px rgba(50, 205, 50, 0.3);
+            transform: translateY(-15px) rotate(5deg);
+            box-shadow: 0 15px 40px rgba(50, 205, 50, 0.3);
         }
         .card h3 {
-            color: #FFA500;
+            color: #fff;
             font-size: 1.5rem;
             margin-bottom: 1rem;
+            text-shadow: 2px 2px #000;
+        }
+        .card p {
+            color: #fff;
+            text-shadow: 1px 1px #000;
+        }
+        .card:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+            z-index: -1;
         }
         .btn {
             background: linear-gradient(90deg, #FFA500, #FF69B4);
             color: #fff;
             padding: 1rem 2rem;
-            border-radius: 15px;
+            border-radius: 20px;
             font-weight: 600;
             font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
             display: inline-block;
+            text-shadow: 1px 1px #000;
         }
         .btn:hover {
             transform: scale(1.1) rotate(5deg);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
+            box-shadow: 0 0 10px #32CD32;
+        }
+        .btn:active {
+            transform: scale(0.95);
         }
         .star-counter {
             position: fixed;
@@ -121,8 +163,8 @@
             right: 1rem;
             background: #fff;
             padding: 0.5rem 1rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             font-weight: 600;
             color: #FFA500;
             z-index: 50;
@@ -132,12 +174,13 @@
             position: fixed;
             top: 6rem;
             left: 1rem;
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            border: 4px solid #FFA500;
+            border: 5px solid #FFA500;
             object-fit: cover;
             animation: float 3s infinite ease-in-out;
+            z-index: 50;
         }
         .character-container {
             display: flex;
@@ -152,7 +195,8 @@
             border-radius: 50%;
             cursor: pointer;
             transition: transform 0.3s, border-color 0.3s;
-            border: 3px solid #fff;
+            border: 4px solid #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         .character:hover {
             transform: scale(1.2) rotate(10deg);
@@ -177,11 +221,12 @@
         .modal-content {
             background: #fff;
             padding: 2rem;
-            border-radius: 20px;
+            border-radius: 30px;
             width: 90%;
             max-width: 500px;
             text-align: center;
             animation: slideIn 0.5s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
         .karbala-img {
             width: 100%;
@@ -189,10 +234,10 @@
             border-radius: 15px;
         }
         #art-canvas {
-            border: 2px solid #87CEEB;
-            border-radius: 15px;
+            border: 3px solid #87CEEB;
+            border-radius: 20px;
             background: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .art-tools {
             display: flex;
@@ -210,10 +255,11 @@
         .wudhu-obligatory, .wudhu-mustahab {
             width: 48%;
             padding: 1rem;
-            border: 2px solid #FFA500;
-            border-radius: 15px;
+            border: 3px solid #FFA500;
+            border-radius: 20px;
             background: #fff;
             min-width: 200px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .memory-card, .wudhu-step {
             width: 90px;
@@ -225,7 +271,7 @@
             font-size: 0.9rem;
             cursor: pointer;
             border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
         }
         .memory-card:hover, .wudhu-step:hover {
@@ -235,20 +281,36 @@
             background: #32CD32;
             color: #fff;
         }
-        .progress-map {
+        .progress-bar {
             position: fixed;
             bottom: 1rem;
             left: 50%;
             transform: translateX(-50%);
+            width: 80%;
+            max-width: 500px;
+            height: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
+            transition: width 0.5s ease-in-out;
+        }
+        .badge {
+            position: fixed;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
             background: #fff;
             padding: 0.5rem 1rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             z-index: 50;
-        }
-        .cloud, .star {
-            position: absolute;
-            animation: float 5s infinite ease-in-out;
+            animation: bounce 2s infinite;
         }
         .mute-btn {
             position: fixed;
@@ -256,7 +318,7 @@
             left: 1rem;
             background: #fff;
             padding: 0.5rem 1rem;
-            border-radius: 15px;
+            border-radius: 20px;
             cursor: pointer;
             z-index: 50;
         }
@@ -276,25 +338,39 @@
         }
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+            50% { transform: translateY(-30px); }
         }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         @media (max-width: 640px) {
             .card-grid { grid-template-columns: 1fr; }
             .wudhu-container { flex-direction: column; }
             .wudhu-obligatory, .wudhu-mustahab { width: 100%; }
+            .nav { padding: 0.5rem; }
         }
     </style>
 </head>
 <body>
     <div class="mute-btn" onclick="toggleMute()">🔊</div>
+    <div class="badge">🏅 Badge: Explorer</div>
+    <div class="background">
+        <div class="tree" style="left: 10%; top: 20%;"></div>
+        <div class="tree" style="right: 15%; top: 40%;"></div>
+        <div class="cloud" style="left: 25%; top: 10%;"></div>
+        <div class="cloud" style="right: 20%; top: 30%;"></div>
+        <div class="star" style="left: 30%; top: 50%;"></div>
+        <div class="star" style="right: 25%; top: 60%;"></div>
+    </div>
     <div class="nav">
         <div class="container flex justify-between items-center">
-            <div class="text-xl font-bold">🌙 Shia Adventure Hub</div>
+            <div class="text-xl font-bold">🌙 Shia Quest Hub</div>
             <div class="space-x-4 hidden md:flex">
                 <a href="#" onclick="showSection('welcome')">Home</a>
                 <a href="#" onclick="showSection('profile')">Profile</a>
@@ -319,26 +395,20 @@
         </div>
     </div>
     <div class="star-counter" id="star-counter">Stars: <span id="star-count">0</span> ⭐</div>
-    <img id="avatar-display" src="" alt="Guide Avatar" class="avatar-display" style="display: none;">
-    <div class="progress-map" id="progress-map">Map: Step 1/7</div>
-
-    <!-- Background Animations -->
-    <div class="cloud" style="left: 10%; top: 20%; font-size: 40px;">☁️</div>
-    <div class="cloud" style="right: 15%; top: 40%; font-size: 50px;">☁️</div>
-    <div class="star" style="left: 25%; top: 60%; font-size: 30px;">⭐</div>
-    <div class="star" style="right: 20%; top: 30%; font-size: 25px;">⭐</div>
+    <img id="avatar-display" src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="avatar-display" style="display: none;">
+    <div class="progress-bar"><div id="progress" class="progress" style="width: 0%;"></div></div>
 
     <!-- Hero Section -->
     <div class="hero">
-        <h1>Welcome to Shia Islamic Adventure!</h1>
-        <p>Embark on a fun journey with games and quests!</p>
-        <button class="btn" onclick="openModal()">Start Adventure</button>
+        <h1>Welcome to Shia Islamic Quest!</h1>
+        <p>Embark on an epic adventure with your guide!</p>
+        <button class="btn" onclick="openModal()">Start Quest</button>
     </div>
 
     <!-- Modal for Intro -->
     <div id="intro-modal" class="modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 class="text-2xl text-orange-600 mb-2">Create Your Hero</h2>
+            <h2 class="text-2xl text-orange-600 mb-2">Choose Your Hero</h2>
             <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Welcome" class="karbala-img mx-auto mb-4">
             <div class="space-y-4">
                 <input type="text" id="name-input" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black">
@@ -362,7 +432,7 @@
                     <img src="https://yourusername.github.io/your-repo/images/girl1_hijab.jpg" alt="Girl 1" class="character" data-gender="girl">
                     <img src="https://yourusername.github.io/your-repo/images/girl2_hijab.jpg" alt="Girl 2" class="character" data-gender="girl">
                 </div>
-                <button class="btn" id="begin-journey-btn">Begin Journey</button>
+                <button class="btn" id="begin-journey-btn">Begin Quest</button>
             </div>
         </div>
     </div>
@@ -370,13 +440,13 @@
     <!-- Content Sections -->
     <div id="welcome" class="section container hidden">
         <div class="card-grid">
-            <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your journey!</p></div>
-            <div class="card" onclick="showSection('kindergarten')"><h3>📚 Quiz</h3><p>Test your knowledge!</p></div>
+            <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your stats!</p></div>
+            <div class="card" onclick="showSection('kindergarten')"><h3>📖 Quiz</h3><p>Test your wisdom!</p></div>
             <div class="card" onclick="showSection('year1')"><h3>🧠 Memory</h3><p>Match Imams!</p></div>
-            <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu</h3><p>Sort steps!</p></div>
-            <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the story!</p></div>
+            <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu</h3><p>Master steps!</p></div>
+            <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the epic!</p></div>
             <div class="card" onclick="showSection('year4')"><h3>🎨 Art</h3><p>Create art!</p></div>
-            <div class="card" onclick="showSection('missions')"><h3>⭐ Missions</h3><p>Complete tasks!</p></div>
+            <div class="card" onclick="showSection('missions')"><h3>⭐ Missions</h3><p>Earn rewards!</p></div>
         </div>
     </div>
 
@@ -389,7 +459,7 @@
     <div id="missions" class="section container hidden"></div>
 
     <script>
-        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 1, missions: {}, artwork: {} };
+        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {} };
         let currentQuestion = 0;
         let score = 0;
         let flippedCards = [], matchedCards = [];
@@ -416,18 +486,19 @@
             { name: 'Rinse mouth', id: 7, category: 'mustahab' }
         ];
         const missions = [
-            { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers are there?', type: 'text', answer: '5' },
-            { id: 'dua', title: 'Learn Dua', question: 'What is the dua for eating?', type: 'text', answer: 'Bismillah' }
+            { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
+            { id: 'dua', title: 'Learn Dua', question: 'Dua before eating?', type: 'text', answer: 'Bismillah' }
         ];
 
         function loadUserData() {
             const saved = localStorage.getItem('userData');
             if (saved) {
                 userData = JSON.parse(saved);
-                document.getElementById('avatar-display').src = userData.character;
+                document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
                 document.getElementById('avatar-display').style.display = 'block';
                 updateStarCounter();
                 updateProgress();
+                updateBadges();
                 if (!isMuted) backgroundMusic.play();
             } else {
                 openModal();
@@ -468,6 +539,7 @@
                 if (sectionId === 'missions') showMissions();
                 if (sectionId === 'profile') showProfile();
                 updateProgress();
+                updateBadges();
             } else {
                 console.error(`Section ${sectionId} not found!`);
             }
@@ -488,7 +560,7 @@
 
         function startLearning() {
             clickSound.play();
-            userData.name = document.getElementById('name-input').value || 'Young Scholar';
+            userData.name = document.getElementById('name-input').value || 'Young Explorer';
             userData.gender = document.querySelector('input[name="gender"]:checked').value;
             userData.year = document.getElementById('year-select').value;
             if (!userData.character) userData.character = document.querySelector('.character').src;
@@ -497,16 +569,16 @@
             saveUserData();
             closeModal({ target: { id: 'intro-modal' } });
             showSection('welcome');
-            console.log('Begin Journey clicked, transitioning to welcome with data:', userData);
+            console.log('Begin Quest clicked, transitioning to welcome with data:', userData);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const beginButton = document.querySelector('#intro-modal .btn');
             if (beginButton) {
                 beginButton.addEventListener('click', startLearning);
-                console.log('Event listener added to Begin Journey button');
+                console.log('Event listener added to Begin Quest button');
             } else {
-                console.error('Begin Journey button not found!');
+                console.error('Begin Quest button not found!');
             }
         });
 
@@ -515,7 +587,7 @@
             const container = document.getElementById('kindergarten');
             container.innerHTML = `
                 <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Kindergarten Quiz 📚</h2>
+                    <h2 class="text-2xl text-orange-600 mb-2">Quiz Challenge 📖</h2>
                     <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Quiz" class="karbala-img mx-auto mb-4">
                     <div id="quiz-container" class="text-black text-center"></div>
                     <div id="score" class="text-lg text-black mt-4"></div>
@@ -535,17 +607,19 @@
             if (q.type === 'text') answer = document.getElementById('answer-input').value;
             if (answer.toLowerCase() === q.answer.toLowerCase()) {
                 score++;
-                userData.stars++;
+                userData.stars += 2;
                 userData.progress = Math.min(userData.progress + 1, 7);
+                if (score === 1) userData.badges.push('Scholar');
                 updateStarCounter();
                 updateProgress();
+                updateBadges();
                 document.getElementById('score').innerHTML = `<span class="text-black text-center">Correct! 🎉 Score: ${score}/${questions.length}</span>`;
                 confetti();
                 sounds.correct.play();
             } else document.getElementById('score').innerHTML = `<span class="text-black text-center">Wrong! 😕 Answer: ${q.answer}</span>`;
             currentQuestion++;
             if (currentQuestion < questions.length) showQuestion();
-            else document.getElementById('score').innerHTML += '<br><span class="text-black text-center">Quiz Done! 🎉</span>';
+            else document.getElementById('score').innerHTML += '<br><span class="text-black text-center">Quest Done! 🎉</span>';
         }
 
         function initMemoryGame() {
@@ -553,7 +627,7 @@
             const container = document.getElementById('year1');
             container.innerHTML = `
                 <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Memory Game 🧠</h2>
+                    <h2 class="text-2xl text-orange-600 mb-2">Memory Quest 🧠</h2>
                     <div id="memory-game" class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4"></div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
@@ -588,10 +662,12 @@
                 card1.classList.add('matched');
                 card2.classList.add('matched');
                 matchedCards.push(card1, card2);
-                userData.stars++;
+                userData.stars += 2;
                 userData.progress = Math.min(userData.progress + 1, 7);
+                if (matchedCards.length === memoryCards.length) userData.badges.push('Memory Master');
                 updateStarCounter();
                 updateProgress();
+                updateBadges();
                 confetti();
                 sounds.correct.play();
             } else {
@@ -600,7 +676,7 @@
             }
             flippedCards = [];
             if (matchedCards.length === memoryCards.length) {
-                document.getElementById('year1').innerHTML += '<p class="text-black text-center mt-4">Game Completed! 🎉</p>';
+                document.getElementById('year1').innerHTML += '<p class="text-black text-center mt-4">Quest Completed! 🎉</p>';
             }
         }
 
@@ -609,7 +685,7 @@
             const container = document.getElementById('year2');
             container.innerHTML = `
                 <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Wudhu Puzzle 💧</h2>
+                    <h2 class="text-2xl text-orange-600 mb-2">Wudhu Challenge 💧</h2>
                     <div class="wudhu-container">
                         <div class="wudhu-obligatory">
                             <h3 class="text-black">Obligatory 📖</h3>
@@ -660,15 +736,17 @@
                 container.appendChild(dragged);
                 if (dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab')) {
                     dragged.classList.add('correct');
-                    userData.stars++;
+                    userData.stars += 2;
                     userData.progress = Math.min(userData.progress + 1, 7);
+                    if (document.getElementById('obligatory-steps').children.length === 6 && document.getElementById('mustahab-steps').children.length === 1) userData.badges.push('Wudhu Expert');
                     updateStarCounter();
                     updateProgress();
+                    updateBadges();
                     confetti();
                     sounds.correct.play();
                 }
                 if (document.getElementById('obligatory-steps').children.length === 6 && document.getElementById('mustahab-steps').children.length === 1) {
-                    document.getElementById('year2').innerHTML += '<p class="text-black text-center mt-4">Puzzle Completed! 🎉</p>';
+                    document.getElementById('year2').innerHTML += '<p class="text-black text-center mt-4">Challenge Completed! 🎉</p>';
                 }
             }
         }
@@ -678,14 +756,18 @@
             const container = document.getElementById('year3');
             container.innerHTML = `
                 <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Karbala Quest 🏰</h2>
-                    <p class="text-black">Learn about Imam Hussain's bravery!</p>
+                    <h2 class="text-2xl text-orange-600 mb-2">Karbala Epic 🏰</h2>
+                    <p class="text-black">Discover Imam Hussain's bravery!</p>
                     <img src="https://yourusername.github.io/your-repo/images/karbala.jpg" alt="Karbala" class="karbala-img mx-auto mt-4">
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
+            userData.stars += 1;
             userData.progress = Math.min(userData.progress + 1, 7);
+            updateStarCounter();
             updateProgress();
+            if (userData.progress === 7) userData.badges.push('Karbala Hero');
+            updateBadges();
         }
 
         function initArtZone() {
@@ -693,7 +775,7 @@
             const container = document.getElementById('year4');
             container.innerHTML = `
                 <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Art Zone 🎨</h2>
+                    <h2 class="text-2xl text-orange-600 mb-2">Art Quest 🎨</h2>
                     <canvas id="art-canvas" width="400" height="300"></canvas>
                     <div class="art-tools mt-4">
                         <button class="btn" onclick="changeColor('red')">Red ❤️</button>
@@ -724,8 +806,12 @@
 
             window.changeColor = (newColor) => { color = newColor; clickSound.play(); };
             window.clearCanvas = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); clickSound.play(); };
+            userData.stars += 1;
             userData.progress = Math.min(userData.progress + 1, 7);
+            if (userData.progress === 7) userData.badges.push('Art Master');
+            updateStarCounter();
             updateProgress();
+            updateBadges();
         }
 
         function showMissions() {
@@ -733,7 +819,7 @@
             const container = document.getElementById('missions');
             container.innerHTML = `
                 <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Daily Missions ⭐</h2>
+                    <h2 class="text-2xl text-orange-600 mb-2">Mission Hub ⭐</h2>
                     <div class="space-y-4">
                         ${missions.map(mission => `
                             <div class="bg-white p-4 rounded-lg shadow">
@@ -754,11 +840,14 @@
             const mission = missions.find(m => m.id === id);
             const input = document.getElementById(`mission-${id}-input`).value;
             if (input.toLowerCase() === mission.answer.toLowerCase()) {
-                userData.stars++;
+                userData.stars += 2;
                 userData.progress = Math.min(userData.progress + 1, 7);
+                if (id === 'salah') userData.badges.push('Prayer Star');
+                if (id === 'dua') userData.badges.push('Dua Master');
                 updateStarCounter();
                 updateProgress();
-                alert('Mission completed! +1 Star 🎉');
+                updateBadges();
+                alert('Mission completed! +2 Stars 🎉');
                 confetti();
                 sounds.correct.play();
             } else {
@@ -776,13 +865,15 @@
                     <div id="profile-info" class="text-lg text-black text-center">
                         Name: ${userData.name}<br>
                         Year: ${userData.year}<br>
-                        Stars: ${userData.stars} ⭐
+                        Stars: ${userData.stars} ⭐<br>
+                        Badges: ${userData.badges.join(', ')} 🏅
                     </div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
             userData.progress = Math.min(userData.progress + 1, 7);
             updateProgress();
+            updateBadges();
         }
 
         function updateStarCounter() {
@@ -792,7 +883,13 @@
 
         function updateProgress() {
             const totalSteps = 7;
-            document.getElementById('progress-map').textContent = `Map: Step ${userData.progress}/${totalSteps} 🌍`;
+            const progressPercent = (userData.progress / totalSteps) * 100;
+            document.getElementById('progress').style.width = `${progressPercent}%`;
+            saveUserData();
+        }
+
+        function updateBadges() {
+            document.querySelector('.badge').textContent = `🏅 Badge: ${userData.badges[userData.badges.length - 1] || 'Explorer'}`;
             saveUserData();
         }
 
@@ -818,740 +915,5 @@
 
         loadUserData();
     </script>
-</body>
-</html>
-
-________________________________________
-From: Mohamed Elzein <melzein@pepper.com.au>
-Sent: Thursday, July 24, 2025 3:55:17 PM
-To: Mohamed Elzein <melzein@pepper.com.au>
-Subject: 
- 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shia Islamic Learning Hub</title>
-    <!-- Tailwind CSS -->
-    <script src=https://cdn.tailwindcss.com></script>
-    <!-- Google Fonts: Poppins and Inter -->
-    <link href=https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap rel="stylesheet">
-    <!-- GSAP -->
-    <script src=https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js></script>
-    <!-- Confetti.js -->
-    <script src=https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js></script>
-    <!-- Howler.js -->
-    <script src=https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #F5F5F5, #E0E7FF);
-            color: #333;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-        h1, h2, h3 {
-            font-family: 'Poppins', sans-serif;
-        }
-        .hero {
-            height: 100vh;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(135deg, #00A3E0, #A100F2);
-            color: #fff;
-            text-align: center;
-            padding-top: 10rem;
-        }
-        .hero h1 {
-            font-size: 3.5rem;
-            animation: fadeInDown 1s ease-out;
-        }
-        .hero p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            animation: fadeInUp 1.5s ease-out;
-        }
-        .nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-            padding: 1rem;
-        }
-        .nav a {
-            color: #fff;
-            margin: 0 1.5rem;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        .nav a:hover {
-            color: #FF6F00;
-        }
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 4rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .section {
-            background: linear-gradient(135deg, #00A3E0, #A100F2);
-            color: #000; /* Changed to black for visibility */
-            min-height: 100vh;
-            padding: 2rem;
-            overflow: auto;
-        }
-        .card {
-            background: #fff;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-        }
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 163, 224, 0.2);
-        }
-        .card h3 {
-            color: #A100F2;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .btn {
-            background: linear-gradient(90deg, #FF6F00, #A100F2);
-            color: #fff;
-            padding: 1rem 2.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 1.2rem;
-            transition: transform 0.3s, background 0.3s;
-        }
-        .btn:hover {
-            transform: scale(1.1);
-            background: linear-gradient(90deg, #A100F2, #FF6F00);
-        }
-        .star-counter {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            background: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            font-weight: 600;
-            color: #A100F2;
-            z-index: 50;
-        }
-        .avatar-display {
-            position: fixed;
-            top: 6rem;
-            left: 1rem;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 4px solid #FF6F00;
-            object-fit: cover;
-        }
-        .character-container {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 1rem 0;
-        }
-        .character {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.3s, border-color 0.3s;
-            border: 3px solid #fff;
-        }
-        .character:hover {
-            transform: scale(1.1);
-            border-color: #00A3E0;
-        }
-        .character.selected {
-            border-color: #FF6F00;
-            transform: scale(1.1);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 1rem;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            animation: slideIn 0.5s ease-out;
-        }
-        .karbala-img {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 0.5rem;
-        }
-        #art-canvas {
-            border: 2px solid #00A3E0;
-            border-radius: 0.5rem;
-            background: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .art-tools {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin: 1rem 0;
-        }
-        .wudhu-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-        .wudhu-obligatory, .wudhu-mustahab {
-            width: 48%;
-            padding: 1rem;
-            border: 2px solid #A100F2;
-            border-radius: 0.5rem;
-            background: #fff;
-        }
-        .memory-card, .wudhu-step {
-            width: 90px;
-            height: 90px;
-            background: #E0E7FF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            cursor: pointer;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-        .memory-card:hover, .wudhu-step:hover {
-            transform: rotate(5deg) scale(1.05);
-        }
-        .memory-card.matched, .wudhu-step.correct {
-            background: #00A3E0;
-            color: #fff;
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideIn {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .centered {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 70vh;
-            flex-direction: column;
-        }
-    </style>
-</head>
-<body>
-    <script>
-        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, missions: {}, artwork: {} };
-        let currentQuestion = 0;
-        let score = 0;
-        let flippedCards = [], matchedCards = [];
-        const questions = [
-            { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
-            { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
-        ];
-        const memoryCards = [
-            { name: 'Imam Ali', match: 'First Imam', id: 1 },
-            { name: 'First Imam', match: 'Imam Ali', id: 2 },
-            { name: 'Imam Hassan', match: 'Second Imam', id: 3 },
-            { name: 'Second Imam', match: 'Imam Hassan', id: 4 }
-        ];
-        const wudhuSteps = [
-            { name: 'Wash face', id: 1, category: 'obligatory' },
-            { name: 'Wash right arm', id: 2, category: 'obligatory' },
-            { name: 'Wash left arm', id: 3, category: 'obligatory' },
-            { name: 'Wipe head', id: 4, category: 'obligatory' },
-            { name: 'Wipe right foot', id: 5, category: 'obligatory' },
-            { name: 'Wipe left foot', id: 6, category: 'obligatory' },
-            { name: 'Rinse mouth', id: 7, category: 'mustahab' }
-        ];
-        const missions = [
-            { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers are there in Islam?', type: 'text', answer: '5' },
-            { id: 'dua', title: 'Learn Dua', question: 'What is the dua for entering the mosque?', type: 'text', answer: 'Allahumma aftah li abwaba rahmatik' }
-        ];
-        const sounds = { correct: new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/success.mp3'] }) };
-
-        function loadUserData() {
-            const saved = localStorage.getItem('userData');
-            if (saved) {
-                userData = JSON.parse(saved);
-                document.getElementById('avatar-display').src = userData.character;
-                document.getElementById('avatar-display').style.display = 'block';
-                updateStarCounter();
-                showSection('welcome');
-            } else {
-                openModal();
-            }
-        }
-
-        function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); }
-
-        document.querySelectorAll('.character').forEach(img => {
-            img.addEventListener('click', () => {
-                document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
-                img.classList.add('selected');
-                userData.character = img.src;
-                document.getElementById('avatar-display').src = userData.character;
-                saveUserData();
-            });
-        });
-
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        }
-
-        function showSection(sectionId) {
-            document.querySelectorAll('.section, .hero').forEach(el => el.classList.add('hidden'));
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.classList.remove('hidden');
-                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                console.log(`Switched to section: ${sectionId}`);
-                if (sectionId === 'kindergarten') showQuestion();
-                if (sectionId === 'year1') initMemoryGame();
-                if (sectionId === 'year2') initWudhuPuzzle();
-                if (sectionId === 'year3') showKarbala();
-                if (sectionId === 'year4') initArtZone();
-                if (sectionId === 'missions') showMissions();
-                if (sectionId === 'profile') showProfile();
-            } else {
-                console.error(`Section ${sectionId} not found!`);
-            }
-        }
-
-        function openModal() {
-            document.getElementById('intro-modal').style.display = 'flex';
-            console.log('Modal opened');
-        }
-        function closeModal(event) {
-            if (event.target.id === 'intro-modal') {
-                document.getElementById('intro-modal').style.display = 'none';
-                console.log('Modal closed');
-            }
-        }
-
-        function startLearning() {
-            userData.name = document.getElementById('name-input').value || 'Young Scholar';
-            userData.gender = document.querySelector('input[name="gender"]:checked').value;
-            userData.year = document.getElementById('year-select').value;
-            if (!userData.character) userData.character = document.querySelector('.character').src;
-            document.getElementById('avatar-display').src = userData.character;
-            document.getElementById('avatar-display').style.display = 'block';
-            saveUserData();
-            closeModal({ target: { id: 'intro-modal' } });
-            showSection('welcome');
-            console.log('Begin Journey clicked, transitioning to welcome with data:', userData);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const beginButton = document.querySelector('#intro-modal .btn');
-            if (beginButton) {
-                beginButton.addEventListener('click', startLearning);
-                console.log('Event listener added to Begin Journey button');
-            } else {
-                console.error('Begin Journey button not found!');
-            }
-        });
-
-        function showQuestion() {
-            const container = document.getElementById('kindergarten');
-            container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-black mb-2">Kindergarten Quiz</h2>
-                    <img src=https://yourusername.github.io/your-repo/images/allah_symbol.jpg alt="Quiz" class="karbala-img mx-auto mb-4">
-                    <div id="quiz-container" class="text-black"></div>
-                    <div id="score" class="text-lg text-black mt-4"></div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-                </div>
-            `;
-            const q = questions[currentQuestion];
-            const quizContainer = document.getElementById('quiz-container');
-            quizContainer.innerHTML = `<div class="text-black text-center">${q.question}</div>` +
-                (q.type === 'text' ? `<input id="answer-input" class="border rounded p-2 bg-white text-black mx-auto block mt-4" style="width: 200px;"><button class="btn ml-2" onclick="checkAnswer()">Submit</button>` :
-                q.options.map(o => `<button class="btn ml-2 mt-2" onclick="checkAnswer('${o}')">${o}</button>`).join(''));
-        }
-
-        function checkAnswer(answer) {
-            const q = questions[currentQuestion];
-            if (q.type === 'text') answer = document.getElementById('answer-input').value;
-            if (answer.toLowerCase() === q.answer.toLowerCase()) {
-                score++;
-                userData.stars++;
-                updateStarCounter();
-                document.getElementById('score').innerHTML = `<span class="text-black text-center">Correct! Score: ${score}/${questions.length}</span>`;
-                sounds.correct.play();
-            } else document.getElementById('score').innerHTML = `<span class="text-black text-center">Wrong! Answer: ${q.answer}</span>`;
-            currentQuestion++;
-            if (currentQuestion < questions.length) showQuestion();
-            else document.getElementById('score').innerHTML += '<br><span class="text-black text-center">Quiz Done!</span>';
-        }
-
-        function initMemoryGame() {
-            const container = document.getElementById('year1');
-            container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-black mb-2">Memory Game</h2>
-                    <div id="memory-game" class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4"></div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-                </div>
-            `;
-            const gameContainer = document.getElementById('memory-game');
-            const shuffledCards = [...memoryCards].sort(() => Math.random() - 0.5);
-            shuffledCards.forEach(card => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'memory-card bg-white text-black p-2 rounded cursor-pointer';
-                cardElement.dataset.name = card.name;
-                cardElement.dataset.match = card.match;
-                cardElement.textContent = '?';
-                cardElement.addEventListener('click', () => flipCard(cardElement));
-                gameContainer.appendChild(cardElement);
-            });
-        }
-
-        function flipCard(card) {
-            if (flippedCards.length < 2 && !flippedCards.includes(card)) {
-                card.textContent = card.dataset.name;
-                flippedCards.push(card);
-                if (flippedCards.length === 2) {
-                    setTimeout(checkMatch, 1000);
-                }
-            }
-        }
-
-        function checkMatch() {
-            const [card1, card2] = flippedCards;
-            if (card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                matchedCards.push(card1, card2);
-                userData.stars++;
-                updateStarCounter();
-                sounds.correct.play();
-            } else {
-                card1.textContent = '?';
-                card2.textContent = '?';
-            }
-            flippedCards = [];
-            if (matchedCards.length === memoryCards.length) {
-                document.getElementById('year1').innerHTML += '<p class="text-black text-center mt-4">Game Completed!</p>';
-            }
-        }
-
-        function initWudhuPuzzle() {
-            const container = document.getElementById('year2');
-            container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-black mb-2">Wudhu Puzzle</h2>
-                    <div class="wudhu-container">
-                        <div class="wudhu-obligatory">
-                            <h3 class="text-black">Obligatory</h3>
-                            <div id="obligatory-steps" class="grid grid-cols-2 gap-2"></div>
-                        </div>
-                        <div class="wudhu-mustahab">
-                            <h3 class="text-black">Mustahab</h3>
-                            <div id="mustahab-steps" class="grid grid-cols-2 gap-2"></div>
-                        </div>
-                    </div>
-                    <div id="wudhu-dropzone" class="mt-4 grid grid-cols-3 gap-2"></div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-                </div>
-            `;
-            const dropzone = document.getElementById('wudhu-dropzone');
-            wudhuSteps.forEach(step => {
-                const stepElement = document.createElement('div');
-                stepElement.className = 'wudhu-step bg-white text-black p-2 rounded';
-                stepElement.draggable = true;
-                stepElement.textContent = step.name;
-                stepElement.dataset.category = step.category;
-                stepElement.addEventListener('dragstart', dragStart);
-                dropzone.appendChild(stepElement);
-            });
-            ['obligatory-steps', 'mustahab-steps'].forEach(id => {
-                const el = document.getElementById(id);
-                el.addEventListener('dragover', dragOver);
-                el.addEventListener('drop', drop);
-            });
-        }
-
-        let dragged;
-        function dragStart(event) {
-            dragged = event.target;
-            event.dataTransfer.setData('text/plain', null);
-        }
-
-        function dragOver(event) {
-            event.preventDefault();
-        }
-
-        function drop(event) {
-            event.preventDefault();
-            const container = event.target;
-            if (container.id.includes('steps') && (!container.children.length || dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab'))) {
-                container.appendChild(dragged);
-                if (dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab')) {
-                    dragged.classList.add('correct');
-                    userData.stars++;
-                    updateStarCounter();
-                    sounds.correct.play();
-                }
-                if (document.getElementById('obligatory-steps').children.length === 6 && document.getElementById('mustahab-steps').children.length === 1) {
-                    document.getElementById('year2').innerHTML += '<p class="text-black text-center mt-4">Puzzle Completed!</p>';
-                }
-            }
-        }
-
-        function showKarbala() {
-            const container = document.getElementById('year3');
-            container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-black mb-2">Karbala Quest</h2>
-                    <p class="text-black">Learn about the Battle of Karbala and Imam Hussain's sacrifice.</p>
-                    <img src=https://yourusername.github.io/your-repo/images/karbala.jpg alt="Karbala" class="karbala-img mx-auto mt-4">
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-                </div>
-            `;
-        }
-
-        function initArtZone() {
-            const container = document.getElementById('year4');
-            container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-black mb-2">Art Zone</h2>
-                    <canvas id="art-canvas" width="400" height="300"></canvas>
-                    <div class="art-tools mt-4">
-                        <button class="btn" onclick="changeColor('red')">Red</button>
-                        <button class="btn" onclick="changeColor('blue')">Blue</button>
-                        <button class="btn" onclick="changeColor('green')">Green</button>
-                        <button class="btn" onclick="changeColor('yellow')">Yellow</button>
-                        <button class="btn" onclick="changeColor('black')">Black</button>
-                        <button class="btn" onclick="clearCanvas()">Clear</button>
-                    </div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-                </div>
-            `;
-            const canvas = document.getElementById('art-canvas');
-            const ctx = canvas.getContext('2d');
-            let drawing = false;
-            let color = 'black';
-
-            canvas.addEventListener('mousedown', () => drawing = true);
-            canvas.addEventListener('mouseup', () => drawing = false);
-            canvas.addEventListener('mousemove', (e) => {
-                if (drawing) {
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(e.offsetX, e.offsetY, 5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-
-            window.changeColor = (newColor) => { color = newColor; };
-            window.clearCanvas = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); };
-        }
-
-        function showMissions() {
-            const container = document.getElementById('missions');
-            container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-black mb-2">Daily Missions</h2>
-                    <div class="space-y-4">
-                        ${missions.map(mission => `
-                            <div class="bg-white p-4 rounded shadow">
-                                <h3 class="text-purple-700">${mission.title}</h3>
-                                <p class="text-black">${mission.question}</p>
-                                <input id="mission-${mission.id}-input" class="border rounded p-2 bg-white text-black mt-2" style="width: 200px;">
-                                <button class="btn ml-2 mt-2" onclick="checkMission('${mission.id}')">Submit</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-                </div>
-            `;
-        }
-
-        function checkMission(id) {
-            const mission = missions.find(m => m.id === id);
-            const input = document.getElementById(`mission-${id}-input`).value;
-            if (input.toLowerCase() === mission.answer.toLowerCase()) {
-                userData.stars++;
-                updateStarCounter();
-                alert('Mission completed! +1 Star');
-                sounds.correct.play();
-            } else {
-                alert('Try again!');
-            }
-        }
-
-        function showProfile() {
-            const container = document.getElementById('profile');
-            container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-black mb-2">Your Profile</h2>
-                    <img src=https://yourusername.github.io/your-repo/images/profile_islamic.jpg alt="Profile" class="karbala-img mx-auto mb-4">
-                    <div id="profile-info" class="text-lg text-black text-center">
-                        Name: ${userData.name}<br>
-                        Year: ${userData.year}<br>
-                        Stars: ${userData.stars} ⭐
-                    </div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home</button>
-                </div>
-            `;
-        }
-
-        function updateStarCounter() {
-            document.getElementById('star-count').textContent = userData.stars;
-            saveUserData();
-        }
-
-        gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
-        gsap.from('.hero p', { opacity: 0, y: 50, duration: 1, delay: 1 });
-        gsap.from('.hero .btn', { opacity: 0, scale: 0.5, duration: 1, delay: 1.5 });
-
-        loadUserData();
-    </script>
-
-    <div class="nav">
-        <div class="container flex justify-between items-center">
-            <div class="text-xl font-bold">🌙 Shia Islamic Hub</div>
-            <div class="space-x-4 hidden md:flex">
-                <a href="#" onclick="showSection('welcome')">Home</a>
-                <a href="#" onclick="showSection('profile')">Profile</a>
-                <a href="#" onclick="showSection('kindergarten')">Quiz</a>
-                <a href="#" onclick="showSection('year1')">Memory</a>
-                <a href="#" onclick="showSection('year2')">Wudhu</a>
-                <a href="#" onclick="showSection('year3')">Karbala</a>
-                <a href="#" onclick="showSection('year4')">Art</a>
-                <a href="#" onclick="showSection('missions')">Missions</a>
-            </div>
-            <button class="md:hidden text-white" onclick="toggleMobileMenu()">☰</button>
-        </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-purple-900 p-2 mt-2">
-            <a href="#" class="block py-1 text-white" onclick="showSection('welcome')">Home</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('profile')">Profile</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('kindergarten')">Quiz</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year1')">Memory</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
-        </div>
-    </div>
-    <div class="star-counter" id="star-counter">Stars: <span id="star-count">0</span> ⭐</div>
-    <img id="avatar-display" src="" alt="Your Avatar" class="avatar-display" style="display: none;">
-
-    <!-- Hero Section -->
-    <div class="hero">
-        <h1>Welcome to Shia Islamic Learning Hub!</h1>
-        <p>Embark on a fun Islamic journey with games and quests.</p>
-        <button class="btn" onclick="openModal()">Start Your Adventure</button>
-    </div>
-
-    <!-- Modal for Intro -->
-    <div id="intro-modal" class="modal" onclick="closeModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 class="text-2xl text-purple-700 mb-2">Create Your Profile</h2>
-            <img src=https://yourusername.github.io/your-repo/images/welcome_islamic.jpg alt="Welcome" class="karbala-img mx-auto mb-4">
-            <div class="space-y-4">
-                <input type="text" id="name-input" placeholder="Enter your name" class="border-2 border-blue-500 rounded-lg p-2 w-full">
-                <div class="flex justify-center gap-4">
-                    <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
-                    <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
-                </div>
-                <select id="year-select" class="border-2 border-blue-500 rounded-lg p-2 w-full">
-                    <option value="kindergarten">Kindergarten</option>
-                    <option value="year1">Year 1</option>
-                    <option value="year2">Year 2</option>
-                    <option value="year3">Year 3</option>
-                    <option value="year4">Year 4</option>
-                    <option value="year5">Year 5</option>
-                    <option value="year6">Year 6</option>
-                    <option value="year7">Year 7</option>
-                </select>
-                <div class="character-container">
-                    <img src=https://yourusername.github.io/your-repo/images/boy1.jpg alt="Boy 1" class="character" data-gender="boy">
-                    <img src=https://yourusername.github.io/your-repo/images/boy2.jpg alt="Boy 2" class="character" data-gender="boy">
-                    <img src=https://yourusername.github.io/your-repo/images/girl1_hijab.jpg alt="Girl 1" class="character" data-gender="girl">
-                    <img src=https://yourusername.github.io/your-repo/images/girl2_hijab.jpg alt="Girl 2" class="character" data-gender="girl">
-                </div>
-                <button class="btn" id="begin-journey-btn">Begin Journey</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Content Sections -->
-    <div id="welcome" class="section container hidden">
-        <div class="card-grid">
-            <div class="card" onclick="showSection('profile')">
-                <h3>View Profile</h3>
-                <p>Check your progress and stars!</p>
-            </div>
-            <div class="card" onclick="showSection('kindergarten')">
-                <h3>Islamic Quiz</h3>
-                <p>Test your knowledge with fun questions.</p>
-            </div>
-            <div class="card" onclick="showSection('year1')">
-                <h3>Memory Game</h3>
-                <p>Match Imams and earn stars.</p>
-            </div>
-            <div class="card" onclick="showSection('year2')">
-                <h3>Wudhu Puzzle</h3>
-                <p>Sort and categorize Wudhu steps.</p>
-            </div>
-            <div class="card" onclick="showSection('year3')">
-                <h3>Karbala Quest</h3>
-                <p>Live the story of Imam Hussain.</p>
-            </div>
-            <div class="card" onclick="showSection('year4')">
-                <h3>Art Zone</h3>
-                <p>Create colorful Islamic art.</p>
-            </div>
-            <div class="card" onclick="showSection('missions')">
-                <h3>Daily Missions</h3>
-                <p>Complete tasks for rewards.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="profile" class="section container hidden"></div>
-    <div id="kindergarten" class="section container hidden"></div>
-    <div id="year1" class="section container hidden"></div>
-    <div id="year2" class="section container hidden"></div>
-    <div id="year3" class="section container hidden"></div>
-    <div id="year4" class="section container hidden"></div>
-    <div id="missions" class="section container hidden"></div>
 </body>
 </html>
