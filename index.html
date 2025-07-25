@@ -61,8 +61,8 @@
         .hero .btn {
             background: linear-gradient(90deg, #FFA500, #FF69B4);
             color: #fff;
-            padding: 2rem 4rem; /* Bigger button */
-            font-size: 2rem; /* Bigger text */
+            padding: 2rem 4rem;
+            font-size: 2rem;
             border-radius: 30px;
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
@@ -92,62 +92,21 @@
             transform: scale(1.2);
             color: #32CD32;
         }
-        .card-grid {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            padding: 4rem 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
+        .section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            text-align: center;
             position: relative;
             z-index: 10;
-            flex-wrap: wrap;
         }
-        .section {
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
             background: rgba(255, 255, 255, 0.9);
             color: #000;
-            min-height: 100vh;
-            padding: 2rem;
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 10;
-        }
-        .card {
-            background: linear-gradient(135deg, #FF69B4, #FFA500);
-            border-radius: 30px;
-            padding: 1.5rem;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            text-align: center;
-            overflow: hidden;
-            width: 250px;
-        }
-        .card:hover {
-            transform: translateY(-15px);
-            box-shadow: 0 15px 40px rgba(50, 205, 50, 0.3);
-        }
-        .card h3 {
-            color: #fff;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px #000;
-        }
-        .card p {
-            color: #fff;
-            text-shadow: 1px 1px #000;
-        }
-        .card:before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-            animation: rotate 10s linear infinite;
-            z-index: -1;
         }
         .btn {
             background: linear-gradient(90deg, #FFA500, #FF69B4);
@@ -192,30 +151,6 @@
             animation: float 3s infinite ease-in-out;
             z-index: 50;
         }
-        .character-container {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 1rem 0;
-        }
-        .character {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.3s, border-color 0.3s;
-            border: 4px solid #fff;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        .character:hover {
-            transform: scale(1.2) rotate(10deg);
-            border-color: #32CD32;
-        }
-        .character.selected {
-            border-color: #FFA500;
-            transform: scale(1.2);
-        }
         .modal {
             display: none;
             position: fixed;
@@ -258,32 +193,34 @@
         }
         .wudhu-container {
             display: flex;
-            justify-content: space-between;
-            gap: 1rem;
+            justify-content: space-around;
+            gap: 2rem;
+            margin: 2rem 0;
             flex-wrap: wrap;
         }
         .wudhu-obligatory, .wudhu-mustahab {
-            width: 48%;
-            padding: 1rem;
+            width: 40%;
+            padding: 2rem;
             border: 3px solid #FFA500;
             border-radius: 20px;
             background: #fff;
-            min-width: 200px;
+            min-height: 300px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .wudhu-step {
-            width: 90px;
-            height: 90px;
+            width: 120px;
+            height: 120px;
             background: #87CEEB;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
             cursor: move;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
             user-select: none;
+            margin: 1rem 0;
         }
         .wudhu-step:hover {
             transform: rotate(10deg) scale(1.1);
@@ -356,12 +293,7 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         @media (max-width: 640px) {
-            .card-grid { flex-direction: column; align-items: center; }
             .wudhu-container { flex-direction: column; }
             .wudhu-obligatory, .wudhu-mustahab { width: 100%; }
             .nav { padding: 0.5rem; }
@@ -446,20 +378,24 @@
     </div>
 
     <div id="welcome" class="section container hidden">
-        <div class="card-grid">
-            <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your stats!</p></div>
-            <div class="card" onclick="showSection('kindergarten')"><h3>📖 Quiz</h3><p>Test your wisdom!</p></div>
-            <div class="card" onclick="showSection('year1')"><h3>🧠 Memory</h3><p>Match Imams!</p></div>
-            <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu</h3><p>Master steps!</p></div>
-            <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the epic!</p></div>
-            <div class="card" onclick="showSection('year4')"><h3>🎨 Art</h3><p>Create art!</p></div>
-            <div class="card" onclick="showSection('missions')"><h3>⭐ Missions</h3><p>Earn rewards!</p></div>
+        <div class="content">
+            <h2 class="text-3xl text-orange-600 mb-4">Welcome to Your Adventure!</h2>
+            <p class="text-lg mb-4">Choose your next challenge below:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your stats!</p></div>
+                <div class="card" onclick="showSection('kindergarten')"><h3>📖 Quiz</h3><p>Test your wisdom!</p></div>
+                <div class="card" onclick="showSection('year1')"><h3>🧠 Memory</h3><p>Match Imams!</p></div>
+                <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu</h3><p>Master steps!</p></div>
+                <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the epic!</p></div>
+                <div class="card" onclick="showSection('year4')"><h3>🎨 Art</h3><p>Create art!</p></div>
+                <div class="card" onclick="showSection('missions')"><h3>⭐ Missions</h3><p>Earn rewards!</p></div>
+            </div>
         </div>
     </div>
 
     <div id="profile" class="section container hidden"></div>
     <div id="kindergarten" class="section container hidden"></div>
-    <div id="year1" class="section container hidden"></div>
+    <div id="year1" class="section section hidden"></div>
     <div id="year2" class="section container hidden"></div>
     <div id="year3" class="section container hidden"></div>
     <div id="year4" class="section container hidden"></div>
@@ -528,6 +464,7 @@
             const saved = localStorage.getItem('userData');
             if (saved) {
                 userData = JSON.parse(saved);
+                if (!userData.badges) userData.badges = ['Explorer']; // Ensure badges is initialized
                 document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
                 document.getElementById('avatar-display').style.display = 'block';
                 updateStarCounter();
@@ -613,12 +550,12 @@
             score = 0;
             const container = document.getElementById('kindergarten');
             container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Quiz Challenge 📖</h2>
+                <div class="content">
+                    <h2 class="text-3xl text-orange-600 mb-4">Quiz Challenge 📖</h2>
                     <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Quiz" class="karbala-img mx-auto mb-4">
-                    <div id="quiz-container" class="text-black text-center"></div>
-                    <div id="score" class="text-lg text-black mt-4"></div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <div id="quiz-container" class="text-lg mb-4"></div>
+                    <div id="score" class="text-xl mb-4"></div>
+                    <button class="btn" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
             showNextQuestion();
@@ -627,8 +564,8 @@
         function showNextQuestion() {
             const q = questions[userData.year][currentQuestion];
             const quizContainer = document.getElementById('quiz-container');
-            quizContainer.innerHTML = `<div class="text-black text-center">${q.question}</div>` +
-                (q.type === 'text' ? `<input id="answer-input" class="border rounded-lg p-2 bg-white text-black mx-auto block mt-4" style="width: 200px;"><button class="btn ml-2" onclick="checkAnswer()">Submit 🎉</button>` :
+            quizContainer.innerHTML = `<p class="mb-4">${q.question}</p>` +
+                (q.type === 'text' ? `<input id="answer-input" class="border rounded-lg p-2 bg-white text-black mx-auto block mt-4 w-1/2" placeholder="Type your answer"><button class="btn ml-2" onclick="checkAnswer()">Submit 🎉</button>` :
                 q.options.map(o => `<button class="btn ml-2 mt-2" onclick="checkAnswer('${o}')">${o} 🌟</button>`).join(''));
         }
 
@@ -644,14 +581,14 @@
                 updateStarCounter();
                 updateProgress();
                 updateBadges();
-                document.getElementById('score').innerHTML = `<span class="text-black text-center">Correct! 🎉 Score: ${score}/${questions[userData.year].length}</span>`;
+                document.getElementById('score').innerHTML = `<p class="text-green-600">Correct! 🎉 Score: ${score}/${questions[userData.year].length}</p>`;
                 confetti();
-            } else document.getElementById('score').innerHTML = `<span class="text-black text-center">Wrong! 😕 Answer: ${q.answer}</span>`;
+            } else document.getElementById('score').innerHTML = `<p class="text-red-600">Wrong! 😕 Answer: ${q.answer}</p>`;
             currentQuestion++;
             if (currentQuestion < questions[userData.year].length) {
                 setTimeout(showNextQuestion, 1000);
             } else {
-                document.getElementById('score').innerHTML += '<br><span class="text-black text-center">Quest Done! 🎉</span>';
+                document.getElementById('score').innerHTML += '<p class="mt-4 text-green-600">Quest Done! 🎉</p>';
             }
         }
 
@@ -659,9 +596,9 @@
             clickSound.play();
             const container = document.getElementById('year1');
             container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Memory Quest 🧠</h2>
-                    <div id="memory-game" class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4"></div>
+                <div class="content">
+                    <h2 class="text-3xl text-orange-600 mb-4">Memory Quest 🧠</h2>
+                    <div id="memory-game" class="grid grid-cols-2 md:grid-cols-4 gap-6 p-4"></div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
@@ -670,7 +607,7 @@
             gameContainer.innerHTML = '';
             shuffledCards.forEach(card => {
                 const cardElement = document.createElement('div');
-                cardElement.className = 'memory-card bg-white text-black p-2 rounded-lg cursor-pointer';
+                cardElement.className = 'memory-card bg-white text-black p-4 rounded-lg cursor-pointer text-xl';
                 cardElement.dataset.name = card.name;
                 cardElement.dataset.match = card.match;
                 cardElement.textContent = '❓';
@@ -709,26 +646,27 @@
                     card2.textContent = '❓';
                 }, 1000);
             }
-            flippedCards = [];
+            flippedCards = []; // Reset flippedCards to allow further clicks
         }
 
         function initWudhuPuzzle() {
             clickSound.play();
             const container = document.getElementById('year2');
             container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Wudhu Challenge 💧</h2>
+                <div class="content">
+                    <h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
                     <div class="wudhu-container">
                         <div class="wudhu-obligatory">
-                            <h3 class="text-black">Obligatory 📖</h3>
-                            <div id="obligatory-steps" class="space-y-2"></div>
+                            <h3 class="text-xl mb-4">Obligatory 📖</h3>
+                            <div id="obligatory-steps" class="space-y-4"></div>
                         </div>
                         <div class="wudhu-mustahab">
-                            <h3 class="text-black">Mustahab 🌱</h3>
-                            <div id="mustahab-steps" class="space-y-2"></div>
+                            <h3 class="text-xl mb-4">Mustahab 🌱</h3>
+                            <div id="mustahab-steps" class="space-y-4"></div>
                         </div>
                     </div>
-                    <div id="wudhu-dropzone" class="mt-4 grid grid-cols-4 gap-2"></div>
+                    <div id="wudhu-dropzone" class="grid grid-cols-4 gap-4 mt-4"></div>
+                    <button id="wudhu-submit" class="btn mt-4">Submit 🎉</button>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
@@ -749,6 +687,7 @@
                 el.addEventListener('dragover', dragOver);
                 el.addEventListener('drop', drop);
             });
+            document.getElementById('wudhu-submit').addEventListener('click', checkWudhuCompletion);
         }
 
         let dragged;
@@ -768,11 +707,11 @@
             const container = event.target;
             if (container.id.includes('steps') && (!container.children.length || dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab'))) {
                 container.appendChild(dragged);
-                checkWudhuCompletion();
             }
         }
 
         function checkWudhuCompletion() {
+            clickSound.play();
             const obligatorySteps = document.getElementById('obligatory-steps');
             const mustahabSteps = document.getElementById('mustahab-steps');
             const isSortedCorrectly = Array.from(obligatorySteps.children).every((step, index) => step.dataset.category === 'obligatory' && step.dataset.order === index + 1) &&
@@ -787,7 +726,9 @@
                 updateProgress();
                 updateBadges();
                 confetti();
-                document.getElementById('year2').innerHTML += '<p class="text-black text-center mt-4">Challenge Completed! 🎉</p>';
+                document.getElementById('year2').innerHTML += '<p class="text-green-600 text-xl mt-4">Challenge Completed! 🎉</p>';
+            } else {
+                alert('Please sort and order correctly! 😕');
             }
         }
 
@@ -795,10 +736,10 @@
             clickSound.play();
             const container = document.getElementById('year3');
             container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Karbala Epic 🏰</h2>
-                    <p class="text-black">Discover Imam Hussain's bravery!</p>
-                    <img src="https://yourusername.github.io/your-repo/images/karbala.jpg" alt="Karbala" class="karbala-img mx-auto mt-4">
+                <div class="content">
+                    <h2 class="text-3xl text-orange-600 mb-4">Karbala Epic 🏰</h2>
+                    <p class="text-lg mb-4">Discover Imam Hussain's bravery!</p>
+                    <img src="https://yourusername.github.io/your-repo/images/karbala.jpg" alt="Karbala" class="karbala-img mx-auto mb-4">
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
@@ -814,9 +755,9 @@
             clickSound.play();
             const container = document.getElementById('year4');
             container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Art Quest 🎨</h2>
-                    <canvas id="art-canvas" width="400" height="300"></canvas>
+                <div class="content">
+                    <h2 class="text-3xl text-orange-600 mb-4">Art Quest 🎨</h2>
+                    <canvas id="art-canvas" width="600" height="400"></canvas>
                     <div class="art-tools mt-4">
                         <button class="btn" onclick="changeColor('red')">Red ❤️</button>
                         <button class="btn" onclick="changeColor('blue')">Blue 💙</button>
@@ -870,14 +811,14 @@
             clickSound.play();
             const container = document.getElementById('missions');
             container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Mission Hub ⭐</h2>
-                    <div class="space-y-4">
+                <div class="content">
+                    <h2 class="text-3xl text-orange-600 mb-4">Mission Hub ⭐</h2>
+                    <div class="space-y-6">
                         ${missions.map(mission => `
                             <div class="bg-white p-4 rounded-lg shadow">
-                                <h3 class="text-orange-600">${mission.title}</h3>
-                                <p class="text-black">${mission.question}</p>
-                                <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2" style="width: 200px;">
+                                <h3 class="text-xl text-orange-600">${mission.title}</h3>
+                                <p class="text-lg mb-2">${mission.question}</p>
+                                <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2 w-1/2" placeholder="Type your answer">
                                 <button class="btn ml-2 mt-2" onclick="checkMission('${mission.id}')">Submit 🎉</button>
                             </div>
                         `).join('')}
@@ -910,10 +851,10 @@
             clickSound.play();
             const container = document.getElementById('profile');
             container.innerHTML = `
-                <div class="card centered">
-                    <h2 class="text-2xl text-orange-600 mb-2">Your Profile 🏡</h2>
+                <div class="content">
+                    <h2 class="text-3xl text-orange-600 mb-4">Your Profile 🏡</h2>
                     <img src="https://yourusername.github.io/your-repo/images/profile_islamic.jpg" alt="Profile" class="karbala-img mx-auto mb-4">
-                    <div id="profile-info" class="text-lg text-black text-center">
+                    <div id="profile-info" class="text-lg">
                         Name: ${userData.name}<br>
                         Year: ${userData.year}<br>
                         Stars: ${userData.stars} ⭐<br>
@@ -940,6 +881,7 @@
         }
 
         function updateBadges() {
+            if (!userData.badges) userData.badges = ['Explorer']; // Safeguard against undefined
             document.querySelector('.badge').textContent = `🏅 Badge: ${userData.badges[userData.badges.length - 1] || 'Explorer'}`;
             saveUserData();
         }
