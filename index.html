@@ -241,33 +241,33 @@
         .wudhu-container {
             display: flex;
             justify-content: space-around;
-            gap: 3rem;
+            gap: 2rem;
             margin: 2rem 0;
             flex-wrap: wrap;
         }
         .wudhu-obligatory, .wudhu-mustahab {
             width: 45%;
-            padding: 3rem;
-            border: 4px solid #FFA500;
-            border-radius: 25px;
+            padding: 2rem;
+            border: 3px solid #FFA500;
+            border-radius: 20px;
             background: #fff;
-            min-height: 400px;
+            min-height: 300px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .wudhu-step {
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             background: #87CEEB;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             cursor: move;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
             user-select: none;
-            margin: 1.5rem 0;
+            margin: 1rem 0;
         }
         .wudhu-step:hover {
             transform: rotate(10deg) scale(1.1);
@@ -690,14 +690,14 @@
                 card.textContent = card.dataset.name;
                 flippedCards.push(card);
                 if (flippedCards.length === 2) {
-                    setTimeout(checkMatch, 1000);
+                    setTimeout(checkMatch, 1000); // Delay to show match
                 }
             }
         }
 
         function checkMatch() {
             const [card1, card2] = flippedCards;
-            if (card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
+            if (card1 && card2 && card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
                 card1.classList.add('matched');
                 card2.classList.add('matched');
                 matchedCards.push(card1, card2);
@@ -762,7 +762,7 @@
         function dragStart(event) {
             clickSound.play();
             dragged = event.target;
-            event.dataTransfer.setData('text/plain', null);
+            event.dataTransfer.setData('text/plain', dragged.textContent);
         }
 
         function dragOver(event) {
@@ -772,8 +772,8 @@
         function drop(event) {
             clickSound.play();
             event.preventDefault();
-            const container = event.target;
-            if (container.id.includes('steps') && (!container.children.length || dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab'))) {
+            const container = event.target.closest('#obligatory-steps, #mustahab-steps');
+            if (container && (!container.children.length || dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab'))) {
                 container.appendChild(dragged);
             }
         }
@@ -862,10 +862,11 @@
             window.loadImage = (src) => {
                 const img = new Image();
                 img.onload = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear before drawing
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     clickSound.play();
                 };
+                img.onerror = () => alert('Failed to load image. Check the URL!');
                 img.src = src;
             };
             userData.stars += 1;
