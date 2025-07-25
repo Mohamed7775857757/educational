@@ -33,13 +33,47 @@
             z-index: -1;
             overflow: hidden;
         }
-        .tree, .cloud, .star {
+        .tree, .cloud, .star, .moon {
             position: absolute;
             animation: float 6s infinite ease-in-out;
         }
         .tree { content: '🌳'; font-size: 80px; }
-        .cloud { content: '☁️'; font-size: 50px; }
-        .star { content: '⭐'; font-size: 30px; }
+        .cloud { content: '☁️'; font-size: 50px; animation: float 8s infinite ease-in-out; }
+        .star { content: '⭐'; font-size: 30px; animation: twinkle 2s infinite alternate; }
+        .moon { content: '🌙'; font-size: 60px; animation: shine 4s infinite ease-in-out; top: 10%; left: 10%; }
+        .mascot {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            width: 100px;
+            height: 100px;
+            background: url('https://via.placeholder.com/100?text=Explorer+Mascot') no-repeat center;
+            background-size: contain;
+            z-index: 50;
+            animation: bounce 2s infinite;
+        }
+        .mascot-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        .mascot-modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
         .hero {
             height: 100vh;
             position: relative;
@@ -355,14 +389,22 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-30px); }
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        @keyframes twinkle {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+        @keyframes shine {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: brightness(1.5); }
         }
         @keyframes rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         @media (max-width: 640px) {
             .card-grid { flex-direction: column; align-items: center; }
@@ -382,6 +424,15 @@
         <div class="cloud" style="right: 20%; top: 30%;"></div>
         <div class="star" style="left: 30%; top: 50%;"></div>
         <div class="star" style="right: 25%; top: 60%;"></div>
+        <div class="moon"></div>
+    </div>
+    <div class="mascot" onclick="showMascotModal()"></div>
+    <div id="mascot-modal" class="mascot-modal" onclick="closeMascotModal(event)">
+        <div class="mascot-modal-content" onclick="event.stopPropagation()">
+            <h2 class="text-2xl text-orange-600 mb-2">Welcome, Explorer!</h2>
+            <p class="text-lg mb-4">I’m your guide! Click the buttons to start your Islamic adventure. Need help? Ask me!</p>
+            <button class="btn" onclick="closeMascotModal()">Let’s Go! 🌟</button>
+        </div>
     </div>
     <div class="nav">
         <div class="container flex justify-between items-center">
@@ -473,8 +524,10 @@
         let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {} };
         let currentQuestion = 0;
         let score = 0;
-        let flippedCards = [], matchedCards = [];
+        let flippedCards = [];
+        let matchedCards = [];
         let isMuted = false;
+        let isLocked = false; // Lock during match check
         const backgroundMusic = new Howl({ src: ['https://yourusername.github.io/your-repo/music/background.mp3'], loop: true, volume: 0.3 });
         const clickSound = new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/click.mp3'] });
         const questions = {
@@ -541,6 +594,7 @@
                 if (!isMuted) backgroundMusic.play();
             } else {
                 openModal();
+                showMascotModal();
             }
         }
 
@@ -578,6 +632,7 @@
                 if (sectionId === 'profile') showProfile();
                 updateProgress();
                 updateBadges();
+                showMascotModal(`Welcome to ${sectionId.replace('year', 'Year ').replace('welcome', 'Home')}! Explore and learn!`);
             }
         }
 
@@ -684,20 +739,21 @@
             });
         }
 
+        let lock = false;
         function flipCard(card) {
             clickSound.play();
-            if (flippedCards.length < 2 && !flippedCards.includes(card) && !card.classList.contains('matched')) {
-                card.textContent = card.dataset.name;
-                flippedCards.push(card);
-                if (flippedCards.length === 2) {
-                    setTimeout(checkMatch, 1000); // Delay to show match
-                }
+            if (lock || flippedCards.length >= 2 || flippedCards.includes(card) || card.classList.contains('matched')) return;
+            card.textContent = card.dataset.name;
+            flippedCards.push(card);
+            if (flippedCards.length === 2) {
+                lock = true;
+                setTimeout(checkMatch, 1000);
             }
         }
 
         function checkMatch() {
             const [card1, card2] = flippedCards;
-            if (card1 && card2 && card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
+            if (card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
                 card1.classList.add('matched');
                 card2.classList.add('matched');
                 matchedCards.push(card1, card2);
@@ -712,9 +768,10 @@
                 setTimeout(() => {
                     card1.textContent = '❓';
                     card2.textContent = '❓';
-                }, 1000);
+                }, 500);
             }
-            flippedCards = []; // Reset to allow further clicks
+            flippedCards = [];
+            lock = false;
         }
 
         function initWudhuPuzzle() {
@@ -775,6 +832,7 @@
             const container = event.target.closest('#obligatory-steps, #mustahab-steps');
             if (container && (!container.children.length || dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab'))) {
                 container.appendChild(dragged);
+                dragged = null; // Clear dragged to prevent reverts
             }
         }
 
@@ -835,7 +893,7 @@
                         <button class="btn" onclick="changeColor('purple')">Purple 💜</button>
                         <button class="btn" onclick="changeColor('orange')">Orange 🍊</button>
                         <button class="btn" onclick="loadImage('https://yourusername.github.io/your-repo/images/kaaba.jpg')">Kaaba 🕋</button>
-                        <button class="btn" onclick="loadImage('https://yourusername.github.io/your-repo/images/masjid.jpg')">Masjid 🕌</button>
+                        <button class="btn" onclick="loadImage('https://via.placeholder.com/600x400?text=Masjid')">Masjid 🕌</button>
                         <button class="btn" onclick="clearCanvas()">Clear 🧹</button>
                     </div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
@@ -866,7 +924,13 @@
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     clickSound.play();
                 };
-                img.onerror = () => alert('Failed to load image. Check the URL!');
+                img.onerror = () => {
+                    console.log(`Image load failed for ${src}`);
+                    alert('Failed to load image. Check the URL or use a valid image path!');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#ccc';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                };
                 img.src = src;
             };
             userData.stars += 1;
@@ -971,6 +1035,21 @@
                 spread: 70,
                 origin: { y: 0.6 }
             });
+        }
+
+        function showMascotModal(message = "Welcome to Shia Islamic Quest! I'm your guide, Explorer! Click to start!") {
+            clickSound.play();
+            const modal = document.getElementById('mascot-modal');
+            const content = document.querySelector('.mascot-modal-content p');
+            if (content) content.textContent = message;
+            modal.style.display = 'flex';
+        }
+
+        function closeMascotModal(event) {
+            if (event.target.id === 'mascot-modal' || event.target.tagName === 'BUTTON') {
+                clickSound.play();
+                document.getElementById('mascot-modal').style.display = 'none';
+            }
         }
 
         gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
