@@ -92,6 +92,17 @@
             transform: scale(1.2);
             color: #32CD32;
         }
+        .card-grid {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 4rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            flex-wrap: wrap;
+        }
         .section {
             min-height: 100vh;
             padding: 4rem 2rem;
@@ -100,13 +111,49 @@
             z-index: 10;
         }
         .content {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 2rem;
             background: rgba(255, 255, 255, 0.9);
             color: #000;
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .card {
+            background: linear-gradient(135deg, #FF69B4, #FFA500);
+            border-radius: 30px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-align: center;
+            overflow: hidden;
+            width: 250px;
+        }
+        .card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 15px 40px rgba(50, 205, 50, 0.3);
+        }
+        .card h3 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px #000;
+        }
+        .card p {
+            color: #fff;
+            text-shadow: 1px 1px #000;
+        }
+        .card:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+            z-index: -1;
         }
         .btn {
             background: linear-gradient(90deg, #FFA500, #FF69B4);
@@ -194,38 +241,58 @@
         .wudhu-container {
             display: flex;
             justify-content: space-around;
-            gap: 2rem;
+            gap: 3rem;
             margin: 2rem 0;
             flex-wrap: wrap;
         }
         .wudhu-obligatory, .wudhu-mustahab {
-            width: 40%;
-            padding: 2rem;
-            border: 3px solid #FFA500;
-            border-radius: 20px;
+            width: 45%;
+            padding: 3rem;
+            border: 4px solid #FFA500;
+            border-radius: 25px;
             background: #fff;
-            min-height: 300px;
+            min-height: 400px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .wudhu-step {
-            width: 120px;
-            height: 120px;
+            width: 150px;
+            height: 150px;
             background: #87CEEB;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             cursor: move;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
             user-select: none;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
         }
         .wudhu-step:hover {
             transform: rotate(10deg) scale(1.1);
         }
         .wudhu-step.correct {
+            background: #32CD32;
+            color: #fff;
+        }
+        .memory-card {
+            width: 150px;
+            height: 150px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .memory-card:hover {
+            transform: scale(1.05);
+        }
+        .memory-card.matched {
             background: #32CD32;
             color: #fff;
         }
@@ -293,7 +360,12 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         @media (max-width: 640px) {
+            .card-grid { flex-direction: column; align-items: center; }
             .wudhu-container { flex-direction: column; }
             .wudhu-obligatory, .wudhu-mustahab { width: 100%; }
             .nav { padding: 0.5rem; }
@@ -378,24 +450,20 @@
     </div>
 
     <div id="welcome" class="section container hidden">
-        <div class="content">
-            <h2 class="text-3xl text-orange-600 mb-4">Welcome to Your Adventure!</h2>
-            <p class="text-lg mb-4">Choose your next challenge below:</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your stats!</p></div>
-                <div class="card" onclick="showSection('kindergarten')"><h3>📖 Quiz</h3><p>Test your wisdom!</p></div>
-                <div class="card" onclick="showSection('year1')"><h3>🧠 Memory</h3><p>Match Imams!</p></div>
-                <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu</h3><p>Master steps!</p></div>
-                <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the epic!</p></div>
-                <div class="card" onclick="showSection('year4')"><h3>🎨 Art</h3><p>Create art!</p></div>
-                <div class="card" onclick="showSection('missions')"><h3>⭐ Missions</h3><p>Earn rewards!</p></div>
-            </div>
+        <div class="card-grid">
+            <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your stats!</p></div>
+            <div class="card" onclick="showSection('kindergarten')"><h3>📖 Quiz</h3><p>Test your wisdom!</p></div>
+            <div class="card" onclick="showSection('year1')"><h3>🧠 Memory</h3><p>Match Imams!</p></div>
+            <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu</h3><p>Master steps!</p></div>
+            <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the epic!</p></div>
+            <div class="card" onclick="showSection('year4')"><h3>🎨 Art</h3><p>Create art!</p></div>
+            <div class="card" onclick="showSection('missions')"><h3>⭐ Missions</h3><p>Earn rewards!</p></div>
         </div>
     </div>
 
     <div id="profile" class="section container hidden"></div>
     <div id="kindergarten" class="section container hidden"></div>
-    <div id="year1" class="section section hidden"></div>
+    <div id="year1" class="section container hidden"></div>
     <div id="year2" class="section container hidden"></div>
     <div id="year3" class="section container hidden"></div>
     <div id="year4" class="section container hidden"></div>
@@ -464,7 +532,7 @@
             const saved = localStorage.getItem('userData');
             if (saved) {
                 userData = JSON.parse(saved);
-                if (!userData.badges) userData.badges = ['Explorer']; // Ensure badges is initialized
+                if (!userData.badges) userData.badges = ['Explorer'];
                 document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
                 document.getElementById('avatar-display').style.display = 'block';
                 updateStarCounter();
@@ -607,7 +675,7 @@
             gameContainer.innerHTML = '';
             shuffledCards.forEach(card => {
                 const cardElement = document.createElement('div');
-                cardElement.className = 'memory-card bg-white text-black p-4 rounded-lg cursor-pointer text-xl';
+                cardElement.className = 'memory-card';
                 cardElement.dataset.name = card.name;
                 cardElement.dataset.match = card.match;
                 cardElement.textContent = '❓';
@@ -646,7 +714,7 @@
                     card2.textContent = '❓';
                 }, 1000);
             }
-            flippedCards = []; // Reset flippedCards to allow further clicks
+            flippedCards = []; // Reset to allow further clicks
         }
 
         function initWudhuPuzzle() {
@@ -794,6 +862,7 @@
             window.loadImage = (src) => {
                 const img = new Image();
                 img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear before drawing
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     clickSound.play();
                 };
@@ -860,6 +929,7 @@
                         Stars: ${userData.stars} ⭐<br>
                         Badges: ${userData.badges.join(', ')} 🏅
                     </div>
+                    <button class="btn mt-4" onclick="openModal()">Change Hero 🎨</button>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
@@ -881,7 +951,7 @@
         }
 
         function updateBadges() {
-            if (!userData.badges) userData.badges = ['Explorer']; // Safeguard against undefined
+            if (!userData.badges) userData.badges = ['Explorer'];
             document.querySelector('.badge').textContent = `🏅 Badge: ${userData.badges[userData.badges.length - 1] || 'Explorer'}`;
             saveUserData();
         }
