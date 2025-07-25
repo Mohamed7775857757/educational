@@ -41,39 +41,6 @@
         .cloud { content: '☁️'; font-size: 50px; animation: float 8s infinite ease-in-out; }
         .star { content: '⭐'; font-size: 30px; animation: twinkle 2s infinite alternate; }
         .moon { content: '🌙'; font-size: 60px; animation: shine 4s infinite ease-in-out; top: 10%; left: 10%; }
-        .mascot {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            width: 100px;
-            height: 100px;
-            background: url('https://via.placeholder.com/100?text=Explorer+Mascot') no-repeat center;
-            background-size: contain;
-            z-index: 50;
-            animation: bounce 2s infinite;
-        }
-        .mascot-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-        }
-        .mascot-modal-content {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 30px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            animation: slideIn 0.5s ease-out;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
         .hero {
             height: 100vh;
             position: relative;
@@ -317,11 +284,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             cursor: pointer;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
+            overflow: hidden;
         }
         .memory-card:hover {
             transform: scale(1.05);
@@ -411,6 +379,7 @@
             .wudhu-container { flex-direction: column; }
             .wudhu-obligatory, .wudhu-mustahab { width: 100%; }
             .nav { padding: 0.5rem; }
+            .memory-card { width: 120px; height: 120px; font-size: 1rem; }
         }
     </style>
 </head>
@@ -425,14 +394,6 @@
         <div class="star" style="left: 30%; top: 50%;"></div>
         <div class="star" style="right: 25%; top: 60%;"></div>
         <div class="moon"></div>
-    </div>
-    <div class="mascot" onclick="showMascotModal()"></div>
-    <div id="mascot-modal" class="mascot-modal" onclick="closeMascotModal(event)">
-        <div class="mascot-modal-content" onclick="event.stopPropagation()">
-            <h2 class="text-2xl text-orange-600 mb-2">Welcome, Explorer!</h2>
-            <p class="text-lg mb-4">I’m your guide! Click the buttons to start your Islamic adventure. Need help? Ask me!</p>
-            <button class="btn" onclick="closeMascotModal()">Let’s Go! 🌟</button>
-        </div>
     </div>
     <div class="nav">
         <div class="container flex justify-between items-center">
@@ -527,7 +488,7 @@
         let flippedCards = [];
         let matchedCards = [];
         let isMuted = false;
-        let isLocked = false; // Lock during match check
+        let isLocked = false;
         const backgroundMusic = new Howl({ src: ['https://yourusername.github.io/your-repo/music/background.mp3'], loop: true, volume: 0.3 });
         const clickSound = new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/click.mp3'] });
         const questions = {
@@ -561,10 +522,34 @@
             ]
         };
         const memoryCards = [
-            { name: 'Imam Ali', match: 'First Imam', id: 1 },
-            { name: 'First Imam', match: 'Imam Ali', id: 2 },
-            { name: 'Imam Hassan', match: 'Second Imam', id: 3 },
-            { name: 'Second Imam', match: 'Imam Hassan', id: 4 }
+            { name: 'Prophet Muhammad(s)', match: 'Prophet Muhammad(s)', id: 1 },
+            { name: 'Prophet Muhammad(s)', match: 'Prophet Muhammad(s)', id: 2 },
+            { name: 'Imam Ali(as)', match: 'Imam Ali(as)', id: 3 },
+            { name: 'Imam Ali(as)', match: 'Imam Ali(as)', id: 4 },
+            { name: 'Sayeda Fatima Al Zahraa(as)', match: 'Sayeda Fatima Al Zahraa(as)', id: 5 },
+            { name: 'Sayeda Fatima Al Zahraa(as)', match: 'Sayeda Fatima Al Zahraa(as)', id: 6 },
+            { name: 'Imam Hasan(as)', match: 'Imam Hasan(as)', id: 7 },
+            { name: 'Imam Hasan(as)', match: 'Imam Hasan(as)', id: 8 },
+            { name: 'Imam Hussain(as)', match: 'Imam Hussain(as)', id: 9 },
+            { name: 'Imam Hussain(as)', match: 'Imam Hussain(as)', id: 10 },
+            { name: 'Imam Al Sajjad(as)', match: 'Imam Al Sajjad(as)', id: 11 },
+            { name: 'Imam Al Sajjad(as)', match: 'Imam Al Sajjad(as)', id: 12 },
+            { name: 'Imam Al Baqir(as)', match: 'Imam Al Baqir(as)', id: 13 },
+            { name: 'Imam Al Baqir(as)', match: 'Imam Al Baqir(as)', id: 14 },
+            { name: 'Imam Al Sadiq(as)', match: 'Imam Al Sadiq(as)', id: 15 },
+            { name: 'Imam Al Sadiq(as)', match: 'Imam Al Sadiq(as)', id: 16 },
+            { name: 'Imam Al Kadhim(as)', match: 'Imam Al Kadhim(as)', id: 17 },
+            { name: 'Imam Al Kadhim(as)', match: 'Imam Al Kadhim(as)', id: 18 },
+            { name: 'Imam Al Redha(as)', match: 'Imam Al Redha(as)', id: 19 },
+            { name: 'Imam Al Redha(as)', match: 'Imam Al Redha(as)', id: 20 },
+            { name: 'Imam Al Jawad(as)', match: 'Imam Al Jawad(as)', id: 21 },
+            { name: 'Imam Al Jawad(as)', match: 'Imam Al Jawad(as)', id: 22 },
+            { name: 'Imam Al Hadi(as)', match: 'Imam Al Hadi(as)', id: 23 },
+            { name: 'Imam Al Hadi(as)', match: 'Imam Al Hadi(as)', id: 24 },
+            { name: 'Imam Al Askari(as)', match: 'Imam Al Askari(as)', id: 25 },
+            { name: 'Imam Al Askari(as)', match: 'Imam Al Askari(as)', id: 26 },
+            { name: 'Imam Al Mahdi(as)', match: 'Imam Al Mahdi(as)', id: 27 },
+            { name: 'Imam Al Mahdi(as)', match: 'Imam Al Mahdi(as)', id: 28 }
         ];
         const wudhuSteps = [
             { name: 'Niyyah', id: 1, category: 'obligatory', order: 1 },
@@ -594,7 +579,6 @@
                 if (!isMuted) backgroundMusic.play();
             } else {
                 openModal();
-                showMascotModal();
             }
         }
 
@@ -632,7 +616,6 @@
                 if (sectionId === 'profile') showProfile();
                 updateProgress();
                 updateBadges();
-                showMascotModal(`Welcome to ${sectionId.replace('year', 'Year ').replace('welcome', 'Home')}! Explore and learn!`);
             }
         }
 
@@ -721,7 +704,7 @@
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Memory Quest 🧠</h2>
-                    <div id="memory-game" class="grid grid-cols-2 md:grid-cols-4 gap-6 p-4"></div>
+                    <div id="memory-game" class="grid grid-cols-4 md:grid-cols-7 gap-4 p-4"></div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
@@ -830,9 +813,9 @@
             clickSound.play();
             event.preventDefault();
             const container = event.target.closest('#obligatory-steps, #mustahab-steps');
-            if (container && (!container.children.length || dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab'))) {
+            if (container && dragged) {
                 container.appendChild(dragged);
-                dragged = null; // Clear dragged to prevent reverts
+                dragged = null; // Clear dragged to prevent reverting
             }
         }
 
@@ -1035,21 +1018,6 @@
                 spread: 70,
                 origin: { y: 0.6 }
             });
-        }
-
-        function showMascotModal(message = "Welcome to Shia Islamic Quest! I'm your guide, Explorer! Click to start!") {
-            clickSound.play();
-            const modal = document.getElementById('mascot-modal');
-            const content = document.querySelector('.mascot-modal-content p');
-            if (content) content.textContent = message;
-            modal.style.display = 'flex';
-        }
-
-        function closeMascotModal(event) {
-            if (event.target.id === 'mascot-modal' || event.target.tagName === 'BUTTON') {
-                clickSound.play();
-                document.getElementById('mascot-modal').style.display = 'none';
-            }
         }
 
         gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
