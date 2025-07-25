@@ -4,15 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shia Islamic Adventure Quest</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Comic Neue and Fredoka -->
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Fredoka:wght@400;500&display=swap" rel="stylesheet">
-    <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <!-- Confetti.js for effects -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Howler.js for sound -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <style>
         body {
@@ -63,6 +58,20 @@
             margin-bottom: 2rem;
             animation: fadeIn 1.5s ease-out;
         }
+        .hero .btn {
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
+            color: #fff;
+            padding: 2rem 4rem; /* Bigger button */
+            font-size: 2rem; /* Bigger text */
+            border-radius: 30px;
+            transition: transform 0.3s, background 0.3s;
+            text-shadow: 1px 1px #000;
+        }
+        .hero .btn:hover {
+            transform: scale(1.1);
+            background: linear-gradient(90deg, #32CD32, #87CEEB);
+            box-shadow: 0 0 10px #32CD32;
+        }
         .nav {
             position: fixed;
             top: 0;
@@ -84,14 +93,15 @@
             color: #32CD32;
         }
         .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            display: flex;
+            justify-content: center;
             gap: 1.5rem;
             padding: 4rem 1rem;
             max-width: 1200px;
             margin: 0 auto;
             position: relative;
             z-index: 10;
+            flex-wrap: wrap;
         }
         .section {
             background: rgba(255, 255, 255, 0.9);
@@ -112,9 +122,10 @@
             cursor: pointer;
             text-align: center;
             overflow: hidden;
+            width: 250px;
         }
         .card:hover {
-            transform: translateY(-15px) rotate(5deg);
+            transform: translateY(-15px);
             box-shadow: 0 15px 40px rgba(50, 205, 50, 0.3);
         }
         .card h3 {
@@ -146,11 +157,10 @@
             font-weight: 600;
             font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
-            display: inline-block;
             text-shadow: 1px 1px #000;
         }
         .btn:hover {
-            transform: scale(1.1) rotate(5deg);
+            transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 0 10px #32CD32;
         }
@@ -261,7 +271,7 @@
             min-width: 200px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        .memory-card, .wudhu-step {
+        .wudhu-step {
             width: 90px;
             height: 90px;
             background: #87CEEB;
@@ -269,15 +279,16 @@
             align-items: center;
             justify-content: center;
             font-size: 0.9rem;
-            cursor: pointer;
+            cursor: move;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
+            user-select: none;
         }
-        .memory-card:hover, .wudhu-step:hover {
+        .wudhu-step:hover {
             transform: rotate(10deg) scale(1.1);
         }
-        .memory-card.matched, .wudhu-step.correct {
+        .wudhu-step.correct {
             background: #32CD32;
             color: #fff;
         }
@@ -350,7 +361,7 @@
             100% { transform: rotate(360deg); }
         }
         @media (max-width: 640px) {
-            .card-grid { grid-template-columns: 1fr; }
+            .card-grid { flex-direction: column; align-items: center; }
             .wudhu-container { flex-direction: column; }
             .wudhu-obligatory, .wudhu-mustahab { width: 100%; }
             .nav { padding: 0.5rem; }
@@ -398,14 +409,12 @@
     <img id="avatar-display" src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="avatar-display" style="display: none;">
     <div class="progress-bar"><div id="progress" class="progress" style="width: 0%;"></div></div>
 
-    <!-- Hero Section -->
     <div class="hero">
         <h1>Welcome to Shia Islamic Quest!</h1>
         <p>Embark on an epic adventure with your guide!</p>
         <button class="btn" onclick="openModal()">Start Quest</button>
     </div>
 
-    <!-- Modal for Intro -->
     <div id="intro-modal" class="modal" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h2 class="text-2xl text-orange-600 mb-2">Choose Your Hero</h2>
@@ -424,7 +433,6 @@
                     <option value="year4">Year 4</option>
                     <option value="year5">Year 5</option>
                     <option value="year6">Year 6</option>
-                    <option value="year7">Year 7</option>
                 </select>
                 <div class="character-container">
                     <img src="https://yourusername.github.io/your-repo/images/boy1.jpg" alt="Boy 1" class="character" data-gender="boy">
@@ -437,7 +445,6 @@
         </div>
     </div>
 
-    <!-- Content Sections -->
     <div id="welcome" class="section container hidden">
         <div class="card-grid">
             <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your stats!</p></div>
@@ -466,10 +473,36 @@
         let isMuted = false;
         const backgroundMusic = new Howl({ src: ['https://yourusername.github.io/your-repo/music/background.mp3'], loop: true, volume: 0.3 });
         const clickSound = new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/click.mp3'] });
-        const questions = [
-            { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
-            { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
-        ];
+        const questions = {
+            kindergarten: [
+                { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
+                { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
+            ],
+            year1: [
+                { question: 'Who was the first Imam?', type: 'text', answer: 'Imam Ali' },
+                { question: 'How many Imams are there?', type: 'text', answer: '12' }
+            ],
+            year2: [
+                { question: 'What is the first step of Wudhu?', type: 'text', answer: 'Niyyah' },
+                { question: 'What do you wash first in Wudhu?', type: 'text', answer: 'Face' }
+            ],
+            year3: [
+                { question: 'Where did the Battle of Karbala take place?', type: 'text', answer: 'Karbala' },
+                { question: 'Who was the leader at Karbala?', type: 'text', answer: 'Imam Hussain' }
+            ],
+            year4: [
+                { question: 'What is the Kaaba made of?', type: 'text', answer: 'Stone' },
+                { question: 'Where is the Kaaba located?', type: 'text', answer: 'Mecca' }
+            ],
+            year5: [
+                { question: 'What is the significance of Hajj?', type: 'text', answer: 'Pilgrimage' },
+                { question: 'How often is Hajj performed?', type: 'text', answer: 'Once' }
+            ],
+            year6: [
+                { question: 'What is the name of the holy book?', type: 'text', answer: 'Quran' },
+                { question: 'How many chapters are in the Quran?', type: 'text', answer: '114' }
+            ]
+        };
         const memoryCards = [
             { name: 'Imam Ali', match: 'First Imam', id: 1 },
             { name: 'First Imam', match: 'Imam Ali', id: 2 },
@@ -477,13 +510,14 @@
             { name: 'Second Imam', match: 'Imam Hassan', id: 4 }
         ];
         const wudhuSteps = [
-            { name: 'Wash face', id: 1, category: 'obligatory' },
-            { name: 'Wash right arm', id: 2, category: 'obligatory' },
-            { name: 'Wash left arm', id: 3, category: 'obligatory' },
-            { name: 'Wipe head', id: 4, category: 'obligatory' },
-            { name: 'Wipe right foot', id: 5, category: 'obligatory' },
-            { name: 'Wipe left foot', id: 6, category: 'obligatory' },
-            { name: 'Rinse mouth', id: 7, category: 'mustahab' }
+            { name: 'Niyyah', id: 1, category: 'obligatory', order: 1 },
+            { name: 'Wash face', id: 2, category: 'obligatory', order: 2 },
+            { name: 'Wash right arm', id: 3, category: 'obligatory', order: 3 },
+            { name: 'Wash left arm', id: 4, category: 'obligatory', order: 4 },
+            { name: 'Wipe head', id: 5, category: 'obligatory', order: 5 },
+            { name: 'Wipe right foot', id: 6, category: 'obligatory', order: 6 },
+            { name: 'Wipe left foot', id: 7, category: 'obligatory', order: 7 },
+            { name: 'Rinse mouth', id: 8, category: 'mustahab', order: 1 }
         ];
         const missions = [
             { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
@@ -529,8 +563,7 @@
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
-                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                console.log(`Switched to section: ${sectionId}`);
+                gsap.from(`#${sectionId}`, { opacity: 0, y: 0, duration: 0.5, ease: 'power2.out' });
                 if (sectionId === 'kindergarten') showQuestion();
                 if (sectionId === 'year1') initMemoryGame();
                 if (sectionId === 'year2') initWudhuPuzzle();
@@ -540,21 +573,17 @@
                 if (sectionId === 'profile') showProfile();
                 updateProgress();
                 updateBadges();
-            } else {
-                console.error(`Section ${sectionId} not found!`);
             }
         }
 
         function openModal() {
             clickSound.play();
             document.getElementById('intro-modal').style.display = 'flex';
-            console.log('Modal opened');
         }
         function closeModal(event) {
             if (event.target.id === 'intro-modal') {
                 clickSound.play();
                 document.getElementById('intro-modal').style.display = 'none';
-                console.log('Modal closed');
             }
         }
 
@@ -569,21 +598,19 @@
             saveUserData();
             closeModal({ target: { id: 'intro-modal' } });
             showSection('welcome');
-            console.log('Begin Quest clicked, transitioning to welcome with data:', userData);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const beginButton = document.querySelector('#intro-modal .btn');
             if (beginButton) {
                 beginButton.addEventListener('click', startLearning);
-                console.log('Event listener added to Begin Quest button');
-            } else {
-                console.error('Begin Quest button not found!');
             }
         });
 
         function showQuestion() {
             clickSound.play();
+            currentQuestion = 0;
+            score = 0;
             const container = document.getElementById('kindergarten');
             container.innerHTML = `
                 <div class="card centered">
@@ -594,7 +621,11 @@
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
-            const q = questions[currentQuestion];
+            showNextQuestion();
+        }
+
+        function showNextQuestion() {
+            const q = questions[userData.year][currentQuestion];
             const quizContainer = document.getElementById('quiz-container');
             quizContainer.innerHTML = `<div class="text-black text-center">${q.question}</div>` +
                 (q.type === 'text' ? `<input id="answer-input" class="border rounded-lg p-2 bg-white text-black mx-auto block mt-4" style="width: 200px;"><button class="btn ml-2" onclick="checkAnswer()">Submit 🎉</button>` :
@@ -603,7 +634,7 @@
 
         function checkAnswer(answer) {
             clickSound.play();
-            const q = questions[currentQuestion];
+            const q = questions[userData.year][currentQuestion];
             if (q.type === 'text') answer = document.getElementById('answer-input').value;
             if (answer.toLowerCase() === q.answer.toLowerCase()) {
                 score++;
@@ -613,13 +644,15 @@
                 updateStarCounter();
                 updateProgress();
                 updateBadges();
-                document.getElementById('score').innerHTML = `<span class="text-black text-center">Correct! 🎉 Score: ${score}/${questions.length}</span>`;
+                document.getElementById('score').innerHTML = `<span class="text-black text-center">Correct! 🎉 Score: ${score}/${questions[userData.year].length}</span>`;
                 confetti();
-                sounds.correct.play();
             } else document.getElementById('score').innerHTML = `<span class="text-black text-center">Wrong! 😕 Answer: ${q.answer}</span>`;
             currentQuestion++;
-            if (currentQuestion < questions.length) showQuestion();
-            else document.getElementById('score').innerHTML += '<br><span class="text-black text-center">Quest Done! 🎉</span>';
+            if (currentQuestion < questions[userData.year].length) {
+                setTimeout(showNextQuestion, 1000);
+            } else {
+                document.getElementById('score').innerHTML += '<br><span class="text-black text-center">Quest Done! 🎉</span>';
+            }
         }
 
         function initMemoryGame() {
@@ -634,6 +667,7 @@
             `;
             const gameContainer = document.getElementById('memory-game');
             const shuffledCards = [...memoryCards].sort(() => Math.random() - 0.5);
+            gameContainer.innerHTML = '';
             shuffledCards.forEach(card => {
                 const cardElement = document.createElement('div');
                 cardElement.className = 'memory-card bg-white text-black p-2 rounded-lg cursor-pointer';
@@ -647,7 +681,7 @@
 
         function flipCard(card) {
             clickSound.play();
-            if (flippedCards.length < 2 && !flippedCards.includes(card)) {
+            if (flippedCards.length < 2 && !flippedCards.includes(card) && !card.classList.contains('matched')) {
                 card.textContent = card.dataset.name;
                 flippedCards.push(card);
                 if (flippedCards.length === 2) {
@@ -669,15 +703,13 @@
                 updateProgress();
                 updateBadges();
                 confetti();
-                sounds.correct.play();
             } else {
-                card1.textContent = '❓';
-                card2.textContent = '❓';
+                setTimeout(() => {
+                    card1.textContent = '❓';
+                    card2.textContent = '❓';
+                }, 1000);
             }
             flippedCards = [];
-            if (matchedCards.length === memoryCards.length) {
-                document.getElementById('year1').innerHTML += '<p class="text-black text-center mt-4">Quest Completed! 🎉</p>';
-            }
         }
 
         function initWudhuPuzzle() {
@@ -689,24 +721,26 @@
                     <div class="wudhu-container">
                         <div class="wudhu-obligatory">
                             <h3 class="text-black">Obligatory 📖</h3>
-                            <div id="obligatory-steps" class="grid grid-cols-2 gap-2"></div>
+                            <div id="obligatory-steps" class="space-y-2"></div>
                         </div>
                         <div class="wudhu-mustahab">
                             <h3 class="text-black">Mustahab 🌱</h3>
-                            <div id="mustahab-steps" class="grid grid-cols-2 gap-2"></div>
+                            <div id="mustahab-steps" class="space-y-2"></div>
                         </div>
                     </div>
-                    <div id="wudhu-dropzone" class="mt-4 grid grid-cols-3 gap-2"></div>
+                    <div id="wudhu-dropzone" class="mt-4 grid grid-cols-4 gap-2"></div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
             const dropzone = document.getElementById('wudhu-dropzone');
-            wudhuSteps.forEach(step => {
+            const shuffledSteps = [...wudhuSteps].sort(() => Math.random() - 0.5);
+            shuffledSteps.forEach(step => {
                 const stepElement = document.createElement('div');
-                stepElement.className = 'wudhu-step bg-white text-black p-2 rounded-lg';
+                stepElement.className = 'wudhu-step';
                 stepElement.draggable = true;
                 stepElement.textContent = step.name;
                 stepElement.dataset.category = step.category;
+                stepElement.dataset.order = step.order;
                 stepElement.addEventListener('dragstart', dragStart);
                 dropzone.appendChild(stepElement);
             });
@@ -734,20 +768,26 @@
             const container = event.target;
             if (container.id.includes('steps') && (!container.children.length || dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab'))) {
                 container.appendChild(dragged);
-                if (dragged.dataset.category === (container.id.includes('obligatory') ? 'obligatory' : 'mustahab')) {
-                    dragged.classList.add('correct');
-                    userData.stars += 2;
-                    userData.progress = Math.min(userData.progress + 1, 7);
-                    if (document.getElementById('obligatory-steps').children.length === 6 && document.getElementById('mustahab-steps').children.length === 1) userData.badges.push('Wudhu Expert');
-                    updateStarCounter();
-                    updateProgress();
-                    updateBadges();
-                    confetti();
-                    sounds.correct.play();
-                }
-                if (document.getElementById('obligatory-steps').children.length === 6 && document.getElementById('mustahab-steps').children.length === 1) {
-                    document.getElementById('year2').innerHTML += '<p class="text-black text-center mt-4">Challenge Completed! 🎉</p>';
-                }
+                checkWudhuCompletion();
+            }
+        }
+
+        function checkWudhuCompletion() {
+            const obligatorySteps = document.getElementById('obligatory-steps');
+            const mustahabSteps = document.getElementById('mustahab-steps');
+            const isSortedCorrectly = Array.from(obligatorySteps.children).every((step, index) => step.dataset.category === 'obligatory' && step.dataset.order === index + 1) &&
+                Array.from(mustahabSteps.children).every((step, index) => step.dataset.category === 'mustahab' && step.dataset.order === index + 1);
+            if (isSortedCorrectly && obligatorySteps.children.length === 7 && mustahabSteps.children.length === 1) {
+                obligatorySteps.querySelectorAll('.wudhu-step').forEach(step => step.classList.add('correct'));
+                mustahabSteps.querySelectorAll('.wudhu-step').forEach(step => step.classList.add('correct'));
+                userData.stars += 5;
+                userData.progress = Math.min(userData.progress + 1, 7);
+                userData.badges.push('Wudhu Expert');
+                updateStarCounter();
+                updateProgress();
+                updateBadges();
+                confetti();
+                document.getElementById('year2').innerHTML += '<p class="text-black text-center mt-4">Challenge Completed! 🎉</p>';
             }
         }
 
@@ -783,6 +823,10 @@
                         <button class="btn" onclick="changeColor('green')">Green 💚</button>
                         <button class="btn" onclick="changeColor('yellow')">Yellow 🌟</button>
                         <button class="btn" onclick="changeColor('pink')">Pink 💗</button>
+                        <button class="btn" onclick="changeColor('purple')">Purple 💜</button>
+                        <button class="btn" onclick="changeColor('orange')">Orange 🍊</button>
+                        <button class="btn" onclick="loadImage('https://yourusername.github.io/your-repo/images/kaaba.jpg')">Kaaba 🕋</button>
+                        <button class="btn" onclick="loadImage('https://yourusername.github.io/your-repo/images/masjid.jpg')">Masjid 🕌</button>
                         <button class="btn" onclick="clearCanvas()">Clear 🧹</button>
                     </div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
@@ -806,6 +850,14 @@
 
             window.changeColor = (newColor) => { color = newColor; clickSound.play(); };
             window.clearCanvas = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); clickSound.play(); };
+            window.loadImage = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    clickSound.play();
+                };
+                img.src = src;
+            };
             userData.stars += 1;
             userData.progress = Math.min(userData.progress + 1, 7);
             if (userData.progress === 7) userData.badges.push('Art Master');
@@ -849,7 +901,6 @@
                 updateBadges();
                 alert('Mission completed! +2 Stars 🎉');
                 confetti();
-                sounds.correct.play();
             } else {
                 alert('Try again! 😕');
             }
