@@ -473,11 +473,11 @@
     <div class="hero">
         <h1>Welcome to Shia Islamic Quest!</h1>
         <p>Embark on an epic adventure with your guide!</p>
-        <button class="btn" onclick="openModal()">Start Quest</button>
+        <button class="btn">Start Quest</button>
     </div>
 
-    <div id="intro-modal" class="modal" onclick="closeModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="intro-modal" class="modal">
+        <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Choose Your Hero</h2>
             <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Welcome" class="karbala-img mx-auto mb-4">
             <div class="space-y-4">
@@ -754,8 +754,9 @@
             clickSound.play();
             document.getElementById('intro-modal').style.display = 'flex';
         }
+
         function closeModal(event) {
-            if (event.target.id === 'intro-modal') {
+            if (event.target.id === 'intro-modal' || event.target.classList.contains('btn')) {
                 clickSound.play();
                 document.getElementById('intro-modal').style.display = 'none';
             }
@@ -776,9 +777,18 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const beginButton = document.querySelector('#intro-modal .btn');
+            const startButton = document.querySelector('.hero .btn');
+            
             if (beginButton) {
                 beginButton.addEventListener('click', startLearning);
+                beginButton.addEventListener('touchstart', startLearning, { passive: true });
             }
+            if (startButton) {
+                startButton.addEventListener('click', openModal);
+                startButton.addEventListener('touchstart', openModal, { passive: true });
+            }
+            document.getElementById('intro-modal').addEventListener('click', closeModal);
+            document.getElementById('intro-modal').addEventListener('touchstart', closeModal, { passive: true });
         });
 
         function showQuestion() {
@@ -1297,7 +1307,7 @@
 
         function toggleMute() {
             clickSound.play();
-}            isMuted = !isMuted;
+            isMuted = !isMuted;
             document.querySelector('.mute-btn').textContent = isMuted ? '🔇' : '🔊';
             if (isMuted) backgroundMusic.pause();
             else backgroundMusic.play();
@@ -1318,4 +1328,4 @@
         loadUserData();
     </script>
 </body>
-</html>
+    </html>
