@@ -241,21 +241,26 @@
             margin: 1rem 0;
             flex-wrap: wrap;
         }
-        .wudhu-container {
-            display: flex;
-            justify-content: space-around;
-            gap: 2rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-        .wudhu-obligatory, .wudhu-mustahab {
-            width: 45%;
-            padding: 2rem;
-            border: 3px solid #FFA500;
-            border-radius: 20px;
+        .memory-card {
+            width: 150px;
+            height: 150px;
             background: #fff;
-            min-height: 300px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            overflow: hidden;
+        }
+        .memory-card:hover {
+            transform: scale(1.05);
+        }
+        .memory-card.matched {
+            background: #32CD32;
+            color: #fff;
         }
         .wudhu-step {
             width: 120px;
@@ -264,7 +269,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
             cursor: move;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -276,27 +281,6 @@
             transform: rotate(10deg) scale(1.1);
         }
         .wudhu-step.correct {
-            background: #32CD32;
-            color: #fff;
-        }
-        .memory-card {
-            width: 150px;
-            height: 150px;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            overflow: hidden;
-        }
-        .memory-card:hover {
-            transform: scale(1.05);
-        }
-        .memory-card.matched {
             background: #32CD32;
             color: #fff;
         }
@@ -422,10 +406,9 @@
         }
         @media (max-width: 640px) {
             .card-grid { flex-direction: column; align-items: center; }
-            .wudhu-container { flex-direction: column; }
-            .wudhu-obligatory, .wudhu-mustahab { width: 100%; }
             .nav { padding: 0.5rem; }
-            .memory-card { width: 120px; height: 120px; font-size: 1rem; }
+            .memory-card { width: 100px; height: 100px; font-size: 0.8rem; }
+            .wudhu-step { width: 100px; height: 100px; font-size: 0.9rem; }
             .jigsaw-container { width: 300px; height: 300px; }
             .jigsaw-piece { width: 100px; height: 100px; }
             .story-card { max-width: 100%; }
@@ -444,7 +427,7 @@
                 <a href="#" onclick="showSection('profile')">Profile</a>
                 <a href="#" onclick="showSection('kindergarten')">Quiz</a>
                 <a href="#" onclick="showSection('year1')">Memory</a>
-                <a href="#" onclick="showSection('year2')">Wudhu</a>
+                <a href="#" onclick="showSection('year2')">Wudhu Challenge</a>
                 <a href="#" onclick="showSection('year3')">Karbala</a>
                 <a href="#" onclick="showSection('year4')">Art</a>
                 <a href="#" onclick="showSection('year5')">Jigsaw</a>
@@ -458,7 +441,7 @@
             <a href="#" class="block py-1 text-white" onclick="showSection('profile')">Profile</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('kindergarten')">Quiz</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('year1')">Memory</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu Challenge</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('year5')">Jigsaw</a>
@@ -510,8 +493,8 @@
         <div class="card-grid">
             <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your stats!</p></div>
             <div class="card" onclick="showSection('kindergarten')"><h3>📖 Quiz</h3><p>Test your wisdom!</p></div>
-            <div class="card" onclick="showSection('year1')"><h3>🧠 Memory</h3><p>Match Imams!</p></div>
-            <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu</h3><p>Master steps!</p></div>
+            <div class="card" onclick="showSection('year1')"><h3>🧠 Memory</h3><p>Match the holy individuals!</p></div>
+            <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu Challenge</h3><p>Sort and order Wudhu steps!</p></div>
             <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the epic!</p></div>
             <div class="card" onclick="showSection('year4')"><h3>🎨 Art</h3><p>Create art!</p></div>
             <div class="card" onclick="showSection('year5')"><h3>🧩 Jigsaw</h3><p>Solve the Kaaba puzzle!</p></div>
@@ -537,7 +520,7 @@
         let flippedCards = [];
         let matchedCards = [];
         let isMuted = false;
-        let isLocked = false;
+        let lock = false;
         const backgroundMusic = new Howl({ src: ['https://yourusername.github.io/your-repo/music/background.mp3'], loop: true, volume: 0.3 });
         const clickSound = new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/click.mp3'] });
         const questions = {
@@ -575,12 +558,12 @@
             { name: 'Prophet Muhammad(s)', match: 'Prophet Muhammad(s)', id: 2 },
             { name: 'Imam Ali(as)', match: 'Imam Ali(as)', id: 3 },
             { name: 'Imam Ali(as)', match: 'Imam Ali(as)', id: 4 },
-            { name: 'Sayeda Fatima Al Zahraa(as)', match: 'Sayeda Fatima Al Zahraa(as)', id: 5 },
-            { name: 'Sayeda Fatima Al Zahraa(as)', match: 'Sayeda Fatima Al Zahraa(as)', id: 6 },
-            { name: 'Imam Hasan(as)', match: 'Imam Hasan(as)', id: 7 },
-            { name: 'Imam Hasan(as)', match: 'Imam Hasan(as)', id: 8 },
-            { name: 'Imam Hussain(as)', match: 'Imam Hussain(as)', id: 9 },
-            { name: 'Imam Hussain(as)', match: 'Imam Hussain(as)', id: 10 },
+            { name: 'Sayeda Fatimah Al-Zahra(as)', match: 'Sayeda Fatimah Al-Zahra(as)', id: 5 },
+            { name: 'Sayeda Fatimah Al-Zahra(as)', match: 'Sayeda Fatimah Al-Zahra(as)', id: 6 },
+            { name: 'Imam Al Hasan(as)', match: 'Imam Al Hasan(as)', id: 7 },
+            { name: 'Imam Al Hasan(as)', match: 'Imam Al Hasan(as)', id: 8 },
+            { name: 'Imam Al Husayn(as)', match: 'Imam Al Husayn(as)', id: 9 },
+            { name: 'Imam Al Husayn(as)', match: 'Imam Al Husayn(as)', id: 10 },
             { name: 'Imam Al Sajjad(as)', match: 'Imam Al Sajjad(as)', id: 11 },
             { name: 'Imam Al Sajjad(as)', match: 'Imam Al Sajjad(as)', id: 12 },
             { name: 'Imam Al Baqir(as)', match: 'Imam Al Baqir(as)', id: 13 },
@@ -589,8 +572,8 @@
             { name: 'Imam Al Sadiq(as)', match: 'Imam Al Sadiq(as)', id: 16 },
             { name: 'Imam Al Kadhim(as)', match: 'Imam Al Kadhim(as)', id: 17 },
             { name: 'Imam Al Kadhim(as)', match: 'Imam Al Kadhim(as)', id: 18 },
-            { name: 'Imam Al Redha(as)', match: 'Imam Al Redha(as)', id: 19 },
-            { name: 'Imam Al Redha(as)', match: 'Imam Al Redha(as)', id: 20 },
+            { name: 'Imam Al Ridha(as)', match: 'Imam Al Ridha(as)', id: 19 },
+            { name: 'Imam Al Ridha(as)', match: 'Imam Al Ridha(as)', id: 20 },
             { name: 'Imam Al Jawad(as)', match: 'Imam Al Jawad(as)', id: 21 },
             { name: 'Imam Al Jawad(as)', match: 'Imam Al Jawad(as)', id: 22 },
             { name: 'Imam Al Hadi(as)', match: 'Imam Al Hadi(as)', id: 23 },
@@ -601,14 +584,16 @@
             { name: 'Imam Al Mahdi(as)', match: 'Imam Al Mahdi(as)', id: 28 }
         ];
         const wudhuSteps = [
-            { name: 'Niyyah', id: 1, category: 'obligatory', order: 1 },
-            { name: 'Wash face', id: 2, category: 'obligatory', order: 2 },
-            { name: 'Wash right arm', id: 3, category: 'obligatory', order: 3 },
-            { name: 'Wash left arm', id: 4, category: 'obligatory', order: 4 },
-            { name: 'Wipe head', id: 5, category: 'obligatory', order: 5 },
-            { name: 'Wipe right foot', id: 6, category: 'obligatory', order: 6 },
-            { name: 'Wipe left foot', id: 7, category: 'obligatory', order: 7 },
-            { name: 'Rinse mouth', id: 8, category: 'mustahab', order: 1 }
+            { name: 'Rinse Mouth', id: 1, category: 'mustahab', order: 1 },
+            { name: 'Rinse Nose', id: 2, category: 'mustahab', order: 2 },
+            { name: 'Wash Hands', id: 3, category: 'mustahab', order: 3 },
+            { name: 'Niyyah', id: 4, category: 'obligatory', order: 1 },
+            { name: 'Wash Face', id: 5, category: 'obligatory', order: 2 },
+            { name: 'Wash Right Arm', id: 6, category: 'obligatory', order: 3 },
+            { name: 'Wash Left Arm', id: 7, category: 'obligatory', order: 4 },
+            { name: 'Wipe Head', id: 8, category: 'obligatory', order: 5 },
+            { name: 'Wipe Right Foot', id: 9, category: 'obligatory', order: 6 },
+            { name: 'Wipe Left Foot', id: 10, category: 'obligatory', order: 7 }
         ];
         const jigsawPieces = [
             { id: 1, x: 0, y: 0, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=0,0,133,133' },
@@ -622,72 +607,155 @@
             { id: 9, x: 266, y: 266, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=266,266,134,134' }
         ];
         const storyData = {
-            start: {
-                text: "You are a young child named Amir living in Mecca during the time of Prophet Muhammad (s). One day, you see a group of people gathered near the Kaaba, listening to the Prophet (s) speak. You want to get closer, but it’s crowded. What do you do?",
-                choices: {
-                    a: { text: "Push through the crowd to get closer.", next: "pushThrough" },
-                    b: { text: "Wait patiently at the edge and listen from afar.", next: "waitPatiently" },
-                    c: { text: "Ask an adult to help you move forward.", next: "askAdult" }
+            mecca: {
+                start: {
+                    text: "You are a young child named Amir living in Mecca during the time of Prophet Muhammad (s). One day, you see a group of people gathered near the Kaaba, listening to the Prophet (s) speak. You want to get closer, but it’s crowded. What do you do?",
+                    choices: {
+                        a: { text: "Push through the crowd to get closer.", next: "pushThrough" },
+                        b: { text: "Wait patiently at the edge and listen from afar.", next: "waitPatiently" },
+                        c: { text: "Ask an adult to help you move forward.", next: "askAdult" }
+                    },
+                    background: "https://example.com/desert.jpg",
+                    animation: "happy"
                 },
-                background: "https://example.com/desert.jpg",
-                animation: "happy"
-            },
-            pushThrough: {
-                text: "You push through the crowd and accidentally bump into an elder. He looks upset but smiles when you apologize. The Prophet (s) notices and praises your honesty. You learn a lesson about respect.",
-                choices: {
-                    a: { text: "Thank the Prophet (s) and return home.", next: "endGood" },
-                    b: { text: "Stay and listen more.", next: "listenMore" }
+                pushThrough: {
+                    text: "You push through the crowd and accidentally bump into an elder. He looks upset but smiles when you apologize. The Prophet (s) notices and praises your honesty. You learn a lesson about respect.",
+                    choices: {
+                        a: { text: "Thank the Prophet (s) and return home.", next: "endGood" },
+                        b: { text: "Stay and listen more.", next: "listenMore" }
+                    },
+                    background: "https://example.com/market.jpg",
+                    animation: "happy"
                 },
-                background: "https://example.com/market.jpg",
-                animation: "happy"
-            },
-            waitPatiently: {
-                text: "You wait patiently and hear the Prophet (s) teach about kindness. A kind man offers you a spot to sit. You feel proud of your patience.",
-                choices: {
-                    a: { text: "Share your spot with another child.", next: "endGood" },
-                    b: { text: "Keep it to yourself.", next: "endBad" }
+                waitPatiently: {
+                    text: "You wait patiently and hear the Prophet (s) teach about kindness. A kind man offers you a spot to sit. You feel proud of your patience.",
+                    choices: {
+                        a: { text: "Share your spot with another child.", next: "endGood" },
+                        b: { text: "Keep it to yourself.", next: "endBad" }
+                    },
+                    background: "https://example.com/desert.jpg",
+                    animation: "neutral"
                 },
-                background: "https://example.com/desert.jpg",
-                animation: "neutral"
-            },
-            askAdult: {
-                text: "You ask an adult for help, and they kindly guide you closer. The Prophet (s) smiles at you and speaks about helping others. You feel grateful.",
-                choices: {
-                    a: { text: "Help another child get closer too.", next: "endGood" },
-                    b: { text: "Stay quiet and enjoy the moment.", next: "endNeutral" }
+                askAdult: {
+                    text: "You ask an adult for help, and they kindly guide you closer. The Prophet (s) smiles at you and speaks about helping others. You feel grateful.",
+                    choices: {
+                        a: { text: "Help another child get closer too.", next: "endGood" },
+                        b: { text: "Stay quiet and enjoy the moment.", next: "endNeutral" }
+                    },
+                    background: "https://example.com/market.jpg",
+                    animation: "happy"
                 },
-                background: "https://example.com/market.jpg",
-                animation: "happy"
+                listenMore: {
+                    text: "You stay and learn more about faith. The Prophet (s) invites you to join a small gathering later, teaching you about community.",
+                    choices: { a: { text: "Join the gathering.", next: "endGood" } },
+                    background: "https://example.com/night.jpg",
+                    animation: "happy"
+                },
+                endGood: {
+                    text: "Your choice leads to a rewarding lesson! You grow wiser and earn the respect of your community. +5 Stars!",
+                    choices: { a: { text: "See your path.", next: "summary" } },
+                    background: "https://example.com/desert.jpg",
+                    animation: "happy"
+                },
+                endBad: {
+                    text: "Your selfishness disappoints others. You learn to be more generous next time. +1 Star.",
+                    choices: { a: { text: "See your path.", next: "summary" } },
+                    background: "https://example.com/desert.jpg",
+                    animation: "sad"
+                },
+                endNeutral: {
+                    text: "You enjoy the moment but miss a chance to help. +2 Stars.",
+                    choices: { a: { text: "See your path.", next: "summary" } },
+                    background: "https://example.com/market.jpg",
+                    animation: "neutral"
+                },
+                summary: {
+                    text: "Your Journey: [Path will be listed here]. Would you like to start over?",
+                    choices: { a: { text: "Restart", next: "start" } },
+                    background: "https://example.com/desert.jpg",
+                    animation: "neutral"
+                }
             },
-            listenMore: {
-                text: "You stay and learn more about faith. The Prophet (s) invites you to join a small gathering later, teaching you about community.",
-                choices: { a: { text: "Join the gathering.", next: "endGood" } },
-                background: "https://example.com/night.jpg",
-                animation: "happy"
-            },
-            endGood: {
-                text: "Your choice leads to a rewarding lesson! You grow wiser and earn the respect of your community. +5 Stars!",
-                choices: { a: { text: "See your path.", next: "summary" } },
-                background: "https://example.com/desert.jpg",
-                animation: "happy"
-            },
-            endBad: {
-                text: "Your selfishness disappoints others. You learn to be more generous next time. +1 Star.",
-                choices: { a: { text: "See your path.", next: "summary" } },
-                background: "https://example.com/desert.jpg",
-                animation: "sad"
-            },
-            endNeutral: {
-                text: "You enjoy the moment but miss a chance to help. +2 Stars.",
-                choices: { a: { text: "See your path.", next: "summary" } },
-                background: "https://example.com/market.jpg",
-                animation: "neutral"
-            },
-            summary: {
-                text: "Your Journey: [Path will be listed here]. Would you like to start over?",
-                choices: { a: { text: "Restart", next: "start" } },
-                background: "https://example.com/desert.jpg",
-                animation: "neutral"
+            kufa: {
+                start: {
+                    text: "You are a young child named Zainab living in Kufa during the holy khilafah of Imam Ali (as). One day, you hear that Imam Ali (as) is teaching justice in the marketplace. You want to learn, but there are challenges. What do you do?",
+                    choices: {
+                        a: { text: "Join the crowd and listen quietly.", next: "listenQuietly" },
+                        b: { text: "Offer to help a struggling elder reach the front.", next: "helpElder" },
+                        c: { text: "Ask a friend to explain later instead.", next: "askFriend" }
+                    },
+                    background: "https://example.com/kufa-market.jpg",
+                    animation: "happy"
+                },
+                listenQuietly: {
+                    text: "You listen quietly and learn about fairness from Imam Ali (as). A guard notices your focus and praises your respect.",
+                    choices: {
+                        a: { text: "Share the lesson with a sibling at home.", next: "shareLesson" },
+                        b: { text: "Keep it to yourself and leave.", next: "keepQuiet" }
+                    },
+                    background: "https://example.com/kufa-day.jpg",
+                    animation: "neutral"
+                },
+                helpElder: {
+                    text: "You help an elder to the front, and Imam Ali (as) smiles at your kindness, teaching about compassion.",
+                    choices: {
+                        a: { text: "Assist another person too.", next: "assistMore" },
+                        b: { text: "Return to your spot after helping.", next: "returnSpot" }
+                    },
+                    background: "https://example.com/kufa-market.jpg",
+                    animation: "happy"
+                },
+                askFriend: {
+                    text: "You ask a friend, but their explanation is unclear. You miss the full lesson but gain a chance to try again.",
+                    choices: {
+                        a: { text: "Go back to the marketplace tomorrow.", next: "tryAgain" },
+                        b: { text: "Give up and play instead.", next: "giveUp" }
+                    },
+                    background: "https://example.com/kufa-night.jpg",
+                    animation: "sad"
+                },
+                shareLesson: {
+                    text: "Sharing the lesson with your sibling earns you praise from your family. +5 Stars!",
+                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
+                    background: "https://example.com/kufa-home.jpg",
+                    animation: "happy"
+                },
+                keepQuiet: {
+                    text: "Keeping it to yourself limits your growth. +1 Star.",
+                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
+                    background: "https://example.com/kufa-day.jpg",
+                    animation: "sad"
+                },
+                assistMore: {
+                    text: "Helping more people impresses Imam Ali (as), who teaches you about community service. +5 Stars!",
+                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
+                    background: "https://example.com/kufa-market.jpg",
+                    animation: "happy"
+                },
+                returnSpot: {
+                    text: "Returning to your spot shows humility. +3 Stars.",
+                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
+                    background: "https://example.com/kufa-day.jpg",
+                    animation: "neutral"
+                },
+                tryAgain: {
+                    text: "Going back tomorrow lets you learn directly from Imam Ali (as). +3 Stars.",
+                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
+                    background: "https://example.com/kufa-market.jpg",
+                    animation: "happy"
+                },
+                giveUp: {
+                    text: "Giving up means missing a valuable lesson. +1 Star.",
+                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
+                    background: "https://example.com/kufa-night.jpg",
+                    animation: "sad"
+                },
+                summaryKufa: {
+                    text: "Your Journey: [Path will be listed here]. Would you like to start over?",
+                    choices: { a: { text: "Restart", next: "start" } },
+                    background: "https://example.com/kufa-home.jpg",
+                    animation: "neutral"
+                }
             }
         };
         const missions = [
@@ -738,7 +806,7 @@
                 gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
                 if (sectionId === 'kindergarten') showQuestion();
                 if (sectionId === 'year1') initMemoryGame();
-                if (sectionId === 'year2') initWudhuPuzzle();
+                if (sectionId === 'year2') initWudhuChallenge();
                 if (sectionId === 'year3') showKarbala();
                 if (sectionId === 'year4') initArtZone();
                 if (sectionId === 'year5') initJigsawPuzzle();
@@ -863,7 +931,6 @@
             });
         }
 
-        let lock = false;
         function flipCard(card) {
             clickSound.play();
             if (lock || flippedCards.length >= 2 || card.classList.contains('matched')) return;
@@ -881,13 +948,17 @@
                 card1.classList.add('matched');
                 card2.classList.add('matched');
                 matchedCards.push(card1, card2);
-                userData.stars += 2;
-                userData.progress = Math.min(userData.progress + 1, 7);
-                if (matchedCards.length === memoryCards.length) userData.badges.push('Memory Master');
+                userData.stars += 1; // 1 star per match
                 updateStarCounter();
-                updateProgress();
-                updateBadges();
-                confetti();
+                if (matchedCards.length === memoryCards.length) {
+                    userData.stars += 10; // Bonus 10 stars for completing all 28 cards
+                    userData.progress = Math.min(userData.progress + 1, 7);
+                    userData.badges.push('Memory Master');
+                    updateProgress();
+                    updateBadges();
+                    confetti();
+                    document.getElementById('year1').innerHTML += '<p class="text-green-600 text-xl mt-4">All 28 cards matched! +10 Bonus Stars! 🎉</p>';
+                }
             } else {
                 setTimeout(() => {
                     card1.textContent = '❓';
@@ -898,7 +969,7 @@
             lock = false;
         }
 
-        function initWudhuPuzzle() {
+        function initWudhuChallenge() {
             clickSound.play();
             const container = document.getElementById('year2');
             container.innerHTML = `
@@ -972,21 +1043,21 @@
             const obligatorySteps = document.getElementById('obligatory-steps');
             const mustahabSteps = document.getElementById('mustahab-steps');
             const obligatoryOrder = Array.from(obligatorySteps.children).map((step, index) => parseInt(step.dataset.order) === index + 1);
-            const mustahabOrder = Array.from(mustahabSteps.children).map(step => step.dataset.order === '1');
+            const mustahabOrder = Array.from(mustahabSteps.children).map((step, index) => parseInt(step.dataset.order) === index + 1);
             if (obligatoryOrder.every(Boolean) && mustahabOrder.every(Boolean) && 
-                obligatorySteps.children.length === 7 && mustahabSteps.children.length === 1) {
+                obligatorySteps.children.length === 7 && mustahabSteps.children.length === 3) {
                 obligatorySteps.querySelectorAll('.wudhu-step').forEach(step => step.classList.add('correct'));
                 mustahabSteps.querySelectorAll('.wudhu-step').forEach(step => step.classList.add('correct'));
-                userData.stars += 5;
+                userData.stars += 10; // 10 stars for completing both objectives
                 userData.progress = Math.min(userData.progress + 1, 7);
-                userData.badges.push('Wudhu Expert');
+                userData.badges.push('Wudhu Master');
                 updateStarCounter();
                 updateProgress();
                 updateBadges();
                 confetti();
-                document.getElementById('year2').innerHTML += '<p class="text-green-600 text-xl mt-4">Challenge Completed! 🎉</p>';
+                document.getElementById('year2').innerHTML += '<p class="text-green-600 text-xl mt-4">Wudhu Challenge Completed! +10 Stars! 🎉</p>';
             } else {
-                alert('Please sort and order correctly in their respective sections! 😕');
+                alert('Please sort and order the steps correctly in their respective sections! 😕');
             }
         }
 
@@ -1145,7 +1216,7 @@
                     updateProgress();
                     updateBadges();
                     confetti();
-                    document.getElementById('year5').innerHTML += '<p class="text-green-600 text-xl mt-4">Puzzle Completed! 🎉</p>';
+                    document.getElementById('year5').innerHTML += '<p class="text-green-600 text-xl mt-4">Puzzle Completed! +5 Stars! 🎉</p>';
                 }
             }
         }
@@ -1153,43 +1224,58 @@
         function startStory() {
             clickSound.play();
             userData.storyPath = [];
-            showStoryScene('start');
+            const storyOptions = ['mecca', 'kufa'];
+            const selectedStory = storyOptions[Math.floor(Math.random() * storyOptions.length)];
+            showStoryScene(selectedStory + '.start');
         }
 
         function showStoryScene(sceneId) {
             clickSound.play();
-            const scene = storyData[sceneId];
+            const [story, scene] = sceneId.split('.');
+            const fullScene = storyData[story][scene];
             userData.storyPath.push({ id: sceneId, choice: null });
             const container = document.getElementById('year6');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Choose Your Path 📖</h2>
                     <div class="story-card">
-                        <p>${scene.text}</p>
-                        ${Object.entries(scene.choices).map(([key, choice]) => `
-                            <button class="choice-btn" onclick="makeChoice('${sceneId}', '${key}', '${choice.next}')">${choice.text}</button>
+                        <p>${fullScene.text}</p>
+                        ${Object.entries(fullScene.choices).map(([key, choice]) => `
+                            <button class="choice-btn" onclick="makeChoice('${story}', '${scene}', '${key}', '${choice.next}')">${choice.text}</button>
                         `).join('')}
-                        ${sceneId === 'summary' ? `<p>Your path: ${userData.storyPath.map(s => s.id).join(' -> ')}</p>` : ''}
+                        ${['summary', 'summaryKufa'].includes(scene) ? `<p>Your path: ${userData.storyPath.map(s => s.id).join(' -> ')}</p>` : ''}
                     </div>
-                    ${sceneId !== 'start' ? '<button class="btn mt-4" onclick="goBack()">Back</button>' : ''}
+                    ${!['start', 'summary', 'summaryKufa'].includes(scene) ? '<button class="btn mt-4" onclick="goBack()">Back</button>' : ''}
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <div class="lottie-animation" id="story-animation"></div>
                 </div>
             `;
-            document.getElementById('story-background').style.backgroundImage = `url(${scene.background})`;
-            loadAnimation(scene.animation);
+            document.getElementById('story-background').style.backgroundImage = `url(${fullScene.background})`;
+            loadAnimation(fullScene.animation);
             gsap.from('.story-card', { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
         }
 
-        function makeChoice(sceneId, choiceKey, nextScene) {
+        function makeChoice(story, scene, choiceKey, nextScene) {
             clickSound.play();
-            const scene = storyData[sceneId];
+            const fullScene = storyData[story][scene];
             userData.storyPath[userData.storyPath.length - 1].choice = choiceKey;
-            if (nextScene === 'endGood') userData.stars += 5;
-            else if (nextScene === 'endBad') userData.stars += 1;
-            else if (nextScene === 'endNeutral') userData.stars += 2;
+            let nextFullScene = nextScene;
+            if (story === 'mecca' && nextScene === 'endGood') { userData.stars += 5; }
+            else if (story === 'mecca' && nextScene === 'endBad') { userData.stars += 1; }
+            else if (story === 'mecca' && nextScene === 'endNeutral') { userData.stars += 2; }
+            else if (story === 'kufa' && nextScene === 'shareLesson') { userData.stars += 5; }
+            else if (story === 'kufa' && nextScene === 'keepQuiet') { userData.stars += 1; }
+            else if (story === 'kufa' && nextScene === 'assistMore') { userData.stars += 5; }
+            else if (story === 'kufa' && nextScene === 'returnSpot') { userData.stars += 3; }
+            else if (story === 'kufa' && nextScene === 'tryAgain') { userData.stars += 3; }
+            else if (story === 'kufa' && nextScene === 'giveUp') { userData.stars += 1; }
+            if (nextScene === 'summary' || nextScene === 'summaryKufa') {
+                nextFullScene = story + '.' + nextScene;
+            } else {
+                nextFullScene = story + '.' + nextScene;
+            }
             updateStarCounter();
-            showStoryScene(nextScene);
+            showStoryScene(nextFullScene);
         }
 
         function goBack() {
@@ -1282,9 +1368,6 @@
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 </div>
             `;
-            userData.progress = Math.min(userData.progress + 1, 7);
-            updateProgress();
-            updateBadges();
         }
 
         function updateStarCounter() {
@@ -1293,39 +1376,41 @@
         }
 
         function updateProgress() {
-            const totalSteps = 7;
-            const progressPercent = (userData.progress / totalSteps) * 100;
-            document.getElementById('progress').style.width = `${progressPercent}%`;
+            const progress = Math.round((userData.progress / 7) * 100);
+            document.getElementById('progress').style.width = `${progress}%`;
             saveUserData();
         }
 
         function updateBadges() {
-            if (!userData.badges) userData.badges = ['Explorer'];
-            document.querySelector('.badge').textContent = `🏅 Badge: ${userData.badges[userData.badges.length - 1] || 'Explorer'}`;
-            saveUserData();
-        }
+            const badgeElement = document.querySelector('.badge');
+            if (badgeElement) badgeElement.textContent = `🏅 Badge: ${userData.badges[userData.badges.length - 1] || 'Explorer'}`;
+            saveUserData
+
+}
 
         function toggleMute() {
             clickSound.play();
             isMuted = !isMuted;
-            document.querySelector('.mute-btn').textContent = isMuted ? '🔇' : '🔊';
-            if (isMuted) backgroundMusic.pause();
-            else backgroundMusic.play();
+            if (isMuted) {
+                backgroundMusic.pause();
+                document.querySelector('.mute-btn').textContent = '🔇';
+            } else {
+                backgroundMusic.play();
+                document.querySelector('.mute-btn').textContent = '🔊';
+            }
         }
 
         function confetti() {
-            if (!isMuted) confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
+            if (!isMuted) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
         }
 
-        gsap.from('.hero h1', { opacity: 0, y: -50, duration: 1, delay: 0.5 });
-        gsap.from('.hero p', { opacity: 0, y: 50, duration: 1, delay: 1 });
-        gsap.from('.hero .btn', { opacity: 0, scale: 0.5, duration: 1, delay: 1.5 });
-
-        loadUserData();
+        window.addEventListener('load', loadUserData);
     </script>
 </body>
-    </html>
+</html>
