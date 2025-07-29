@@ -10,561 +10,27 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-    <style>
-        body {
-            font-family: 'Fredoka', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            min-height: 100vh;
-            position: relative;
-            background: #87CEEB;
-            overflow: hidden;
-        }
-        h1, h2, h3 {
-            font-family: 'Comic Neue', cursive;
-        }
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            z-index: -1;
-            transition: background-image 1s ease;
-        }
-        .tree, .cloud, .star, .moon {
-            position: absolute;
-            animation: float 6s infinite ease-in-out;
-        }
-        .tree { content: '🌳'; font-size: 80px; }
-        .cloud { content: '☁️'; font-size: 50px; animation: float 8s infinite ease-in-out; }
-        .star { content: '⭐'; font-size: 30px; animation: twinkle 2s infinite alternate; }
-        .moon { content: '🌙'; font-size: 60px; animation: shine 4s infinite ease-in-out; top: 10%; left: 10%; }
-        .hero {
-            height: 100vh;
-            position: relative;
-            overflow: hidden;
-            color: #fff;
-            text-align: center;
-            padding-top: 10rem;
-            border-radius: 0 0 50px 50px;
-            display: none;
-        }
-        .hero h1 {
-            font-size: 3.5rem;
-            animation: bounce 1s ease-out;
-        }
-        .hero p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            animation: fadeIn 1.5s ease-out;
-        }
-        .hero .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            color: #fff;
-            padding: 2rem 4rem;
-            font-size: 2rem;
-            border-radius: 30px;
-            transition: transform 0.3s, background 0.3s;
-            text-shadow: 1px 1px #000;
-        }
-        .hero .btn:hover {
-            transform: scale(1.1);
-            background: linear-gradient(90deg, #32CD32, #87CEEB);
-            box-shadow: 0 0 10px #32CD32;
-        }
-        .nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(255, 165, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-            padding: 1rem;
-            border-radius: 0 0 20px 20px;
-        }
-        .nav a {
-            color: #fff;
-            margin: 0 1.5rem;
-            font-weight: 500;
-            transition: transform 0.3s, color 0.3s;
-        }
-        .nav a:hover {
-            transform: scale(1.2);
-            color: #32CD32;
-        }
-        .card-grid {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            padding: 4rem 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
-            flex-wrap: wrap;
-        }
-        .section {
-            min-height: 100vh;
-            padding: 4rem 2rem;
-            text-align: center;
-            position: relative;
-            z-index: 10;
-        }
-        .content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.9);
-            color: #000;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        .card {
-            background: linear-gradient(135deg, #FF69B4, #FFA500);
-            border-radius: 30px;
-            padding: 1.5rem;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            text-align: center;
-            overflow: hidden;
-            width: 250px;
-        }
-        .card:hover {
-            transform: translateY(-15px);
-            box-shadow: 0 15px 40px rgba(50, 205, 50, 0.3);
-        }
-        .card h3 {
-            color: #fff;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px #000;
-        }
-        .card p {
-            color: #fff;
-            text-shadow: 1px 1px #000;
-        }
-        .card:before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-            animation: rotate 10s linear infinite;
-            z-index: -1;
-        }
-        .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            color: #fff;
-            padding: 1rem 2rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 1.2rem;
-            transition: transform 0.3s, background 0.3s;
-            text-shadow: 1px 1px #000;
-        }
-        .btn:hover {
-            transform: scale(1.1);
-            background: linear-gradient(90deg, #32CD32, #87CEEB);
-            box-shadow: 0 0 10px #32CD32;
-        }
-        .btn:active {
-            transform: scale(0.95);
-        }
-        .star-counter {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            background: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            font-weight: 600;
-            color: #FFA500;
-            z-index: 50;
-            animation: pulse 2s infinite;
-        }
-        .avatar-display {
-            position: fixed;
-            top: 6rem;
-            left: 1rem;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 5px solid #FFA500;
-            object-fit: cover;
-            animation: float 3s infinite ease-in-out;
-            z-index: 50;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 30px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            animation: slideIn 0.5s ease-out;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        .karbala-img {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 15px;
-        }
-        #art-canvas {
-            border: 3px solid #87CEEB;
-            border-radius: 20px;
-            background: #fff;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .art-tools {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin: 1rem 0;
-            flex-wrap: wrap;
-        }
-        .memory-card {
-            width: 150px;
-            height: 150px;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            overflow: hidden;
-        }
-        .memory-card:hover {
-            transform: scale(1.05);
-        }
-        .memory-card.matched {
-            background: #32CD32;
-            color: #fff;
-        }
-        .wudhu-step {
-            width: 120px;
-            height: 120px;
-            background: #87CEEB;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            cursor: move;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            user-select: none;
-            margin: 1rem 0;
-            position: relative;
-        }
-        .wudhu-step:hover {
-            transform: rotate(10deg) scale(1.1);
-        }
-        .wudhu-step.correct {
-            background: #32CD32;
-            color: #fff;
-        }
-        .jigsaw-piece {
-            width: 133px;
-            height: 133px;
-            background-size: cover;
-            border: 2px solid #FFA500;
-            cursor: move;
-            position: absolute;
-            user-select: none;
-        }
-        .jigsaw-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-            margin: 0 auto;
-            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg') no-repeat;
-            background-size: 400px 400px;
-            border: 2px solid #32CD32;
-        }
-        .story-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 1rem auto;
-            max-width: 600px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            text-align: left;
-        }
-        .choice-btn {
-            margin: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 15px;
-            background: #FFA500;
-            color: #fff;
-            transition: transform 0.3s, background 0.3s;
-        }
-        .choice-btn:hover {
-            transform: scale(1.05);
-            background: #32CD32;
-        }
-        .progress-bar {
-            position: fixed;
-            bottom: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 500px;
-            height: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            overflow: hidden;
-        }
-        .progress {
-            height: 100%;
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            transition: width 0.5s ease-in-out;
-        }
-        .badge {
-            position: fixed;
-            top: 50%;
-            left: 1rem;
-            transform: translateY(-50%);
-            background: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            animation: bounce 2s infinite;
-        }
-        .mute-btn {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            background: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            z-index: 50;
-        }
-        .lottie-animation {
-            width: 200px;
-            height: 200px;
-            margin: 1rem auto;
-        }
-        .wudhu-container {
-            display: flex;
-            justify-content: space-around;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        .wudhu-dropzone {
-            min-height: 120px;
-            background: #fff;
-            border: 2px dashed #FFA500;
-            border-radius: 15px;
-            padding: 1rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-        }
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-20px); }
-            60% { transform: translateY(-10px); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideIn {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-30px); }
-        }
-        @keyframes twinkle {
-            from { opacity: 0.5; }
-            to { opacity: 1; }
-        }
-        @keyframes shine {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); filter: brightness(1.5); }
-        }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @media (max-width: 640px) {
-            .card-grid { flex-direction: column; align-items: center; }
-            .nav { padding: 0.5rem; }
-            .memory-card { width: 100px; height: 100px; font-size: 0.8rem; }
-            .wudhu-step { width: 100px; height: 100px; font-size: 0.9rem; }
-            .jigsaw-container { width: 300px; height: 300px; }
-            .jigsaw-piece { width: 100px; height: 100px; }
-            .story-card { max-width: 100%; }
-            .wudhu-container { flex-direction: column; align-items: center; }
-            .wudhu-dropzone { width: 100%; }
-            .lottie-animation { width: 150px; height: 150px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="mute-btn" onclick="toggleMute()">🔊</div>
-    <div class="badge">🏅 Badge: Explorer</div>
-    <div class="background" id="story-background" style="background-image: url('https://example.com/desert.jpg');"></div>
-    <div class="nav">
-        <div class="container flex justify-between items-center">
-            <div class="text-xl font-bold">🌙 Shia Quest Hub</div>
-            <div class="space-x-4 hidden md:flex">
-                <a href="#" onclick="showSection('welcome')">Home</a>
-                <a href="#" onclick="showSection('profile')">Profile</a>
-                <a href="#" onclick="showSection('kindergarten')">Quiz</a>
-                <a href="#" onclick="showSection('year1')">Memory</a>
-                <a href="#" onclick="showSection('year2')">Wudhu Challenge</a>
-                <a href="#" onclick="showSection('year3')">Karbala</a>
-                <a href="#" onclick="showSection('year4')">Art</a>
-                <a href="#" onclick="showSection('year6')">Story</a>
-                <a href="#" onclick="showSection('missions')">Missions</a>
-            </div>
-            <button class="md:hidden text-white" onclick="toggleMobileMenu()">☰</button>
-        </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-orange-600 p-2 mt-2 rounded-xl">
-            <a href="#" class="block py-1 text-white" onclick="showSection('welcome')">Home</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('profile')">Profile</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('kindergarten')">Quiz</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year1')">Memory</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu Challenge</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year6')">Story</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
-        </div>
-    </div>
-    <div class="star-counter" id="star-counter">Stars: <span id="star-count">0</span> ⭐</div>
-    <img id="avatar-display" src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="avatar-display" style="display: none;">
-    <div class="progress-bar"><div id="progress" class="progress" style="width: 0%;"></div></div>
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBD2asTEG40b4hhVmUZK1Gd3Zvw2udPTOo",
+            authDomain: "shia-kids-learning-tool.firebaseapp.com",
+            projectId: "shia-kids-learning-tool",
+            storageBucket: "shia-kids-learning-tool.appspot.com",
+            messagingSenderId: "786313108719",
+            appId: "1:786313108719:web:5d4d9ced7abcef72e1fdd9"
+        };
 
-    <!-- Landing Page -->
-    <div id="landing-page" class="hero" style="display: block;">
-        <div class="lottie-animation" id="robot-animation" style="position: absolute; top: 20%; left: 10%;"></div>
-        <h1>Welcome to Shia Islamic Quest!</h1>
-        <p>Embark on an epic adventure with your guide!</p>
-        <div class="space-y-4">
-            <button class="btn" onclick="showLoginModal()">Login</button>
-            <button class="btn" onclick="showSignupModal()">Sign Up</button>
-            <button class="btn" onclick="showAdminLoginModal()">Admin Login</button>
-        </div>
-    </div>
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
-            <input type="text" id="login-username" placeholder="Username" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="loginUser()">Login</button>
-            <button class="btn mt-2" onclick="resetPassword()">Reset Password</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Signup Modal -->
-    <div id="signup-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
-            <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Welcome" class="karbala-img mx-auto mb-4">
-            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <div class="flex justify-center gap-4 mb-2">
-                <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
-                <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
-            </div>
-            <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-                <option value="kindergarten">Kindergarten</option>
-                <option value="year1">Year 1</option>
-                <option value="year2">Year 2</option>
-                <option value="year3">Year 3</option>
-                <option value="year4">Year 4</option>
-                <option value="year5">Year 5</option>
-                <option value="year6">Year 6</option>
-            </select>
-            <div class="character-container flex justify-center gap-4 mb-2">
-                <img src="https://yourusername.github.io/your-repo/images/boy1.jpg" alt="Boy 1" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="boy">
-                <img src="https://yourusername.github.io/your-repo/images/boy2.jpg" alt="Boy 2" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="boy">
-                <img src="https://yourusername.github.io/your-repo/images/girl1_hijab.jpg" alt="Girl 1" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="girl">
-                <img src="https://yourusername.github.io/your-repo/images/girl2_hijab.jpg" alt="Girl 2" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="girl">
-            </div>
-            <button class="btn" id="signup-btn">Sign Up</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Admin Login Modal -->
-    <div id="admin-login-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Admin Login</h2>
-            <input type="text" id="admin-username" placeholder="Admin Username" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="admin-password" placeholder="Admin Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="loginAdmin()">Login</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
-        </div>
-    </div>
-
-    <div id="welcome" class="section container hidden">
-        <div class="card-grid">
-            <div class="card" onclick="showSection('profile')"><h3>🏡 Profile</h3><p>Check your stats!</p></div>
-            <div class="card" onclick="showSection('kindergarten')"><h3>📖 Quiz</h3><p>Test your wisdom!</p></div>
-            <div class="card" onclick="showSection('year1')"><h3>🧠 Memory</h3><p>Match the holy individuals!</p></div>
-            <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu Challenge</h3><p>Sort and order Wudhu steps!</p></div>
-            <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the epic!</p></div>
-            <div class="card" onclick="showSection('year4')"><h3>🎨 Art</h3><p>Create art!</p></div>
-            <div class="card" onclick="showSection('year6')"><h3>📖 Story</h3><p>Choose your path!</p></div>
-            <div class="card" onclick="showSection('missions')"><h3>⭐ Missions</h3><p>Earn rewards!</p></div>
-        </div>
-    </div>
-
-    <div id="profile" class="section container hidden"></div>
-    <div id="kindergarten" class="section container hidden"></div>
-    <div id="year1" class="section container hidden"></div>
-    <div id="year2" class="section container hidden"></div>
-    <div id="year3" class="section container hidden"></div>
-    <div id="year4" class="section container hidden"></div>
-    <div id="year6" class="section container hidden"></div>
-    <div id="missions" class="section container hidden"></div>
-
-    <script>
-        let userData = { username: '', email: '', password: '', name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+        // Global variables
+        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
         let currentQuestion = 0;
         let score = 0;
         let flippedCards = [];
@@ -801,8 +267,48 @@
             { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
             { id: 'dua', title: 'Learn Dua', question: 'Dua before eating?', type: 'text', answer: 'Bismillah' }
         ];
-        const users = {}; // In-memory storage for users (replace with a database in production)
         const adminCredentials = { username: 'admin', password: 'admin123' }; // Admin credentials (change for security)
+
+        // Firebase Authentication Integration
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userData.email = user.email;
+                loadUserData();
+            } else {
+                document.getElementById('landing-page').style.display = 'block';
+            }
+        });
+
+        window.signup = () => {
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert("✅ Sign-up successful!");
+                    userData.email = email;
+                    showSignupModal(); // Show signup form for additional details
+                })
+                .catch(error => alert("❌ " + error.message));
+        };
+
+        window.login = () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert("✅ Login successful!");
+                    userData.email = email;
+                    loadUserData();
+                })
+                .catch(error => alert("❌ " + error.message));
+        };
+
+        window.resetPassword = () => {
+            const email = document.getElementById('reset-email').value;
+            sendPasswordResetEmail(auth, email)
+                .then(() => alert("📧 Password reset email sent!"))
+                .catch(error => alert("❌ " + error.message));
+        };
 
         function loadUserData() {
             const saved = localStorage.getItem('userData');
@@ -822,7 +328,9 @@
             loadRobotAnimation();
         }
 
-        function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); }
+        function saveUserData() {
+            localStorage.setItem('userData', JSON.stringify(userData));
+        }
 
         document.querySelectorAll('.character').forEach(img => {
             img.addEventListener('click', () => {
@@ -886,54 +394,14 @@
 
         function signupUser() {
             clickSound.play();
-            const username = document.getElementById('signup-name').value.toLowerCase();
-            const email = document.getElementById('signup-email').value.toLowerCase();
-            const password = document.getElementById('signup-password').value;
-            if (users[username]) {
-                alert('Username already exists!');
-                return;
-            }
-            userData.username = username;
-            userData.email = email;
-            userData.password = password;
             userData.name = document.getElementById('signup-name').value || 'Young Explorer';
             userData.gender = document.querySelector('input[name="gender"]:checked').value;
             userData.year = document.getElementById('year-select').value;
             const selected = document.querySelector('.character.selected');
             userData.character = selected ? selected.src : document.querySelector('.character').src;
-            users[username] = { email, password, userData: { ...userData } };
             saveUserData();
             closeModal({ target: { id: 'signup-modal' } });
             showSection('welcome');
-        }
-
-        function loginUser() {
-            clickSound.play();
-            const username = document.getElementById('login-username').value.toLowerCase();
-            const password = document.getElementById('login-password').value;
-            if (users[username] && users[username].password === password) {
-                userData = { ...users[username].userData };
-                saveUserData();
-                closeModal({ target: { id: 'login-modal' } });
-                showSection('welcome');
-            } else {
-                alert('Invalid username or password!');
-            }
-        }
-
-        function resetPassword() {
-            clickSound.play();
-            const username = document.getElementById('login-username').value.toLowerCase();
-            if (users[username]) {
-                const newPassword = prompt('Enter new password:');
-                if (newPassword) {
-                    users[username].password = newPassword;
-                    alert('Password reset successfully! Please log in with the new password.');
-                    closeModal({ target: { id: 'login-modal' } });
-                }
-            } else {
-                alert('Username not found!');
-            }
         }
 
         function loginAdmin() {
@@ -1419,14 +887,7 @@
                         <div class="story-card mb-4">
                             <h3 class="text-xl">${mission.title}</h3>
                             <p>${mission.question}</p>
-                            <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2"
-
-
-
-
-
-
-placeholder="Type your answer">
+                            <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
                             <button class="btn mt-2" onclick="checkMission('${mission.id}', '${mission.answer}')">Submit 🎉</button>
                         </div>
                     `).join('')}
@@ -1457,8 +918,7 @@ placeholder="Type your answer">
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
-                    <p>Username: ${userData.username}</p>
-                    <p>Email: ${userData.email}</p>
+                    <p>Email: ${userData.email || 'Not set'}</p>
                     <p>Name: ${userData.name}</p>
                     <p>Level: ${userData.year}</p>
                     <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
@@ -1515,5 +975,599 @@ placeholder="Type your answer">
 
         window.addEventListener('load', loadUserData);
     </script>
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            background: #87CEEB;
+            overflow: hidden;
+        }
+        h1, h2, h3 {
+            font-family: 'Comic Neue', cursive;
+        }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            transition: background-image 1s ease;
+        }
+        .tree, .cloud, .star, .moon {
+            position: absolute;
+            animation: float 6s infinite ease-in-out;
+        }
+        .tree { content: '🌳'; font-size: 80px; }
+        .cloud { content: '☁️'; font-size: 50px; animation: float 8s infinite ease-in-out; }
+        .star { content: '⭐'; font-size: 30px; animation: twinkle 2s infinite alternate; }
+        .moon { content: '🌙'; font-size: 60px; animation: shine 4s infinite ease-in-out; top: 10%; left: 10%; }
+        .hero {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+            text-align: center;
+            padding-top: 10rem;
+            border-radius: 0 0 50px 50px;
+            display: none;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            animation: bounce 1s ease-out;
+        }
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+        .hero .btn {
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
+            color: #fff;
+            padding: 2rem 4rem;
+            font-size: 2rem;
+            border-radius: 30px;
+            transition: transform 0.3s, background 0.3s;
+            text-shadow: 1px 1px #000;
+        }
+        .hero .btn:hover {
+            transform: scale(1.1);
+            background: linear-gradient(90deg, #32CD32, #87CEEB);
+            box-shadow: 0 0 10px #32CD32;
+        }
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 165, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            padding: 1rem;
+            border-radius: 0 0 20px 20px;
+        }
+        .nav a {
+            color: #fff;
+            margin: 0 1.5rem;
+            font-weight: 500;
+            transition: transform 0.3s, color 0.3s;
+        }
+        .nav a:hover {
+            transform: scale(1.2);
+            color: #32CD32;
+        }
+        .card-grid {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 4rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            flex-wrap: wrap;
+        }
+        .section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .card {
+            background: linear-gradient(135deg, #FF69B4, #FFA500);
+            border-radius: 30px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-align: center;
+            overflow: hidden;
+            width: 250px;
+        }
+        .card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 15px 40px rgba(50, 205, 50, 0.3);
+        }
+        .card h3 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px #000;
+        }
+        .card p {
+            color: #fff;
+            text-shadow: 1px 1px #000;
+        }
+        .card:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+            z-index: -1;
+        }
+        .btn {
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: transform 0.3s, background 0.3s;
+            text-shadow: 1px 1px #000;
+        }
+        .btn:hover {
+            transform: scale(1.1);
+            background: linear-gradient(90deg, #32CD32, #87CEEB);
+            box-shadow: 0 0 10px #32CD32;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .star-counter {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            color: #FFA500;
+            z-index: 50;
+            animation: pulse 2s infinite;
+        }
+        .avatar-display {
+            position: fixed;
+            top: 6rem;
+            left: 1rem;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid #FFA500;
+            object-fit: cover;
+            animation: float 3s infinite ease-in-out;
+            z-index: 50;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .karbala-img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 15px;
+        }
+        #art-canvas {
+            border: 3px solid #87CEEB;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .art-tools {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .memory-card {
+            width: 150px;
+            height: 150px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            overflow: hidden;
+        }
+        .memory-card:hover {
+            transform: scale(1.05);
+        }
+        .memory-card.matched {
+            background: #32CD32;
+            color: #fff;
+        }
+        .wudhu-step {
+            width: 120px;
+            height: 120px;
+            background: #87CEEB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: move;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            user-select: none;
+            margin: 1rem 0;
+            position: relative;
+        }
+        .wudhu-step:hover {
+            transform: rotate(10deg) scale(1.1);
+        }
+        .wudhu-step.correct {
+            background: #32CD32;
+            color: #fff;
+        }
+        .jigsaw-piece {
+            width: 133px;
+            height: 133px;
+            background-size: cover;
+            border: 2px solid #FFA500;
+            cursor: move;
+            position: absolute;
+            user-select: none;
+        }
+        .jigsaw-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg') no-repeat;
+            background-size: 400px 400px;
+            border: 2px solid #32CD32;
+        }
+        .story-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1rem auto;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        .choice-btn {
+            margin: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 15px;
+            background: #FFA500;
+            color: #fff;
+            transition: transform 0.3s, background 0.3s;
+        }
+        .choice-btn:hover {
+            transform: scale(1.05);
+            background: #32CD32;
+        }
+        .progress-bar {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 500px;
+            height: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
+            transition: width 0.5s ease-in-out;
+        }
+        .badge {
+            position: fixed;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            background: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            animation: bounce 2s infinite;
+        }
+        .mute-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 50;
+        }
+        .lottie-animation {
+            width: 200px;
+            height: 200px;
+            margin: 1rem auto;
+        }
+        .wudhu-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .wudhu-dropzone {
+            min-height: 120px;
+            background: #fff;
+            border: 2px dashed #FFA500;
+            border-radius: 15px;
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+        @keyframes twinkle {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+        @keyframes shine {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: brightness(1.5); }
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @media (max-width: 640px) {
+            .card-grid { flex-direction: column; align-items: center; }
+            .nav { padding: 0.5rem; }
+            .memory-card { width: 100px; height: 100px; font-size: 0.8rem; }
+            .wudhu-step { width: 100px; height: 100px; font-size: 0.9rem; }
+            .jigsaw-container { width: 300px; height: 300px; }
+            .jigsaw-piece { width: 100px; height: 100px; }
+            .story-card { max-width: 100%; }
+            .wudhu-container { flex-direction: column; align-items: center; }
+            .wudhu-dropzone { width: 100%; }
+            .lottie-animation { width: 150px; height: 150px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mute-btn" onclick="toggleMute()">🔊</div>
+    <div class="badge">🏅 Badge: Explorer</div>
+    <div class="background" id="story-background" style="background-image: url('https://example.com/desert.jpg');"></div>
+    <div class="nav">
+        <div class="container flex justify-between items-center">
+            <div class="text-xl font-bold">🌙 Shia Quest Hub</div>
+            <div class="space-x-4 hidden md:flex">
+                <a href="#" onclick="showSection('welcome')">Home</a>
+                <a href="#" onclick="showSection('profile')">Profile</a>
+                <a href="#" onclick="showSection('kindergarten')">Quiz</a>
+                <a href="#" onclick="showSection('year1')">Memory</a>
+                <a href="#" onclick="showSection('year2')">Wudhu Challenge</a>
+                <a href="#" onclick="showSection('year3')">Karbala</a>
+                <a href="#" onclick="showSection('year4')">Art</a>
+                <a href="#" onclick="showSection('year6')">Story</a>
+                <a href="#" onclick="showSection('missions')">Missions</a>
+            </div>
+            <button class="md:hidden text-white" onclick="toggleMobileMenu()">☰</button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-orange-600 p-2 mt-2 rounded-xl">
+            <a href="#" class="block py-1 text-white" onclick="showSection('welcome')">Home</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('profile')">Profile</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('kindergarten')">Quiz</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year1')">Memory</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu Challenge</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('year6')">Story</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
+        </div>
+    </div>
+    <div class="star-counter" id="star-counter">Stars: <span id="star-count">0</span> ⭐</div>
+    <img id="avatar-display" src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="avatar-display" style="display: none;">
+    <div class="progress-bar"><div id="progress" class="progress" style="width: 0%;"></div></div>
+
+    <!-- Landing Page -->
+    <div id="landing-page" class="hero" style="display: block;">
+        <div class="lottie-animation" id="robot-animation" style="position: absolute; top: 20%; left: 10%;"></div>
+        <h1>Welcome to Shia Islamic Quest!</h1>
+        <p>Embark on an epic adventure with your guide!</p>
+        <div class="space-y-4">
+            <button class="btn" onclick="showLoginModal()">Login</button>
+            <button class="btn" onclick="showSignupModal()">Sign Up</button>
+            <button class="btn" onclick="showAdminLoginModal()">Admin Login</button>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
+            <input type="email" id="login-email" placeholder="Email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <button class="btn" onclick="login()">Login</button>
+            <button class="btn mt-2" onclick="resetPassword()">Reset Password</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
+            <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Welcome" class="karbala-img mx-auto mb-4">
+            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <div class="flex justify-center gap-4 mb-2">
+                <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
+                <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
+            </div>
+            <select id="year-select" class="border-2 border-orange-500 rounded-lg
+
+p-2 w-full text-black mb-2">
+                <option value="kindergarten">Kindergarten</option>
+                <option value="year1">Year 1</option>
+                <option value="year2">Year 2</option>
+                <option value="year3">Year 3</option>
+                <option value="year4">Year 4</option>
+                <option value="year5">Year 5</option>
+                <option value="year6">Year 6</option>
+            </select>
+            <div class="flex justify-center gap-2 mb-2">
+                <img src="https://yourusername.github.io/your-repo/images/boy1.png" alt="Boy 1" class="character w-16 h-16 cursor-pointer">
+                <img src="https://yourusername.github.io/your-repo/images/boy2.png" alt="Boy 2" class="character w-16 h-16 cursor-pointer">
+                <img src="https://yourusername.github.io/your-repo/images/girl1.png" alt="Girl 1" class="character w-16 h-16 cursor-pointer">
+                <img src="https://yourusername.github.io/your-repo/images/girl2.png" alt="Girl 2" class="character w-16 h-16 cursor-pointer">
+            </div>
+            <button id="signup-btn" class="btn">Sign Up</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl text-orange-600 mb-2">Admin Login</h2>
+            <input type="text" id="admin-username" placeholder="Username" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="admin-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <button class="btn" onclick="loginAdmin()">Login</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div id="welcome" class="section hidden">
+        <div class="content">
+            <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">${userData.name || 'Young Explorer'}</span>! 🌟</h2>
+            <div class="card-grid">
+                <div class="card" onclick="showSection('kindergarten')">
+                    <h3>Quiz Challenge 📖</h3>
+                    <p>Test your Islamic knowledge!</p>
+                </div>
+                <div class="card" onclick="showSection('year1')">
+                    <h3>Memory Quest 🧠</h3>
+                    <p>Match the Imams!</p>
+                </div>
+                <div class="card" onclick="showSection('year2')">
+                    <h3>Wudhu Challenge 💧</h3>
+                    <p>Order the steps!</p>
+                </div>
+                <div class="card" onclick="showSection('year3')">
+                    <h3>Karbala Epic 🏰</h3>
+                    <p>Learn about Karbala!</p>
+                </div>
+                <div class="card" onclick="showSection('year4')">
+                    <h3>Art Quest 🎨</h3>
+                    <p>Create Islamic art!</p>
+                </div>
+                <div class="card" onclick="showSection('year6')">
+                    <h3>Choose Your Path 📖</h3>
+                    <p>Live an Islamic story!</p>
+                </div>
+                <div class="card" onclick="showSection('missions')">
+                    <h3>Mission Board ⭐</h3>
+                    <p>Complete daily tasks!</p>
+                </div>
+            </div>
+            <button class="btn mt-4" onclick="showSection('profile')">View Profile 🏡</button>
+        </div>
+    </div>
+
+    <!-- Kindergarten Section -->
+    <div id="kindergarten" class="section hidden"></div>
+
+    <!-- Year 1 Section -->
+    <div id="year1" class="section hidden"></div>
+
+    <!-- Year 2 Section -->
+    <div id="year2" class="section hidden"></div>
+
+    <!-- Year 3 Section -->
+    <div id="year3" class="section hidden"></div>
+
+    <!-- Year 4 Section -->
+    <div id="year4" class="section hidden"></div>
+
+    <!-- Year 6 Section -->
+    <div id="year6" class="section hidden"></div>
+
+    <!-- Missions Section -->
+    <div id="missions" class="section hidden"></div>
+
+    <!-- Profile Section -->
+    <div id="profile" class="section hidden"></div>
 </body>
 </html>
