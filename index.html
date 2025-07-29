@@ -10,11 +10,11 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-    <!-- Firebase CDN Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <!-- ✅ Firebase 9 CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script type="module">
-        // Initialize Firebase
+        // ✅ Firebase Config from your project
         const firebaseConfig = {
             apiKey: "AIzaSyBD2asTEG40b4hhVmUZK1Gd3Zvw2udPTOo",
             authDomain: "shia-kids-learning-tool.firebaseapp.com",
@@ -24,11 +24,12 @@
             appId: "1:786313108719:web:5d4d9ced7abcef72e1fdd9"
         };
 
+        // ✅ Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
         // Global variables
-        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+        let userData = { name: '', gender: 'boy', year: 'Level 1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
         let currentQuestion = 0;
         let score = 0;
         let flippedCards = [];
@@ -38,34 +39,37 @@
         const backgroundMusic = new Howl({ src: ['https://yourusername.github.io/your-repo/music/background.mp3'], loop: true, volume: 0.3 });
         const clickSound = new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/click.mp3'] });
         const questions = {
-            kindergarten: [
+            'Level 1': [
                 { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
                 { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
             ],
-            year1: [
+            'Level 2': [
                 { question: 'Who was the first Imam?', type: 'text', answer: 'Imam Ali' },
                 { question: 'How many Imams are there?', type: 'text', answer: '12' }
             ],
-            year2: [
+            'Level 3': [
                 { question: 'What is the first step of Wudhu?', type: 'text', answer: 'Niyyah' },
                 { question: 'What do you wash first in Wudhu?', type: 'text', answer: 'Face' }
             ],
-            year3: [
+            'Level 4': [
                 { question: 'Where did the Battle of Karbala take place?', type: 'text', answer: 'Karbala' },
                 { question: 'Who was the leader at Karbala?', type: 'text', answer: 'Imam Hussain' }
             ],
-            year4: [
+            'Level 5': [
                 { question: 'What is the Kaaba made of?', type: 'text', answer: 'Stone' },
                 { question: 'Where is the Kaaba located?', type: 'text', answer: 'Mecca' }
             ],
-            year5: [
+            'Level 6': [
                 { question: 'What is the significance of Hajj?', type: 'text', answer: 'Pilgrimage' },
                 { question: 'How often is Hajj performed?', type: 'text', answer: 'Once' }
             ],
-            year6: [
+            'Level 7': [
                 { question: 'What is the name of the holy book?', type: 'text', answer: 'Quran' },
                 { question: 'How many chapters are in the Quran?', type: 'text', answer: '114' }
-            ]
+            ],
+            'Level 8': [],
+            'Level 9': [],
+            'Level 10': []
         };
         const memoryCards = [
             { name: 'Prophet Muhammad(s)', match: 'Prophet Muhammad(s)', id: 1 },
@@ -376,12 +380,12 @@
             if (section) {
                 section.classList.remove('hidden');
                 gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                if (sectionId === 'kindergarten') showQuestion();
-                if (sectionId === 'year1') initMemoryGame();
-                if (sectionId === 'year2') initWudhuChallenge();
-                if (sectionId === 'year3') showKarbala();
-                if (sectionId === 'year4') initArtZone();
-                if (sectionId === 'year6') startStory();
+                if (sectionId === 'Level 1') showQuestion();
+                if (sectionId === 'Level 2') initMemoryGame();
+                if (sectionId === 'Level 3') initWudhuChallenge();
+                if (sectionId === 'Level 4') showKarbala();
+                if (sectionId === 'Level 5') initArtZone();
+                if (sectionId === 'Level 7') startStory();
                 if (sectionId === 'missions') showMissions();
                 if (sectionId === 'profile') showProfile();
                 updateProgress();
@@ -452,7 +456,7 @@
             clickSound.play();
             currentQuestion = 0;
             score = 0;
-            const container = document.getElementById('kindergarten');
+            const container = document.getElementById('Level 1');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Quiz Challenge 📖</h2>
@@ -480,7 +484,7 @@
             if (answer.toLowerCase() === q.answer.toLowerCase()) {
                 score++;
                 userData.stars += 2;
-                userData.progress = Math.min(userData.progress + 1, 7);
+                userData.progress = Math.min(userData.progress + 1, 10);
                 if (score === 1) userData.badges.push('Scholar');
                 updateStarCounter();
                 updateProgress();
@@ -498,7 +502,7 @@
 
         function initMemoryGame() {
             clickSound.play();
-            const container = document.getElementById('year1');
+            const container = document.getElementById('Level 2');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Memory Quest 🧠</h2>
@@ -541,12 +545,12 @@
                 updateStarCounter();
                 if (matchedCards.length === memoryCards.length) {
                     userData.stars += 10; // Bonus 10 stars for completing all 28 cards
-                    userData.progress = Math.min(userData.progress + 1, 7);
+                    userData.progress = Math.min(userData.progress + 1, 10);
                     userData.badges.push('Memory Master');
                     updateProgress();
                     updateBadges();
                     confetti();
-                    const container = document.getElementById('year1');
+                    const container = document.getElementById('Level 2');
                     container.innerHTML += '<p class="text-green-600 text-xl mt-4">All 28 cards matched! +10 Bonus Stars! 🎉</p>';
                 }
             } else {
@@ -561,7 +565,7 @@
 
         function initWudhuChallenge() {
             clickSound.play();
-            const container = document.getElementById('year2');
+            const container = document.getElementById('Level 3');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
@@ -663,13 +667,13 @@
                 obligatorySteps.forEach(step => step.classList.add('correct'));
                 mustahabSteps.forEach(step => step.classList.add('correct'));
                 userData.stars += 10;
-                userData.progress = Math.min(userData.progress + 1, 7);
+                userData.progress = Math.min(userData.progress + 1, 10);
                 userData.badges.push('Wudhu Master');
                 updateStarCounter();
                 updateProgress();
                 updateBadges();
                 confetti();
-                document.getElementById('year2').innerHTML += '<p class="text-green-600 text-xl mt-4">Wudhu Challenge Completed! +10 Stars! 🎉</p>';
+                document.getElementById('Level 3').innerHTML += '<p class="text-green-600 text-xl mt-4">Wudhu Challenge Completed! +10 Stars! 🎉</p>';
             } else {
                 alert('Please sort and order all 10 steps correctly in their respective sections! 😕');
             }
@@ -677,7 +681,7 @@
 
         function resetWudhuChallenge() {
             clickSound.play();
-            const container = document.getElementById('year2');
+            const container = document.getElementById('Level 3');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
@@ -689,7 +693,7 @@
                             <h3 class="text-xl mb-4">Mustahab 🌱</h3>
                         </div>
                     </div>
-                    <div id="wudhu-source" class="grid grid-cols-3 gap-2 mt-4">
+                    <div id="wudhu-source" class="card-grid grid-cols-3 gap-2 mt-4">
                         ${wudhuSteps.map(step => `
                             <div class="wudhu-step" draggable="true" data-id="${step.id}" data-category="${step.category}" data-order="${step.order}">${step.name}</div>
                         `).join('')}
@@ -706,7 +710,7 @@
 
         function showKarbala() {
             clickSound.play();
-            const container = document.getElementById('year3');
+            const container = document.getElementById('Level 4');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Karbala Epic 🏰</h2>
@@ -716,16 +720,16 @@
                 </div>
             `;
             userData.stars += 1;
-            userData.progress = Math.min(userData.progress + 1, 7);
+            userData.progress = Math.min(userData.progress + 1, 10);
             updateStarCounter();
             updateProgress();
-            if (userData.progress === 7) userData.badges.push('Karbala Hero');
+            if (userData.progress === 10) userData.badges.push('Karbala Hero');
             updateBadges();
         }
 
         function initArtZone() {
             clickSound.play();
-            const container = document.getElementById('year4');
+            const container = document.getElementById('Level 5');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Art Quest 🎨</h2>
@@ -780,8 +784,8 @@
                 img.src = src;
             };
             userData.stars += 1;
-            userData.progress = Math.min(userData.progress + 1, 7);
-            if (userData.progress === 7) userData.badges.push('Art Master');
+            userData.progress = Math.min(userData.progress + 1, 10);
+            if (userData.progress === 10) userData.badges.push('Art Master');
             updateStarCounter();
             updateProgress();
             updateBadges();
@@ -800,7 +804,7 @@
             const [story, scene] = sceneId.split('.');
             const fullScene = storyData[story][scene];
             userData.storyPath.push({ id: sceneId, choice: null });
-            const container = document.getElementById('year6');
+            const container = document.getElementById('Level 7');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Choose Your Path 📖</h2>
@@ -838,7 +842,7 @@
             if (nextScene === 'summary' || nextScene === 'summaryKufa') {
                 nextFullScene = story + '.' + nextScene;
             }
-            userData.progress = Math.min(userData.progress + 1, 7);
+            userData.progress = Math.min(userData.progress + 1, 10);
             updateStarCounter();
             updateProgress();
             showStoryScene(nextFullScene);
@@ -917,7 +921,7 @@
             const userAnswer = document.getElementById(`mission-${id}-input`).value.toLowerCase();
             if (userAnswer === answer.toLowerCase()) {
                 userData.stars += 2;
-                userData.progress = Math.min(userData.progress + 1, 7);
+                userData.progress = Math.min(userData.progress + 1, 10);
                 userData.missions[id] = true;
                 updateStarCounter();
                 updateProgress();
@@ -938,7 +942,7 @@
                     <p>Name: ${userData.name}</p>
                     <p>Level: ${userData.year}</p>
                     <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
-                    <p>Progress: <span id="profile-progress">${userData.progress}/7</span></p>
+                    <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
                     <p>Badges: ${userData.badges.join(', ')}</p>
                     <img src="${userData.character}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
@@ -955,9 +959,9 @@
         }
 
         function updateProgress() {
-            const progress = (userData.progress / 7) * 100;
+            const progress = (userData.progress / 10) * 100;
             document.getElementById('progress').style.width = `${progress}%`;
-            if (document.getElementById('profile-progress')) document.getElementById('profile-progress').textContent = `${userData.progress}/7`;
+            if (document.getElementById('profile-progress')) document.getElementById('profile-progress').textContent = `${userData.progress}/10`;
             saveUserData();
         }
 
@@ -1429,12 +1433,12 @@
             <div class="space-x-4 hidden md:flex">
                 <a href="#" onclick="showSection('welcome')">Home</a>
                 <a href="#" onclick="showSection('profile')">Profile</a>
-                <a href="#" onclick="showSection('kindergarten')">Quiz</a>
-                <a href="#" onclick="showSection('year1')">Memory</a>
-                <a href="#" onclick="showSection('year2')">Wudhu Challenge</a>
-                <a href="#" onclick="showSection('year3')">Karbala</a>
-                <a href="#" onclick="showSection('year4')">Art</a>
-                <a href="#" onclick="showSection('year6')">Story</a>
+                <a href="#" onclick="showSection('Level 1')">Quiz</a>
+                <a href="#" onclick="showSection('Level 2')">Memory</a>
+                <a href="#" onclick="showSection('Level 3')">Wudhu Challenge</a>
+                <a href="#" onclick="showSection('Level 4')">Karbala</a>
+                <a href="#" onclick="showSection('Level 5')">Art</a>
+                <a href="#" onclick="showSection('Level 7')">Story</a>
                 <a href="#" onclick="showSection('missions')">Missions</a>
             </div>
             <button class="md:hidden text-white" onclick="toggleMobileMenu()">☰</button>
@@ -1442,12 +1446,12 @@
         <div id="mobile-menu" class="hidden md:hidden bg-orange-600 p-2 mt-2 rounded-xl">
             <a href="#" class="block py-1 text-white" onclick="showSection('welcome')">Home</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('profile')">Profile</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('kindergarten')">Quiz</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year1')">Memory</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu Challenge</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year6')">Story</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('Level 1')">Quiz</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('Level 2')">Memory</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('Level 3')">Wudhu Challenge</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('Level 4')">Karbala</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('Level 5')">Art</a>
+            <a href="#" class="block py-1 text-white" onclick="showSection('Level 7')">Story</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
         </div>
     </div>
@@ -1480,12 +1484,10 @@
     </div>
 
     <!-- Signup Modal -->
-    <div id="signup-modal" class="modal">
-        <div class="modal-content">
+
+<div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
-            <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Welcome" class="karbala-img mx-auto mb-4">
-            <input type="text" id="signup-name" placeholder
-"Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <div class="flex justify-center gap-4 mb-2">
@@ -1493,13 +1495,16 @@
                 <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
             </div>
             <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-                <option value="kindergarten">Kindergarten</option>
-                <option value="year1">Year 1</option>
-                <option value="year2">Year 2</option>
-                <option value="year3">Year 3</option>
-                <option value="year4">Year 4</option>
-                <option value="year5">Year 5</option>
-                <option value="year6">Year 6</option>
+                <option value="Level 1">Level 1</option>
+                <option value="Level 2">Level 2</option>
+                <option value="Level 3">Level 3</option>
+                <option value="Level 4">Level 4</option>
+                <option value="Level 5">Level 5</option>
+                <option value="Level 6">Level 6</option>
+                <option value="Level 7">Level 7</option>
+                <option value="Level 8">Level 8</option>
+                <option value="Level 9">Level 9</option>
+                <option value="Level 10">Level 10</option>
             </select>
             <div class="flex justify-center gap-2 mb-2">
                 <img src="https://yourusername.github.io/your-repo/images/boy1.png" alt="Boy 1" class="character w-16 h-16 cursor-pointer">
@@ -1528,27 +1533,31 @@
         <div class="content">
             <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">${userData.name || 'Young Explorer'}</span>! 🌟</h2>
             <div class="card-grid">
-                <div class="card" onclick="showSection('kindergarten')">
+                <div class="card" onclick="showSection('Level 1')">
                     <h3>Quiz Challenge 📖</h3>
                     <p>Test your Islamic knowledge!</p>
                 </div>
-                <div class="card" onclick="showSection('year1')">
+                <div class="card" onclick="showSection('Level 2')">
                     <h3>Memory Quest 🧠</h3>
                     <p>Match the Imams!</p>
                 </div>
-                <div class="card" onclick="showSection('year2')">
+                <div class="card" onclick="showSection('Level 3')">
                     <h3>Wudhu Challenge 💧</h3>
                     <p>Order the steps!</p>
                 </div>
-                <div class="card" onclick="showSection('year3')">
+                <div class="card" onclick="showSection('Level 4')">
                     <h3>Karbala Epic 🏰</h3>
                     <p>Learn about Karbala!</p>
                 </div>
-                <div class="card" onclick="showSection('year4')">
+                <div class="card" onclick="showSection('Level 5')">
                     <h3>Art Quest 🎨</h3>
                     <p>Create Islamic art!</p>
                 </div>
-                <div class="card" onclick="showSection('year6')">
+                <div class="card" onclick="showSection('Level 6')">
+                    <h3>Explore Hajj 🌍</h3>
+                    <p>Learn about the pilgrimage!</p>
+                </div>
+                <div class="card" onclick="showSection('Level 7')">
                     <h3>Choose Your Path 📖</h3>
                     <p>Live an Islamic story!</p>
                 </div>
@@ -1561,23 +1570,35 @@
         </div>
     </div>
 
-    <!-- Kindergarten Section -->
-    <div id="kindergarten" class="section hidden"></div>
+    <!-- Level 1 Section -->
+    <div id="Level 1" class="section hidden"></div>
 
-    <!-- Year 1 Section -->
-    <div id="year1" class="section hidden"></div>
+    <!-- Level 2 Section -->
+    <div id="Level 2" class="section hidden"></div>
 
-    <!-- Year 2 Section -->
-    <div id="year2" class="section hidden"></div>
+    <!-- Level 3 Section -->
+    <div id="Level 3" class="section hidden"></div>
 
-    <!-- Year 3 Section -->
-    <div id="year3" class="section hidden"></div>
+    <!-- Level 4 Section -->
+    <div id="Level 4" class="section hidden"></div>
 
-    <!-- Year 4 Section -->
-    <div id="year4" class="section hidden"></div>
+    <!-- Level 5 Section -->
+    <div id="Level 5" class="section hidden"></div>
 
-    <!-- Year 6 Section -->
-    <div id="year6" class="section hidden"></div>
+    <!-- Level 6 Section -->
+    <div id="Level 6" class="section hidden"></div>
+
+    <!-- Level 7 Section -->
+    <div id="Level 7" class="section hidden"></div>
+
+    <!-- Level 8 Section -->
+    <div id="Level 8" class="section hidden"></div>
+
+    <!-- Level 9 Section -->
+    <div id="Level 9" class="section hidden"></div>
+
+    <!-- Level 10 Section -->
+    <div id="Level 10" class="section hidden"></div>
 
     <!-- Missions Section -->
     <div id="missions" class="section hidden"></div>
@@ -1586,5 +1607,3 @@
     <div id="profile" class="section hidden"></div>
 </body>
 </html>
-
-
