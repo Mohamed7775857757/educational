@@ -341,8 +341,10 @@
                 userData.email = user.email;
                 loadUserData();
             } else {
+                // Ensure landing page is shown for unauthenticated users
                 document.getElementById('landing-page').style.display = 'block';
                 document.getElementById('welcome').classList.add('hidden');
+                document.getElementById('profile').classList.add('hidden');
                 ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                     const modal = document.getElementById(id);
                     if (modal) modal.style.display = 'none';
@@ -389,6 +391,7 @@
                 localStorage.removeItem('userData');
                 document.getElementById('landing-page').style.display = 'block';
                 document.getElementById('welcome').classList.add('hidden');
+                document.getElementById('profile').classList.add('hidden');
                 document.getElementById('avatar-display').style.display = 'none';
                 document.getElementById('star-count').textContent = '0 ⭐';
                 backgroundMusic.stop();
@@ -409,9 +412,11 @@
                 if (!isMuted) backgroundMusic.play();
                 document.getElementById('landing-page').style.display = 'none';
                 document.getElementById('welcome').classList.remove('hidden');
+                showSection('welcome'); // Explicitly show welcome section
             } else {
                 document.getElementById('landing-page').style.display = 'block';
                 document.getElementById('welcome').classList.add('hidden');
+                document.getElementById('profile').classList.add('hidden');
             }
             loadRobotAnimation();
         }
@@ -483,8 +488,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Force landing page as default view
             document.getElementById('landing-page').style.display = 'block';
             document.getElementById('welcome').classList.add('hidden');
+            document.getElementById('profile').classList.add('hidden');
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
@@ -978,6 +985,11 @@
 
         function showProfile() {
             clickSound.play();
+            if (!userData.email) {
+                alert("Please log in to view your profile!");
+                showSection('welcome');
+                return;
+            }
             const container = document.getElementById('profile');
             container.innerHTML = `
                 <div class="content">
@@ -1039,8 +1051,14 @@
         }
 
         window.addEventListener('load', () => {
+            // Force landing page on load
             document.getElementById('landing-page').style.display = 'block';
             document.getElementById('welcome').classList.add('hidden');
+            document.getElementById('profile').classList.add('hidden');
+            // Clear any cached auth state initially
+            auth.signOut().then(() => {
+                console.log('Cleared initial auth state');
+            }).catch(error => console.log('Error clearing auth state:', error));
         });
     </script>
     <style>
@@ -1422,76 +1440,30 @@
             gap: 1rem;
             justify-content: center;
         }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-20px); }
-            60% { transform: translateY(-10px); }
+        .character {
+            transition: transform 0.3s;
+            border: 3px solid transparent;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .character:hover {
+            transform: scale(1.1);
         }
-        @keyframes slideIn {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .character.selected {
+            border-color: #32CD32;
+            box-shadow: 0 0 10px #32CD32;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-30px); }
+        .hidden {
+            display: none !important;
         }
-        @keyframes twinkle {
-            from { opacity: 0.5; }
-            to { opacity: 1; }
-        }
-        @keyframes shine {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); filter: brightness(1.5); }
-        }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @media (max-width: 640px) {
-            .card-grid { flex-direction: column; align-items: center; }
-            .nav { padding: 0.5rem; }
-            .memory-card { width: 100px; height: 100px; font-size: 0.8rem; }
-            .wudhu-step { width: 100px; height: 100px; font-size: 0.9rem; }
-            .jigsaw-container { width: 300px; height: 300px; }
-            .jigsaw-piece { width: 100px; height: 100px; }
-            .story-card { max-width: 100%; }
-            .wudhu-container { flex-direction: column; align-items: center; }
-            .wudhu-dropzone { width: 100%; }
-.character {
-                transition: transform 0.3s;
-                border: 3px solid transparent;
-            }
-            .character:hover {
-                transform: scale(1.1);
-            }
-            .character.selected {
-                border-color: #32CD32;
-                box-shadow: 0 0 10px #32CD32;
-            }
-            .hidden {
-                display: none !important;
-            }
-            #story-background {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-size: cover;
-                background-position: center;
-                z-index: -1;
-                transition: background-image 1s ease;
-            }
+        #story-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            transition: background-image 1s ease;
         }
     </style>
 </head>
@@ -1517,7 +1489,9 @@
     </div>
     <div id="landing-page">
         <div class="hero" id="hero">
-            <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="w-32 h-32 mx-auto mb-4">
+            <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="w-32 h-32 mx-auto
+
+mb-4">
             <div class="content">
                 <h1>🌙 Shia Islamic Adventure Quest</h1>
                 <p>Embark on an exciting journey to learn about Islam!</p>
@@ -1680,5 +1654,6 @@
 
     <div class="star-counter" id="star-count">0 ⭐</div>
     <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display" id="avatar-display" style="display: none;">
+    <div id="story-background"></div>
 </body>
 </html>
