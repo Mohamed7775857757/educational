@@ -274,19 +274,22 @@
         // Expose functions to global scope
         window.showLoginModal = function() {
             clickSound.play();
-            document.getElementById('login-modal').style.display = 'flex';
+            const modal = document.getElementById('login-modal');
+            if (modal) modal.style.display = 'flex';
             console.log('Login modal shown');
         };
 
         window.showSignupModal = function() {
             clickSound.play();
-            document.getElementById('signup-modal').style.display = 'flex';
+            const modal = document.getElementById('signup-modal');
+            if (modal) modal.style.display = 'flex';
             console.log('Sign up modal shown');
         };
 
         window.showAdminLoginModal = function() {
             clickSound.play();
-            document.getElementById('admin-login-modal').style.display = 'flex';
+            const modal = document.getElementById('admin-login-modal');
+            if (modal) modal.style.display = 'flex';
             console.log('Admin login modal shown');
         };
 
@@ -298,9 +301,10 @@
             } else {
                 document.getElementById('landing-page').style.display = 'block';
                 // Ensure modals are hidden initially
-                document.getElementById('login-modal').style.display = 'none';
-                document.getElementById('signup-modal').style.display = 'none';
-                document.getElementById('admin-login-modal').style.display = 'none';
+                ['login-modal', 'signup-modal', 'admin-login-modal'].forEach(id => {
+                    const modal = document.getElementById(id);
+                    if (modal) modal.style.display = 'none';
+                });
             }
         });
 
@@ -438,17 +442,25 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Ensure modals are hidden initially
+            ['login-modal', 'signup-modal', 'admin-login-modal'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (modal) modal.style.display = 'none';
+            });
+
             const signupButton = document.getElementById('signup-btn');
             if (signupButton) {
                 signupButton.addEventListener('click', signupUser);
                 signupButton.addEventListener('touchstart', signupUser, { passive: true });
             }
+
             document.getElementById('login-modal').addEventListener('click', closeModal);
             document.getElementById('signup-modal').addEventListener('click', closeModal);
             document.getElementById('admin-login-modal').addEventListener('click', closeModal);
             document.getElementById('login-modal').addEventListener('touchstart', closeModal, { passive: true });
             document.getElementById('signup-modal').addEventListener('touchstart', closeModal, { passive: true });
             document.getElementById('admin-login-modal').addEventListener('touchstart', closeModal, { passive: true });
+
             loadUserData();
         });
 
@@ -1476,16 +1488,28 @@
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="login(); console.log('Login attempted');">Login</button>
-            <button class="btn mt-2" onclick="resetPassword(); console.log('Reset password attempted');">Reset Password</button>
+            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-
+
+<input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <button class="btn" onclick="login(); console.log('Login submitted');">Login</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+            <p class="mt-2 text-sm"><a href="#" onclick="document.getElementById('reset-password-modal').style.display='flex'; closeModal(event); console.log('Reset password clicked');" class="text-blue-600">Forgot Password?</a></p>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="reset-password-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl text-orange-600 mb-2">Reset Password</h2>
+            <input type="email" id="reset-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <button class="btn" onclick="resetPassword(); console.log('Reset password submitted');">Send Reset Email</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
         </div>
     </div>
 
     <!-- Signup Modal -->
-
-<div class="modal-content">
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
             <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
