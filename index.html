@@ -10,23 +10,25 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-    <!-- ✅ Firebase 9 CDN Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <!-- Import Firebase libraries from CDN -->
     <script type="module">
-        // ✅ Firebase Config from your project
+        // Import Firebase libraries
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // Your fixed Firebase config
         const firebaseConfig = {
-            apiKey: "AIzaSyBD2asTEG40b4hhVmUZK1Gd3Zvw2udPTOo",
+            apiKey: "AIzaSyBD2asTEG40b4hhVmUZKlGd3ZPe-NJctxM",
             authDomain: "shia-kids-learning-tool.firebaseapp.com",
             projectId: "shia-kids-learning-tool",
             storageBucket: "shia-kids-learning-tool.appspot.com",
             messagingSenderId: "786313108719",
-            appId: "1:786313108719:web:5d4d9ced7abcef72e1fdd9"
+            appId: "1:786313108719:web:5d4d9ced7abd14b9d18f1a"
         };
 
-        // ✅ Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
         // Global variables
         let userData = { name: '', gender: 'boy', year: 'Level 1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
@@ -300,7 +302,6 @@
                 loadUserData();
             } else {
                 document.getElementById('landing-page').style.display = 'block';
-                // Ensure modals are hidden initially
                 ['login-modal', 'signup-modal', 'admin-login-modal'].forEach(id => {
                     const modal = document.getElementById(id);
                     if (modal) modal.style.display = 'none';
@@ -311,7 +312,7 @@
         window.signup = function() {
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            auth.createUserWithEmailAndPassword(email, password)
+            createUserWithEmailAndPassword(auth, email, password)
                 .then(() => {
                     alert("✅ Sign-up successful!");
                     userData.email = email;
@@ -323,7 +324,7 @@
         window.login = function() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            auth.signInWithEmailAndPassword(email, password)
+            signInWithEmailAndPassword(auth, email, password)
                 .then(() => {
                     alert("✅ Login successful!");
                     userData.email = email;
@@ -334,7 +335,7 @@
 
         window.resetPassword = function() {
             const email = document.getElementById('reset-email').value;
-            auth.sendPasswordResetEmail(email)
+            sendPasswordResetEmail(auth, email)
                 .then(() => alert("📧 Password reset email sent!"))
                 .catch(error => alert("❌ " + error.message));
         };
@@ -415,10 +416,9 @@
             const selected = document.querySelector('.character.selected');
             userData.character = selected ? selected.src : document.querySelector('.character').src;
             saveUserData();
-            // Trigger Firebase signup
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            auth.createUserWithEmailAndPassword(email, password)
+            createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     alert("✅ Sign-up successful!");
                     userData.email = email;
@@ -442,7 +442,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Ensure modals are hidden initially
             ['login-modal', 'signup-modal', 'admin-login-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
@@ -1488,11 +1487,11 @@
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-
-
-<input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <button class="btn" onclick="login(); console.log('Login submitted');">Login</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+            <button
+
+class="btn mt-2" onclick="closeModal(event)">Cancel</button>
             <p class="mt-2 text-sm"><a href="#" onclick="document.getElementById('reset-password-modal').style.display='flex'; closeModal(event); console.log('Reset password clicked');" class="text-blue-600">Forgot Password?</a></p>
         </div>
     </div>
