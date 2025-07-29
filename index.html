@@ -14,7 +14,7 @@
     <script type="module">
         // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         // Your fixed Firebase config
         const firebaseConfig = {
@@ -31,7 +31,7 @@
         const auth = getAuth(app);
 
         // Global variables
-        let userData = { name: '', gender: 'boy', year: 'Level 1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
         let currentQuestion = 0;
         let score = 0;
         let flippedCards = [];
@@ -41,37 +41,37 @@
         const backgroundMusic = new Howl({ src: ['https://yourusername.github.io/your-repo/music/background.mp3'], loop: true, volume: 0.3 });
         const clickSound = new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/click.mp3'] });
         const questions = {
-            'Level 1': [
+            'Level-1': [
                 { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
                 { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
             ],
-            'Level 2': [
+            'Level-2': [
                 { question: 'Who was the first Imam?', type: 'text', answer: 'Imam Ali' },
                 { question: 'How many Imams are there?', type: 'text', answer: '12' }
             ],
-            'Level 3': [
+            'Level-3': [
                 { question: 'What is the first step of Wudhu?', type: 'text', answer: 'Niyyah' },
                 { question: 'What do you wash first in Wudhu?', type: 'text', answer: 'Face' }
             ],
-            'Level 4': [
+            'Level-4': [
                 { question: 'Where did the Battle of Karbala take place?', type: 'text', answer: 'Karbala' },
                 { question: 'Who was the leader at Karbala?', type: 'text', answer: 'Imam Hussain' }
             ],
-            'Level 5': [
+            'Level-5': [
                 { question: 'What is the Kaaba made of?', type: 'text', answer: 'Stone' },
                 { question: 'Where is the Kaaba located?', type: 'text', answer: 'Mecca' }
             ],
-            'Level 6': [
+            'Level-6': [
                 { question: 'What is the significance of Hajj?', type: 'text', answer: 'Pilgrimage' },
                 { question: 'How often is Hajj performed?', type: 'text', answer: 'Once' }
             ],
-            'Level 7': [
+            'Level-7': [
                 { question: 'What is the name of the holy book?', type: 'text', answer: 'Quran' },
                 { question: 'How many chapters are in the Quran?', type: 'text', answer: '114' }
             ],
-            'Level 8': [],
-            'Level 9': [],
-            'Level 10': []
+            'Level-8': [],
+            'Level-9': [],
+            'Level-10': []
         };
         const memoryCards = [
             { name: 'Prophet Muhammad(s)', match: 'Prophet Muhammad(s)', id: 1 },
@@ -298,13 +298,13 @@
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
-                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                if (sectionId === 'Level 1') showQuestion();
-                if (sectionId === 'Level 2') initMemoryGame();
-                if (sectionId === 'Level 3') initWudhuChallenge();
-                if (sectionId === 'Level 4') showKarbala();
-                if (sectionId === 'Level 5') initArtZone();
-                if (sectionId === 'Level 7') startStory();
+                gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
+                if (sectionId === 'Level-1') showQuestion();
+                if (sectionId === 'Level-2') initMemoryGame();
+                if (sectionId === 'Level-3') initWudhuChallenge();
+                if (sectionId === 'Level-4') showKarbala();
+                if (sectionId === 'Level-5') initArtZone();
+                if (sectionId === 'Level-7') startStory();
                 if (sectionId === 'missions') showMissions();
                 if (sectionId === 'profile') showProfile();
                 updateProgress();
@@ -320,7 +320,7 @@
             } else {
                 document.getElementById('landing-page').style.display = 'block';
                 document.getElementById('welcome').classList.add('hidden');
-                ['login-modal', 'signup-modal', 'admin-login-modal'].forEach(id => {
+                ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                     const modal = document.getElementById(id);
                     if (modal) modal.style.display = 'none';
                 });
@@ -356,6 +356,20 @@
             sendPasswordResetEmail(auth, email)
                 .then(() => alert("📧 Password reset email sent!"))
                 .catch(error => alert("❌ " + error.message));
+        };
+
+        window.logout = function() {
+            clickSound.play();
+            signOut(auth).then(() => {
+                alert("✅ Logged out successfully!");
+                userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+                localStorage.removeItem('userData');
+                document.getElementById('landing-page').style.display = 'block';
+                document.getElementById('welcome').classList.add('hidden');
+                document.getElementById('avatar-display').style.display = 'none';
+                document.getElementById('star-count').textContent = '0 ⭐';
+                backgroundMusic.stop();
+            }).catch(error => alert("❌ " + error.message));
         };
 
         function loadUserData() {
@@ -400,11 +414,12 @@
         }
 
         window.closeModal = function(event) {
-            if (event.target.id === 'login-modal' || event.target.id === 'signup-modal' || event.target.id === 'admin-login-modal' || event.target.classList.contains('btn')) {
+            if (event.target.id === 'login-modal' || event.target.id === 'signup-modal' || event.target.id === 'admin-login-modal' || event.target.id === 'reset-password-modal' || event.target.classList.contains('btn')) {
                 clickSound.play();
                 document.getElementById('login-modal').style.display = 'none';
                 document.getElementById('signup-modal').style.display = 'none';
                 document.getElementById('admin-login-modal').style.display = 'none';
+                document.getElementById('reset-password-modal').style.display = 'none';
                 console.log('Modal closed');
             }
         };
@@ -445,7 +460,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            ['login-modal', 'signup-modal', 'admin-login-modal'].forEach(id => {
+            ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
             });
@@ -459,9 +474,11 @@
             document.getElementById('login-modal').addEventListener('click', closeModal);
             document.getElementById('signup-modal').addEventListener('click', closeModal);
             document.getElementById('admin-login-modal').addEventListener('click', closeModal);
+            document.getElementById('reset-password-modal').addEventListener('click', closeModal);
             document.getElementById('login-modal').addEventListener('touchstart', closeModal, { passive: true });
             document.getElementById('signup-modal').addEventListener('touchstart', closeModal, { passive: true });
             document.getElementById('admin-login-modal').addEventListener('touchstart', closeModal, { passive: true });
+            document.getElementById('reset-password-modal').addEventListener('touchstart', closeModal, { passive: true });
 
             // Initial load - ensure landing page is shown
             document.getElementById('landing-page').style.display = 'block';
@@ -472,7 +489,7 @@
             clickSound.play();
             currentQuestion = 0;
             score = 0;
-            const container = document.getElementById('Level 1');
+            const container = document.getElementById('Level-1');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Quiz Challenge 📖</h2>
@@ -480,6 +497,7 @@
                     <div id="quiz-container" class="text-lg mb-4"></div>
                     <div id="score" class="text-xl mb-4"></div>
                     <button class="btn" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                 </div>
             `;
             showNextQuestion();
@@ -518,12 +536,13 @@
 
         function initMemoryGame() {
             clickSound.play();
-            const container = document.getElementById('Level 2');
+            const container = document.getElementById('Level-2');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Memory Quest 🧠</h2>
                     <div id="memory-game" class="grid grid-cols-4 md:grid-cols-7 gap-4 p-4"></div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                 </div>
             `;
             const gameContainer = document.getElementById('memory-game');
@@ -566,7 +585,7 @@
                     updateProgress();
                     updateBadges();
                     confetti();
-                    const container = document.getElementById('Level 2');
+                    const container = document.getElementById('Level-2');
                     container.innerHTML += '<p class="text-green-600 text-xl mt-4">All 28 cards matched! +10 Bonus Stars! 🎉</p>';
                 }
             } else {
@@ -581,7 +600,7 @@
 
         function initWudhuChallenge() {
             clickSound.play();
-            const container = document.getElementById('Level 3');
+            const container = document.getElementById('Level-3');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
@@ -603,6 +622,7 @@
                         <button id="wudhu-reset" class="btn">Reset 🔄</button>
                     </div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                 </div>
             `;
 
@@ -689,7 +709,7 @@
                 updateProgress();
                 updateBadges();
                 confetti();
-                document.getElementById('Level 3').innerHTML += '<p class="text-green-600 text-xl mt-4">Wudhu Challenge Completed! +10 Stars! 🎉</p>';
+                document.getElementById('Level-3').innerHTML += '<p class="text-green-600 text-xl mt-4">Wudhu Challenge Completed! +10 Stars! 🎉</p>';
             } else {
                 alert('Please sort and order all 10 steps correctly in their respective sections! 😕');
             }
@@ -697,7 +717,7 @@
 
         function resetWudhuChallenge() {
             clickSound.play();
-            const container = document.getElementById('Level 3');
+            const container = document.getElementById('Level-3');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
@@ -719,6 +739,7 @@
                         <button id="wudhu-reset" class="btn">Reset 🔄</button>
                     </div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                 </div>
             `;
             initWudhuChallenge();
@@ -726,13 +747,14 @@
 
         function showKarbala() {
             clickSound.play();
-            const container = document.getElementById('Level 4');
+            const container = document.getElementById('Level-4');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Karbala Epic 🏰</h2>
                     <p class="text-lg mb-4">Discover Imam Hussain's bravery!</p>
                     <img src="https://yourusername.github.io/your-repo/images/karbala.jpg" alt="Karbala" class="karbala-img mx-auto mb-4">
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                 </div>
             `;
             userData.stars += 1;
@@ -745,7 +767,7 @@
 
         function initArtZone() {
             clickSound.play();
-            const container = document.getElementById('Level 5');
+            const container = document.getElementById('Level-5');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Art Quest 🎨</h2>
@@ -763,6 +785,7 @@
                         <button class="btn" onclick="clearCanvas()">Clear 🧹</button>
                     </div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                 </div>
             `;
             const canvas = document.getElementById('art-canvas');
@@ -820,7 +843,7 @@
             const [story, scene] = sceneId.split('.');
             const fullScene = storyData[story][scene];
             userData.storyPath.push({ id: sceneId, choice: null });
-            const container = document.getElementById('Level 7');
+            const container = document.getElementById('Level-7');
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Choose Your Path 📖</h2>
@@ -833,6 +856,7 @@
                     </div>
                     ${!['start', 'summary', 'summaryKufa'].includes(scene) ? '<button class="btn mt-4" onclick="goBack()">Back</button>' : ''}
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                     <div class="lottie-animation" id="story-animation"></div>
                 </div>
             `;
@@ -928,6 +952,7 @@
                         </div>
                     `).join('')}
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                 </div>
             `;
         }
@@ -962,6 +987,7 @@
                     <p>Badges: ${userData.badges.join(', ')}</p>
                     <img src="${userData.character}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
                 </div>
             `;
             updateStarCounter();
@@ -1451,43 +1477,29 @@
             <div class="text-xl font-bold">🌙 Shia Quest Hub</div>
             <div class="space-x-4 hidden md:flex">
                 <a href="#" onclick="showSection('welcome')">Home</a>
-                <a href="#" onclick="showSection('profile')">Profile</a>
-                <a href="#" onclick="showSection('Level 1')">Quiz</a>
-                <a href="#" onclick="showSection('Level 2')">Memory</a>
-                <a href="#" onclick="showSection('Level 3')">Wudhu Challenge</a>
-                <a href="#" onclick="showSection('Level 4')">Karbala</a>
-                <a href="#" onclick="showSection('Level 5')">Art</a>
-                <a href="#" onclick="showSection('Level 7')">Story</a>
-                <a href="#" onclick="showSection('missions')">Missions</a>
+                <a href="#" onclick="showSection('profile')">Profile
+</div>
+            <button class="md:hidden" onclick="toggleMobileMenu()">☰</button>
+            <div id="mobile-menu" class="hidden md:hidden absolute top-16 right-4 bg-orange-500 p-4 rounded-lg shadow-lg">
+                <a href="#" onclick="showSection('welcome')" class="block text-white mb-2">Home</a>
+                <a href="#" onclick="showSection('profile')" class="block text-white">Profile</a>
             </div>
-            <button class="md:hidden text-white" onclick="toggleMobileMenu()">☰</button>
-        </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-orange-600 p-2 mt-2 rounded-xl">
-            <a href="#" class="block py-1 text-white" onclick="showSection('welcome')">Home</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('profile')">Profile</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('Level 1')">Quiz</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('Level 2')">Memory</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('Level 3')">Wudhu Challenge</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('Level 4')">Karbala</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('Level 5')">Art</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('Level 7')">Story</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
         </div>
     </div>
-
-    <div id="landing-page" class="hero">
-        <div class="star-counter" id="star-count">0 ⭐</div>
-        <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="avatar-display" id="avatar-display" style="display: none;">
-<div class="content">
-            <h1>🌙 Shia Islamic Adventure Quest</h1>
-            <p>Embark on an exciting journey to learn about Islam!</p>
-            <button class="btn" onclick="showLoginModal()">Login 🚪</button>
-            <button class="btn" onclick="showSignupModal()">Sign Up 🌟</button>
-            <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔑</button>
-            <div class="lottie-animation" id="robot-animation"></div>
-        </div>
-        <div class="progress-bar">
-            <div class="progress" id="progress"></div>
+    <div id="landing-page">
+        <div class="hero" id="hero">
+            <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="w-32 h-32 mx-auto mb-4">
+            <div class="content">
+                <h1>🌙 Shia Islamic Adventure Quest</h1>
+                <p>Embark on an exciting journey to learn about Islam!</p>
+                <button class="btn" onclick="showLoginModal()">Login 🚪</button>
+                <button class="btn" onclick="showSignupModal()">Sign Up 🌟</button>
+                <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔑</button>
+                <div class="lottie-animation" id="robot-animation"></div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
         </div>
     </div>
 
@@ -1525,16 +1537,16 @@
                 <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
             </div>
             <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-                <option value="Level 1">Level 1</option>
-                <option value="Level 2">Level 2</option>
-                <option value="Level 3">Level 3</option>
-                <option value="Level 4">Level 4</option>
-                <option value="Level 5">Level 5</option>
-                <option value="Level 6">Level 6</option>
-                <option value="Level 7">Level 7</option>
-                <option value="Level 8">Level 8</option>
-                <option value="Level 9">Level 9</option>
-                <option value="Level 10">Level 10</option>
+                <option value="Level-1">Level 1</option>
+                <option value="Level-2">Level 2</option>
+                <option value="Level-3">Level 3</option>
+                <option value="Level-4">Level 4</option>
+                <option value="Level-5">Level 5</option>
+                <option value="Level-6">Level 6</option>
+                <option value="Level-7">Level 7</option>
+                <option value="Level-8">Level 8</option>
+                <option value="Level-9">Level 9</option>
+                <option value="Level-10">Level 10</option>
             </select>
             <div class="flex justify-center gap-2 mb-2">
                 <img src="https://yourusername.github.io/your-repo/images/boy1.png" alt="Boy 1" class="character w-16 h-16 cursor-pointer">
@@ -1563,31 +1575,31 @@
         <div class="content">
             <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">${userData.name || 'Young Explorer'}</span>! 🌟</h2>
             <div class="card-grid">
-                <div class="card" onclick="showSection('Level 1')">
+                <div class="card" onclick="showSection('Level-1')">
                     <h3>Quiz Challenge 📖</h3>
                     <p>Test your Islamic knowledge!</p>
                 </div>
-                <div class="card" onclick="showSection('Level 2')">
+                <div class="card" onclick="showSection('Level-2')">
                     <h3>Memory Quest 🧠</h3>
                     <p>Match the Imams!</p>
                 </div>
-                <div class="card" onclick="showSection('Level 3')">
+                <div class="card" onclick="showSection('Level-3')">
                     <h3>Wudhu Challenge 💧</h3>
                     <p>Order the steps!</p>
                 </div>
-                <div class="card" onclick="showSection('Level 4')">
+                <div class="card" onclick="showSection('Level-4')">
                     <h3>Karbala Epic 🏰</h3>
                     <p>Learn about Karbala!</p>
                 </div>
-                <div class="card" onclick="showSection('Level 5')">
+                <div class="card" onclick="showSection('Level-5')">
                     <h3>Art Quest 🎨</h3>
                     <p>Create Islamic art!</p>
                 </div>
-                <div class="card" onclick="showSection('Level 6')">
+                <div class="card" onclick="showSection('Level-6')">
                     <h3>Explore Hajj 🌍</h3>
                     <p>Learn about the pilgrimage!</p>
                 </div>
-                <div class="card" onclick="showSection('Level 7')">
+                <div class="card" onclick="showSection('Level-7')">
                     <h3>Choose Your Path 📖</h3>
                     <p>Live an Islamic story!</p>
                 </div>
@@ -1597,43 +1609,47 @@
                 </div>
             </div>
             <button class="btn mt-4" onclick="showSection('profile')">View Profile 🏡</button>
+            <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
         </div>
     </div>
 
     <!-- Level 1 Section -->
-    <div id="Level 1" class="section hidden"></div>
+    <div id="Level-1" class="section hidden"></div>
 
     <!-- Level 2 Section -->
-    <div id="Level 2" class="section hidden"></div>
+    <div id="Level-2" class="section hidden"></div>
 
     <!-- Level 3 Section -->
-    <div id="Level 3" class="section hidden"></div>
+    <div id="Level-3" class="section hidden"></div>
 
     <!-- Level 4 Section -->
-    <div id="Level 4" class="section hidden"></div>
+    <div id="Level-4" class="section hidden"></div>
 
     <!-- Level 5 Section -->
-    <div id="Level 5" class="section hidden"></div>
+    <div id="Level-5" class="section hidden"></div>
 
     <!-- Level 6 Section -->
-    <div id="Level 6" class="section hidden"></div>
+    <div id="Level-6" class="section hidden"></div>
 
     <!-- Level 7 Section -->
-    <div id="Level 7" class="section hidden"></div>
+    <div id="Level-7" class="section hidden"></div>
 
     <!-- Level 8 Section -->
-    <div id="Level 8" class="section hidden"></div>
+    <div id="Level-8" class="section hidden"></div>
 
     <!-- Level 9 Section -->
-    <div id="Level 9" class="section hidden"></div>
+    <div id="Level-9" class="section hidden"></div>
 
     <!-- Level 10 Section -->
-    <div id="Level 10" class="section hidden"></div>
+    <div id="Level-10" class="section hidden"></div>
 
     <!-- Missions Section -->
     <div id="missions" class="section hidden"></div>
 
     <!-- Profile Section -->
     <div id="profile" class="section hidden"></div>
+
+    <div class="star-counter" id="star-count">0 ⭐</div>
+    <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display" id="avatar-display" style="display: none;">
 </body>
 </html>
