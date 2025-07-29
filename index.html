@@ -276,30 +276,47 @@
         // Expose functions to global scope
         window.showLoginModal = function() {
             clickSound.play();
-            const modal = document.getElementById('login-modal');
-            if (modal) modal.style.display = 'flex';
+            document.getElementById('login-modal').style.display = 'flex';
             console.log('Login modal shown');
         };
 
         window.showSignupModal = function() {
             clickSound.play();
-            const modal = document.getElementById('signup-modal');
-            if (modal) modal.style.display = 'flex';
+            document.getElementById('signup-modal').style.display = 'flex';
             console.log('Sign up modal shown');
         };
 
         window.showAdminLoginModal = function() {
             clickSound.play();
-            const modal = document.getElementById('admin-login-modal');
-            if (modal) modal.style.display = 'flex';
+            document.getElementById('admin-login-modal').style.display = 'flex';
             console.log('Admin login modal shown');
+        };
+
+        window.showSection = function(sectionId) {
+            clickSound.play();
+            document.querySelectorAll('.section, #landing-page, #hero').forEach(el => el.classList.add('hidden'));
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.remove('hidden');
+                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
+                if (sectionId === 'Level 1') showQuestion();
+                if (sectionId === 'Level 2') initMemoryGame();
+                if (sectionId === 'Level 3') initWudhuChallenge();
+                if (sectionId === 'Level 4') showKarbala();
+                if (sectionId === 'Level 5') initArtZone();
+                if (sectionId === 'Level 7') startStory();
+                if (sectionId === 'missions') showMissions();
+                if (sectionId === 'profile') showProfile();
+                updateProgress();
+                updateBadges();
+            }
         };
 
         // Firebase Authentication Integration
         auth.onAuthStateChanged((user) => {
             if (user) {
                 userData.email = user.email;
-                loadUserData(); // Load user data only if authenticated
+                loadUserData();
             } else {
                 document.getElementById('landing-page').style.display = 'block';
                 document.getElementById('welcome').classList.add('hidden');
@@ -380,26 +397,6 @@
         function toggleMobileMenu() {
             clickSound.play();
             document.getElementById('mobile-menu').classList.toggle('hidden');
-        }
-
-        function showSection(sectionId) {
-            clickSound.play();
-            document.querySelectorAll('.section, #landing-page, #hero').forEach(el => el.classList.add('hidden'));
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.classList.remove('hidden');
-                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                if (sectionId === 'Level 1') showQuestion();
-                if (sectionId === 'Level 2') initMemoryGame();
-                if (sectionId === 'Level 3') initWudhuChallenge();
-                if (sectionId === 'Level 4') showKarbala();
-                if (sectionId === 'Level 5') initArtZone();
-                if (sectionId === 'Level 7') startStory();
-                if (sectionId === 'missions') showMissions();
-                if (sectionId === 'profile') showProfile();
-                updateProgress();
-                updateBadges();
-            }
         }
 
         window.closeModal = function(event) {
@@ -1476,13 +1473,12 @@
             <a href="#" class="block py-1 text-white" onclick="showSection('Level 7')">Story</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
         </div>
-</div>
     </div>
 
     <div id="landing-page" class="hero">
         <div class="star-counter" id="star-count">0 ⭐</div>
         <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="avatar-display" id="avatar-display" style="display: none;">
-        <div class="content">
+<div class="content">
             <h1>🌙 Shia Islamic Adventure Quest</h1>
             <p>Embark on an exciting journey to learn about Islam!</p>
             <button class="btn" onclick="showLoginModal()">Login 🚪</button>
