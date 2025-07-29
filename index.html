@@ -10,12 +10,11 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-        // Your Firebase config
+        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBD2asTEG40b4hhVmUZK1Gd3Zvw2udPTOo",
             authDomain: "shia-kids-learning-tool.firebaseapp.com",
@@ -25,9 +24,8 @@
             appId: "1:786313108719:web:5d4d9ced7abcef72e1fdd9"
         };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
         // Global variables
         let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
@@ -289,7 +287,7 @@
         };
 
         // Firebase Authentication Integration
-        onAuthStateChanged(auth, (user) => {
+        auth.onAuthStateChanged((user) => {
             if (user) {
                 userData.email = user.email;
                 loadUserData();
@@ -305,7 +303,7 @@
         window.signup = function() {
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            createUserWithEmailAndPassword(auth, email, password)
+            auth.createUserWithEmailAndPassword(email, password)
                 .then(() => {
                     alert("✅ Sign-up successful!");
                     userData.email = email;
@@ -317,7 +315,7 @@
         window.login = function() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            signInWithEmailAndPassword(auth, email, password)
+            auth.signInWithEmailAndPassword(email, password)
                 .then(() => {
                     alert("✅ Login successful!");
                     userData.email = email;
@@ -328,7 +326,7 @@
 
         window.resetPassword = function() {
             const email = document.getElementById('reset-email').value;
-            sendPasswordResetEmail(auth, email)
+            auth.sendPasswordResetEmail(email)
                 .then(() => alert("📧 Password reset email sent!"))
                 .catch(error => alert("❌ " + error.message));
         };
@@ -412,7 +410,7 @@
             // Trigger Firebase signup
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            createUserWithEmailAndPassword(auth, email, password)
+            auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     alert("✅ Sign-up successful!");
                     userData.email = email;
@@ -1474,9 +1472,7 @@
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="login-password" placeholder
-
-"Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <button class="btn" onclick="login(); console.log('Login attempted');">Login</button>
             <button class="btn mt-2" onclick="resetPassword(); console.log('Reset password attempted');">Reset Password</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
@@ -1488,7 +1484,8 @@
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
             <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Welcome" class="karbala-img mx-auto mb-4">
-            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="text" id="signup-name" placeholder
+"Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <div class="flex justify-center gap-4 mb-2">
@@ -1589,3 +1586,5 @@
     <div id="profile" class="section hidden"></div>
 </body>
 </html>
+
+
