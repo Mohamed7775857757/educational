@@ -312,6 +312,29 @@
             }
         };
 
+        window.checkAnswer = function(answer) {
+            clickSound.play();
+            const q = questions[userData.year][currentQuestion];
+            if (q.type === 'text') answer = document.getElementById('answer-input').value;
+            if (answer.toLowerCase() === q.answer.toLowerCase()) {
+                score++;
+                userData.stars += 2;
+                userData.progress = Math.min(userData.progress + 1, 10);
+                if (score === 1) userData.badges.push('Scholar');
+                updateStarCounter();
+                updateProgress();
+                updateBadges();
+                document.getElementById('score').innerHTML = `<p class="text-green-600">Correct! 🎉 Score: ${score}/${questions[userData.year].length}</p>`;
+                confetti();
+            } else document.getElementById('score').innerHTML = `<p class="text-red-600">Wrong! 😕 Answer: ${q.answer}</p>`;
+            currentQuestion++;
+            if (currentQuestion < questions[userData.year].length) {
+                setTimeout(showNextQuestion, 1000);
+            } else {
+                document.getElementById('score').innerHTML += '<p class="mt-4 text-green-600">Quest Done! 🎉</p>';
+            }
+        };
+
         // Firebase Authentication Integration
         auth.onAuthStateChanged((user) => {
             if (user) {
@@ -460,6 +483,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('landing-page').style.display = 'block';
+            document.getElementById('welcome').classList.add('hidden');
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
@@ -480,9 +505,10 @@
             document.getElementById('admin-login-modal').addEventListener('touchstart', closeModal, { passive: true });
             document.getElementById('reset-password-modal').addEventListener('touchstart', closeModal, { passive: true });
 
-            // Initial load - ensure landing page is shown
-            document.getElementById('landing-page').style.display = 'block';
-            document.getElementById('welcome').classList.add('hidden');
+            // Ensure buttons trigger modals
+            document.querySelectorAll('.btn[onclick^="show"]').forEach(btn => {
+                btn.addEventListener('click', eval(btn.getAttribute('onclick')));
+            });
         });
 
         function showQuestion() {
@@ -509,29 +535,6 @@
             quizContainer.innerHTML = `<p class="mb-4">${q.question}</p>` +
                 (q.type === 'text' ? `<input id="answer-input" class="border rounded-lg p-2 bg-white text-black mx-auto block mt-4 w-1/2" placeholder="Type your answer"><button class="btn ml-2" onclick="checkAnswer()">Submit 🎉</button>` :
                 q.options.map(o => `<button class="btn ml-2 mt-2" onclick="checkAnswer('${o}')">${o} 🌟</button>`).join(''));
-        }
-
-        function checkAnswer(answer) {
-            clickSound.play();
-            const q = questions[userData.year][currentQuestion];
-            if (q.type === 'text') answer = document.getElementById('answer-input').value;
-            if (answer.toLowerCase() === q.answer.toLowerCase()) {
-                score++;
-                userData.stars += 2;
-                userData.progress = Math.min(userData.progress + 1, 10);
-                if (score === 1) userData.badges.push('Scholar');
-                updateStarCounter();
-                updateProgress();
-                updateBadges();
-                document.getElementById('score').innerHTML = `<p class="text-green-600">Correct! 🎉 Score: ${score}/${questions[userData.year].length}</p>`;
-                confetti();
-            } else document.getElementById('score').innerHTML = `<p class="text-red-600">Wrong! 😕 Answer: ${q.answer}</p>`;
-            currentQuestion++;
-            if (currentQuestion < questions[userData.year].length) {
-                setTimeout(showNextQuestion, 1000);
-            } else {
-                document.getElementById('score').innerHTML += '<p class="mt-4 text-green-600">Quest Done! 🎉</p>';
-            }
         }
 
         function initMemoryGame() {
@@ -1081,7 +1084,7 @@
             text-align: center;
             padding-top: 10rem;
             border-radius: 0 0 50px 50px;
-            display: none;
+            display: block;
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -1464,21 +1467,47 @@
             .story-card { max-width: 100%; }
             .wudhu-container { flex-direction: column; align-items: center; }
             .wudhu-dropzone { width: 100%; }
-            .lottie-animation { width: 150px; height: 150px; }
+.character {
+                transition: transform 0.3s;
+                border: 3px solid transparent;
+            }
+            .character:hover {
+                transform: scale(1.1);
+            }
+            .character.selected {
+                border-color: #32CD32;
+                box-shadow: 0 0 10px #32CD32;
+            }
+            .hidden {
+                display: none !important;
+            }
+            #story-background {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: cover;
+                background-position: center;
+                z-index: -1;
+                transition: background-image 1s ease;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="mute-btn" onclick="toggleMute()">🔊</div>
-    <div class="badge">🏅 Badge: Explorer</div>
-    <div class="background" id="story-background" style="background-image: url('https://example.com/desert.jpg');"></div>
+    <div class="background"></div>
+    <div class="tree" style="top: 80%; left: 10%;"></div>
+    <div class="cloud" style="top: 20%; left: 70%;"></div>
+    <div class="star" style="top: 30%; left: 20%;"></div>
+    <div class="star" style="top: 40%; left: 80%;"></div>
+    <div class="moon"></div>
     <div class="nav">
-        <div class="container flex justify-between items-center">
-            <div class="text-xl font-bold">🌙 Shia Quest Hub</div>
-            <div class="space-x-4 hidden md:flex">
-                <a href="#" onclick="showSection('welcome')">Home</a>
-                <a href="#" onclick="showSection('profile')">Profile
-</div>
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <div class="hidden md:flex">
+                <a href="#" onclick="showSection('welcome')" class="mr-4">Home</a>
+                <a href="#" onclick="showSection('profile')" class="">Profile</a>
+            </div>
             <button class="md:hidden" onclick="toggleMobileMenu()">☰</button>
             <div id="mobile-menu" class="hidden md:hidden absolute top-16 right-4 bg-orange-500 p-4 rounded-lg shadow-lg">
                 <a href="#" onclick="showSection('welcome')" class="block text-white mb-2">Home</a>
