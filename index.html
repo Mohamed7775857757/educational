@@ -51,6 +51,7 @@
             text-align: center;
             padding-top: 10rem;
             border-radius: 0 0 50px 50px;
+            display: none;
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -83,7 +84,7 @@
             backdrop-filter: blur(10px);
             z-index: 100;
             padding: 1rem;
-            border-radius: 0 0 20px 20px;f
+            border-radius: 0 0 20px 20px;
         }
         .nav a {
             color: #fff;
@@ -366,7 +367,7 @@
             z-index: 50;
         }
         .lottie-animation {
-            width: 200px; /* Increased size for robot */
+            width: 200px;
             height: 200px;
             margin: 1rem auto;
         }
@@ -433,7 +434,7 @@
             .story-card { max-width: 100%; }
             .wudhu-container { flex-direction: column; align-items: center; }
             .wudhu-dropzone { width: 100%; }
-            .lottie-animation { width: 150px; height: 150px; } /* Adjusted for mobile */
+            .lottie-animation { width: 150px; height: 150px; }
         }
     </style>
 </head>
@@ -452,7 +453,6 @@
                 <a href="#" onclick="showSection('year2')">Wudhu Challenge</a>
                 <a href="#" onclick="showSection('year3')">Karbala</a>
                 <a href="#" onclick="showSection('year4')">Art</a>
-                <a href="#" onclick="showSection('year5')">Jigsaw</a>
                 <a href="#" onclick="showSection('year6')">Story</a>
                 <a href="#" onclick="showSection('missions')">Missions</a>
             </div>
@@ -466,7 +466,6 @@
             <a href="#" class="block py-1 text-white" onclick="showSection('year2')">Wudhu Challenge</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('year3')">Karbala</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('year4')">Art</a>
-            <a href="#" class="block py-1 text-white" onclick="showSection('year5')">Jigsaw</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('year6')">Story</a>
             <a href="#" class="block py-1 text-white" onclick="showSection('missions')">Missions</a>
         </div>
@@ -475,40 +474,70 @@
     <img id="avatar-display" src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="avatar-display" style="display: none;">
     <div class="progress-bar"><div id="progress" class="progress" style="width: 0%;"></div></div>
 
-    <div class="hero">
-        <div class="lottie-animation" id="robot-animation" style="position: absolute; top: 20%; left: 10%;"></div> <!-- Placeholder for animated robot -->
+    <!-- Landing Page -->
+    <div id="landing-page" class="hero" style="display: block;">
+        <div class="lottie-animation" id="robot-animation" style="position: absolute; top: 20%; left: 10%;"></div>
         <h1>Welcome to Shia Islamic Quest!</h1>
         <p>Embark on an epic adventure with your guide!</p>
-        <button class="btn" onclick="openModal()">Start Quest</button>
+        <div class="space-y-4">
+            <button class="btn" onclick="showLoginModal()">Login</button>
+            <button class="btn" onclick="showSignupModal()">Sign Up</button>
+            <button class="btn" onclick="showAdminLoginModal()">Admin Login</button>
+        </div>
     </div>
 
-    <div id="intro-modal" class="modal">
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Choose Your Hero</h2>
+            <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
+            <input type="text" id="login-username" placeholder="Username" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <button class="btn" onclick="loginUser()">Login</button>
+            <button class="btn mt-2" onclick="resetPassword()">Reset Password</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
             <img src="https://yourusername.github.io/your-repo/images/welcome_islamic.jpg" alt="Welcome" class="karbala-img mx-auto mb-4">
-            <div class="space-y-4">
-                <input type="text" id="name-input" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black">
-                <div class="flex justify-center gap-4">
-                    <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
-                    <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
-                </div>
-                <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black">
-                    <option value="kindergarten">Kindergarten</option>
-                    <option value="year1">Year 1</option>
-                    <option value="year2">Year 2</option>
-                    <option value="year3">Year 3</option>
-                    <option value="year4">Year 4</option>
-                    <option value="year5">Year 5</option>
-                    <option value="year6">Year 6</option>
-                </select>
-                <div class="character-container flex justify-center gap-4">
-                    <img src="https://Mohamed7775857757.github.io/educational/images/boy1.png" alt="Boy 1" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="boy">
-                    <img src="https://Mohamed7775857757.github.io/educational/images/boy2.png" alt="Boy 2" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="boy">
-                    <img src="https://Mohamed7775857757.github.io/educational/images/girl2.png" alt="Girl 1" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="girl">
-                    <img src="https://Mohamed7775857757.github.io/educational/images/girl1.png" alt="Girl 2" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="girl">
-                </div>
-                <button class="btn" id="begin-journey-btn">Begin Quest</button>
+            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <div class="flex justify-center gap-4 mb-2">
+                <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
+                <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
             </div>
+            <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+                <option value="kindergarten">Kindergarten</option>
+                <option value="year1">Year 1</option>
+                <option value="year2">Year 2</option>
+                <option value="year3">Year 3</option>
+                <option value="year4">Year 4</option>
+                <option value="year5">Year 5</option>
+                <option value="year6">Year 6</option>
+            </select>
+            <div class="character-container flex justify-center gap-4 mb-2">
+                <img src="https://yourusername.github.io/your-repo/images/boy1.jpg" alt="Boy 1" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="boy">
+                <img src="https://yourusername.github.io/your-repo/images/boy2.jpg" alt="Boy 2" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="boy">
+                <img src="https://yourusername.github.io/your-repo/images/girl1_hijab.jpg" alt="Girl 1" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="girl">
+                <img src="https://yourusername.github.io/your-repo/images/girl2_hijab.jpg" alt="Girl 2" class="character w-20 h-20 object-cover rounded-full cursor-pointer border-2 border-transparent hover:border-orange-500" data-gender="girl">
+            </div>
+            <button class="btn" id="signup-btn">Sign Up</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl text-orange-600 mb-2">Admin Login</h2>
+            <input type="text" id="admin-username" placeholder="Admin Username" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="admin-password" placeholder="Admin Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <button class="btn" onclick="loginAdmin()">Login</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
         </div>
     </div>
 
@@ -520,7 +549,6 @@
             <div class="card" onclick="showSection('year2')"><h3>💧 Wudhu Challenge</h3><p>Sort and order Wudhu steps!</p></div>
             <div class="card" onclick="showSection('year3')"><h3>🏰 Karbala</h3><p>Learn the epic!</p></div>
             <div class="card" onclick="showSection('year4')"><h3>🎨 Art</h3><p>Create art!</p></div>
-            <div class="card" onclick="showSection('year5')"><h3>🧩 Jigsaw</h3><p>Solve the Kaaba puzzle!</p></div>
             <div class="card" onclick="showSection('year6')"><h3>📖 Story</h3><p>Choose your path!</p></div>
             <div class="card" onclick="showSection('missions')"><h3>⭐ Missions</h3><p>Earn rewards!</p></div>
         </div>
@@ -532,12 +560,11 @@
     <div id="year2" class="section container hidden"></div>
     <div id="year3" class="section container hidden"></div>
     <div id="year4" class="section container hidden"></div>
-    <div id="year5" class="section container hidden"></div>
     <div id="year6" class="section container hidden"></div>
     <div id="missions" class="section container hidden"></div>
 
     <script>
-        let userData = { name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+        let userData = { username: '', email: '', password: '', name: '', gender: 'boy', year: 'kindergarten', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
         let currentQuestion = 0;
         let score = 0;
         let flippedCards = [];
@@ -617,17 +644,6 @@
             { name: 'Wipe Head', id: 8, category: 'obligatory', order: 5 },
             { name: 'Wipe Right Foot', id: 9, category: 'obligatory', order: 6 },
             { name: 'Wipe Left Foot', id: 10, category: 'obligatory', order: 7 }
-        ];
-        const jigsawPieces = [
-            { id: 1, x: 0, y: 0, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=0,0,133,133' },
-            { id: 2, x: 133, y: 0, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=133,0,133,133' },
-            { id: 3, x: 266, y: 0, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=266,0,134,133' },
-            { id: 4, x: 0, y: 133, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=0,133,133,133' },
-            { id: 5, x: 133, y: 133, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=133,133,133,133' },
-            { id: 6, x: 266, y: 133, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=266,133,134,133' },
-            { id: 7, x: 0, y: 266, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=0,266,133,134' },
-            { id: 8, x: 133, y: 266, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=133,266,133,134' },
-            { id: 9, x: 266, y: 266, url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg?clip=266,266,134,134' }
         ];
         const storyData = {
             mecca: {
@@ -785,6 +801,8 @@
             { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
             { id: 'dua', title: 'Learn Dua', question: 'Dua before eating?', type: 'text', answer: 'Bismillah' }
         ];
+        const users = {}; // In-memory storage for users (replace with a database in production)
+        const adminCredentials = { username: 'admin', password: 'admin123' }; // Admin credentials (change for security)
 
         function loadUserData() {
             const saved = localStorage.getItem('userData');
@@ -797,10 +815,11 @@
                 updateProgress();
                 updateBadges();
                 if (!isMuted) backgroundMusic.play();
+                showSection('welcome');
             } else {
-                openModal();
+                document.getElementById('landing-page').style.display = 'block';
             }
-            loadRobotAnimation(); // Load robot animation on page load
+            loadRobotAnimation();
         }
 
         function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); }
@@ -823,7 +842,7 @@
 
         function showSection(sectionId) {
             clickSound.play();
-            document.querySelectorAll('.section, .hero').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.section, #landing-page, #hero').forEach(el => el.classList.add('hidden'));
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
@@ -833,7 +852,6 @@
                 if (sectionId === 'year2') initWudhuChallenge();
                 if (sectionId === 'year3') showKarbala();
                 if (sectionId === 'year4') initArtZone();
-                if (sectionId === 'year5') initJigsawPuzzle();
                 if (sectionId === 'year6') startStory();
                 if (sectionId === 'missions') showMissions();
                 if (sectionId === 'profile') showProfile();
@@ -842,48 +860,108 @@
             }
         }
 
-        function openModal() {
+        function showLoginModal() {
             clickSound.play();
-            document.getElementById('intro-modal').style.display = 'flex';
+            document.getElementById('login-modal').style.display = 'flex';
+        }
+
+        function showSignupModal() {
+            clickSound.play();
+            document.getElementById('signup-modal').style.display = 'flex';
+        }
+
+        function showAdminLoginModal() {
+            clickSound.play();
+            document.getElementById('admin-login-modal').style.display = 'flex';
         }
 
         function closeModal(event) {
-            if (event.target.id === 'intro-modal' || event.target.classList.contains('btn')) {
+            if (event.target.id === 'login-modal' || event.target.id === 'signup-modal' || event.target.id === 'admin-login-modal' || event.target.classList.contains('btn')) {
                 clickSound.play();
-                document.getElementById('intro-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('signup-modal').style.display = 'none';
+                document.getElementById('admin-login-modal').style.display = 'none';
             }
         }
 
-        function startLearning() {
+        function signupUser() {
             clickSound.play();
-            userData.name = document.getElementById('name-input').value || 'Young Explorer';
+            const username = document.getElementById('signup-name').value.toLowerCase();
+            const email = document.getElementById('signup-email').value.toLowerCase();
+            const password = document.getElementById('signup-password').value;
+            if (users[username]) {
+                alert('Username already exists!');
+                return;
+            }
+            userData.username = username;
+            userData.email = email;
+            userData.password = password;
+            userData.name = document.getElementById('signup-name').value || 'Young Explorer';
             userData.gender = document.querySelector('input[name="gender"]:checked').value;
             userData.year = document.getElementById('year-select').value;
-            if (!userData.character) {
-                const selected = document.querySelector('.character.selected');
-                userData.character = selected ? selected.src : document.querySelector('.character').src;
-            }
-            document.getElementById('avatar-display').src = userData.character;
-            document.getElementById('avatar-display').style.display = 'block';
+            const selected = document.querySelector('.character.selected');
+            userData.character = selected ? selected.src : document.querySelector('.character').src;
+            users[username] = { email, password, userData: { ...userData } };
             saveUserData();
-            closeModal({ target: { id: 'intro-modal' } });
+            closeModal({ target: { id: 'signup-modal' } });
             showSection('welcome');
         }
 
+        function loginUser() {
+            clickSound.play();
+            const username = document.getElementById('login-username').value.toLowerCase();
+            const password = document.getElementById('login-password').value;
+            if (users[username] && users[username].password === password) {
+                userData = { ...users[username].userData };
+                saveUserData();
+                closeModal({ target: { id: 'login-modal' } });
+                showSection('welcome');
+            } else {
+                alert('Invalid username or password!');
+            }
+        }
+
+        function resetPassword() {
+            clickSound.play();
+            const username = document.getElementById('login-username').value.toLowerCase();
+            if (users[username]) {
+                const newPassword = prompt('Enter new password:');
+                if (newPassword) {
+                    users[username].password = newPassword;
+                    alert('Password reset successfully! Please log in with the new password.');
+                    closeModal({ target: { id: 'login-modal' } });
+                }
+            } else {
+                alert('Username not found!');
+            }
+        }
+
+        function loginAdmin() {
+            clickSound.play();
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+            if (username === adminCredentials.username && password === adminCredentials.password) {
+                alert('Admin login successful!'); // Implement admin dashboard here
+                closeModal({ target: { id: 'admin-login-modal' } });
+                // Add admin functionality (e.g., redirect to admin panel)
+            } else {
+                alert('Invalid admin credentials!');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            const beginButton = document.querySelector('#intro-modal .btn');
-            const startButton = document.querySelector('.hero .btn');
-            
-            if (beginButton) {
-                beginButton.addEventListener('click', startLearning);
-                beginButton.addEventListener('touchstart', startLearning, { passive: true });
+            const signupButton = document.getElementById('signup-btn');
+            if (signupButton) {
+                signupButton.addEventListener('click', signupUser);
+                signupButton.addEventListener('touchstart', signupUser, { passive: true });
             }
-            if (startButton) {
-                startButton.addEventListener('click', openModal);
-                startButton.addEventListener('touchstart', openModal, { passive: true });
-            }
-            document.getElementById('intro-modal').addEventListener('click', closeModal);
-            document.getElementById('intro-modal').addEventListener('touchstart', closeModal, { passive: true });
+            document.getElementById('login-modal').addEventListener('click', closeModal);
+            document.getElementById('signup-modal').addEventListener('click', closeModal);
+            document.getElementById('admin-login-modal').addEventListener('click', closeModal);
+            document.getElementById('login-modal').addEventListener('touchstart', closeModal, { passive: true });
+            document.getElementById('signup-modal').addEventListener('touchstart', closeModal, { passive: true });
+            document.getElementById('admin-login-modal').addEventListener('touchstart', closeModal, { passive: true });
+            loadUserData();
         });
 
         function showQuestion() {
@@ -1225,83 +1303,6 @@
             updateBadges();
         }
 
-        function initJigsawPuzzle() {
-            clickSound.play();
-            const container = document.getElementById('year5');
-            container.innerHTML = `
-                <div class="content">
-                    <h2 class="text-3xl text-orange-600 mb-4">Jigsaw Puzzle 🧩</h2>
-                    <div id="jigsaw-container" class="jigsaw-container"></div>
-                    <div id="jigsaw-pieces" class="grid grid-cols-3 gap-2 mt-4"></div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                </div>
-            `;
-            const jigsawContainer = document.getElementById('jigsaw-container');
-            const piecesContainer = document.getElementById('jigsaw-pieces');
-            const shuffledPieces = [...jigsawPieces].sort(() => Math.random() - 0.5);
-
-            shuffledPieces.forEach(piece => {
-                const pieceElement = document.createElement('div');
-                pieceElement.className = 'jigsaw-piece';
-                pieceElement.style.backgroundImage = `url(${piece.url})`;
-                pieceElement.style.left = `${Math.random() * 300}px`;
-                pieceElement.style.top = `${Math.random() * 300}px`;
-                pieceElement.dataset.x = piece.x;
-                pieceElement.dataset.y = piece.y;
-                pieceElement.draggable = true;
-                pieceElement.addEventListener('dragstart', dragStartJigsaw);
-                piecesContainer.appendChild(pieceElement);
-            });
-
-            jigsawContainer.addEventListener('dragover', dragOverJigsaw);
-            jigsawContainer.addEventListener('drop', dropJigsaw);
-        }
-
-        let draggedJigsaw;
-        function dragStartJigsaw(event) {
-            clickSound.play();
-            draggedJigsaw = event.target;
-            event.dataTransfer.setData('x', draggedJigsaw.dataset.x);
-            event.dataTransfer.setData('y', draggedJigsaw.dataset.y);
-        }
-
-        function dragOverJigsaw(event) {
-            event.preventDefault();
-        }
-
-        function dropJigsaw(event) {
-            clickSound.play();
-            event.preventDefault();
-            if (draggedJigsaw) {
-                const x = event.dataTransfer.getData('x');
-                const y = event.dataTransfer.getData('y');
-                draggedJigsaw.style.left = `${x}px`;
-                draggedJigsaw.style.top = `${y}px`;
-                document.getElementById('jigsaw-container').appendChild(draggedJigsaw);
-                draggedJigsaw = null;
-                checkJigsawCompletion();
-            }
-        }
-
-        function checkJigsawCompletion() {
-            const pieces = document.querySelectorAll('#jigsaw-container .jigsaw-piece');
-            if (pieces.length === jigsawPieces.length) {
-                const isComplete = Array.from(pieces).every(piece => {
-                    return parseInt(piece.style.left) === parseInt(piece.dataset.x) && parseInt(piece.style.top) === parseInt(piece.dataset.y);
-                });
-                if (isComplete) {
-                    userData.stars += 5;
-                    userData.progress = Math.min(userData.progress + 1, 7);
-                    userData.badges.push('Jigsaw Master');
-                    updateStarCounter();
-                    updateProgress();
-                    updateBadges();
-                    confetti();
-                    document.getElementById('year5').innerHTML += '<p class="text-green-600 text-xl mt-4">Puzzle Completed! +5 Stars! 🎉</p>';
-                }
-            }
-        }
-
         function startStory() {
             clickSound.play();
             userData.storyPath = [];
@@ -1362,7 +1363,7 @@
         function goBack() {
             clickSound.play();
             if (userData.storyPath.length > 1) {
-userData.storyPath.pop();
+                userData.storyPath.pop();
                 const prevScene = userData.storyPath[userData.storyPath.length - 1].id;
                 showStoryScene(prevScene);
             }
@@ -1374,16 +1375,16 @@ userData.storyPath.pop();
                 let animationData;
                 switch (type) {
                     case 'happy':
-                        animationData = { path: 'https://Mohamed7775857757.github.io/educational/images/robot-mascot.jpeg' };
+                        animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
                         break;
                     case 'sad':
-                        animationData = { path: 'https://Mohamed7775857757.github.io/educational/images/robot-mascot.jpeg' };
+                        animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json' };
                         break;
                     case 'neutral':
-                        animationData = { path: 'https://Mohamed7775857757.github.io/educational/images/robot-mascot.jpeg' };
+                        animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_wl3khqiv.json' };
                         break;
                     default:
-                        animationData = { path: 'https://Mohamed7775857757.github.io/educational/images/robot-mascot.jpeg' };
+                        animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
                 }
                 lottie.loadAnimation({
                     container: animationContainer,
@@ -1403,7 +1404,7 @@ userData.storyPath.pop();
                     renderer: 'svg',
                     loop: true,
                     autoplay: true,
-                    path: 'https://Mohamed7775857757.github.io/educational/images/robot-mascot.jpeg' // Placeholder path for robot animation
+                    path: 'https://assets10.lottiefiles.com/packages/lf20_your-robot-animation.json'
                 });
             }
         }
@@ -1418,7 +1419,14 @@ userData.storyPath.pop();
                         <div class="story-card mb-4">
                             <h3 class="text-xl">${mission.title}</h3>
                             <p>${mission.question}</p>
-                            <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
+                            <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2"
+
+
+
+
+
+
+placeholder="Type your answer">
                             <button class="btn mt-2" onclick="checkMission('${mission.id}', '${mission.answer}')">Submit 🎉</button>
                         </div>
                     `).join('')}
@@ -1449,6 +1457,8 @@ userData.storyPath.pop();
             container.innerHTML = `
                 <div class="content">
                     <h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
+                    <p>Username: ${userData.username}</p>
+                    <p>Email: ${userData.email}</p>
                     <p>Name: ${userData.name}</p>
                     <p>Level: ${userData.year}</p>
                     <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
