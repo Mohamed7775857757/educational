@@ -269,6 +269,25 @@
         ];
         const adminCredentials = { username: 'admin', password: 'admin123' }; // Admin credentials (change for security)
 
+        // Expose functions to global scope
+        window.showLoginModal = function() {
+            clickSound.play();
+            document.getElementById('login-modal').style.display = 'flex';
+            console.log('Login modal shown');
+        };
+
+        window.showSignupModal = function() {
+            clickSound.play();
+            document.getElementById('signup-modal').style.display = 'flex';
+            console.log('Sign up modal shown');
+        };
+
+        window.showAdminLoginModal = function() {
+            clickSound.play();
+            document.getElementById('admin-login-modal').style.display = 'flex';
+            console.log('Admin login modal shown');
+        };
+
         // Firebase Authentication Integration
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -276,14 +295,18 @@
                 loadUserData();
             } else {
                 document.getElementById('landing-page').style.display = 'block';
+                // Ensure modals are hidden initially
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('signup-modal').style.display = 'none';
+                document.getElementById('admin-login-modal').style.display = 'none';
             }
         });
 
-        window.signup = () => {
+        window.signup = function() {
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
             createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
+                .then(() => {
                     alert("✅ Sign-up successful!");
                     userData.email = email;
                     showSignupModal(); // Show signup form for additional details
@@ -291,11 +314,11 @@
                 .catch(error => alert("❌ " + error.message));
         };
 
-        window.login = () => {
+        window.login = function() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
+                .then(() => {
                     alert("✅ Login successful!");
                     userData.email = email;
                     loadUserData();
@@ -303,7 +326,7 @@
                 .catch(error => alert("❌ " + error.message));
         };
 
-        window.resetPassword = () => {
+        window.resetPassword = function() {
             const email = document.getElementById('reset-email').value;
             sendPasswordResetEmail(auth, email)
                 .then(() => alert("📧 Password reset email sent!"))
@@ -368,29 +391,15 @@
             }
         }
 
-        function showLoginModal() {
-            clickSound.play();
-            document.getElementById('login-modal').style.display = 'flex';
-        }
-
-        function showSignupModal() {
-            clickSound.play();
-            document.getElementById('signup-modal').style.display = 'flex';
-        }
-
-        function showAdminLoginModal() {
-            clickSound.play();
-            document.getElementById('admin-login-modal').style.display = 'flex';
-        }
-
-        function closeModal(event) {
+        window.closeModal = function(event) {
             if (event.target.id === 'login-modal' || event.target.id === 'signup-modal' || event.target.id === 'admin-login-modal' || event.target.classList.contains('btn')) {
                 clickSound.play();
                 document.getElementById('login-modal').style.display = 'none';
                 document.getElementById('signup-modal').style.display = 'none';
                 document.getElementById('admin-login-modal').style.display = 'none';
+                console.log('Modal closed');
             }
-        }
+        };
 
         function signupUser() {
             clickSound.play();
@@ -400,8 +409,17 @@
             const selected = document.querySelector('.character.selected');
             userData.character = selected ? selected.src : document.querySelector('.character').src;
             saveUserData();
-            closeModal({ target: { id: 'signup-modal' } });
-            showSection('welcome');
+            // Trigger Firebase signup
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert("✅ Sign-up successful!");
+                    userData.email = email;
+                    closeModal({ target: { id: 'signup-modal' } });
+                    showSection('welcome');
+                })
+                .catch(error => alert("❌ " + error.message));
         }
 
         function loginAdmin() {
@@ -745,9 +763,9 @@
                 }
             });
 
-            window.changeColor = (newColor) => { color = newColor; clickSound.play(); };
-            window.clearCanvas = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); clickSound.play(); };
-            window.loadImage = (src) => {
+            window.changeColor = function(newColor) { color = newColor; clickSound.play(); };
+            window.clearCanvas = function() { ctx.clearRect(0, 0, canvas.width, canvas.height); clickSound.play(); };
+            window.loadImage = function(src) {
                 const img = new Image();
                 img.onload = () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1445,9 +1463,9 @@
         <h1>Welcome to Shia Islamic Quest!</h1>
         <p>Embark on an epic adventure with your guide!</p>
         <div class="space-y-4">
-            <button class="btn" onclick="showLoginModal()">Login</button>
-            <button class="btn" onclick="showSignupModal()">Sign Up</button>
-            <button class="btn" onclick="showAdminLoginModal()">Admin Login</button>
+            <button class="btn" onclick="showLoginModal(); console.log('Login clicked');">Login</button>
+            <button class="btn" onclick="showSignupModal(); console.log('Sign up clicked');">Sign Up</button>
+            <button class="btn" onclick="showAdminLoginModal(); console.log('Admin login clicked');">Admin Login</button>
         </div>
     </div>
 
@@ -1456,9 +1474,11 @@
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="login()">Login</button>
-            <button class="btn mt-2" onclick="resetPassword()">Reset Password</button>
+            <input type="password" id="login-password" placeholder
+
+"Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <button class="btn" onclick="login(); console.log('Login attempted');">Login</button>
+            <button class="btn mt-2" onclick="resetPassword(); console.log('Reset password attempted');">Reset Password</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
         </div>
     </div>
@@ -1475,9 +1495,7 @@
                 <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
                 <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
             </div>
-            <select id="year-select" class="border-2 border-orange-500 rounded-lg
-
-p-2 w-full text-black mb-2">
+            <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
                 <option value="kindergarten">Kindergarten</option>
                 <option value="year1">Year 1</option>
                 <option value="year2">Year 2</option>
@@ -1492,7 +1510,7 @@ p-2 w-full text-black mb-2">
                 <img src="https://yourusername.github.io/your-repo/images/girl1.png" alt="Girl 1" class="character w-16 h-16 cursor-pointer">
                 <img src="https://yourusername.github.io/your-repo/images/girl2.png" alt="Girl 2" class="character w-16 h-16 cursor-pointer">
             </div>
-            <button id="signup-btn" class="btn">Sign Up</button>
+            <button id="signup-btn" class="btn" onclick="signupUser(); console.log('Sign up submitted');">Sign Up</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
         </div>
     </div>
@@ -1503,7 +1521,7 @@ p-2 w-full text-black mb-2">
             <h2 class="text-2xl text-orange-600 mb-2">Admin Login</h2>
             <input type="text" id="admin-username" placeholder="Username" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="admin-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="loginAdmin()">Login</button>
+            <button class="btn" onclick="loginAdmin(); console.log('Admin login attempted');">Login</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
         </div>
     </div>
