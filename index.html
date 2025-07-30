@@ -306,7 +306,7 @@
                 if (sectionId === 'Level-5') initArtZone();
                 if (sectionId === 'Level-7') startStory();
                 if (sectionId === 'missions') showMissions();
-                if (sectionId === 'profile') showProfile();
+                if (sectionId === 'profile' && userData.email) showProfile(); // Only show profile if logged in
                 updateProgress();
                 updateBadges();
             }
@@ -987,7 +987,7 @@
             clickSound.play();
             if (!userData.email) {
                 alert("Please log in to view your profile!");
-                showSection('welcome');
+                showSection('welcome'); // Redirect to welcome if not logged in
                 return;
             }
             const container = document.getElementById('profile');
@@ -1489,9 +1489,8 @@
     </div>
     <div id="landing-page">
         <div class="hero" id="hero">
-            <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="w-32 h-32 mx-auto
-
-mb-4">
+            <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="w-32
+h-32 mx-auto mb-4">
             <div class="content">
                 <h1>🌙 Shia Islamic Adventure Quest</h1>
                 <p>Embark on an exciting journey to learn about Islam!</p>
