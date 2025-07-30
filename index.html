@@ -1432,51 +1432,88 @@
             to { transform: translateY(0); opacity: 1; }
         }
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+
+
+0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
         @keyframes rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        @media (max-width: 768px) {
+            .hero {
+                padding-top: 5rem;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero .btn {
+                padding: 1rem 2rem;
+                font-size: 1.5rem;
+            }
+            .card-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            .card {
+                width: 150px;
+                padding: 1rem;
+            }
+            .card h3 {
+                font-size: 1.2rem;
+            }
+            .modal-content {
+                width: 95%;
+            }
+            .nav {
+                padding: 0.5rem;
+            }
+            .nav a {
+                margin: 0 1rem;
+                font-size: 1rem;
+            }
+            .memory-card {
+                width: 100px;
+                height: 100px;
+                font-size: 0.8rem;
+            }
+            .wudhu-step {
+                width: 100px;
+                height: 100px;
+                font-size: 0.9rem;
+            }
+            .wudhu-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .wudhu-dropzone {
+                width: 100%;
+                min-height: 100px;
+            }
+            #art-canvas {
+                width: 100%;
+                height: 300px;
+            }
+            .story-card {
+                padding: 1rem;
+            }
+            .choice-btn {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="background"></div>
-    <div class="tree" style="top: 80%; left: 10%;"></div>
-    <div class="cloud" style="top: 20%; left: 70%;"></div>
-    <div class="star" style="top: 30%; left: 20%;"></div>
-    <div class="star" style="top: 40%; left: 80%;"></div>
-    <div class="moon"></div>
-    <div class="nav">
-        <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="hidden md:flex">
-                <a href="#" onclick="showSection('welcome')" class="mr-4">Home</a>
-                <a href="#" onclick="showSection('profile')" class="">Profile</a>
-            </div>
-            <button class="md:hidden" onclick="toggleMobileMenu()">☰</button>
-            <div id="mobile-menu" class="hidden md:hidden absolute top-16 right-4 bg-orange-500 p-4 rounded-lg shadow-lg">
-                <a href="#" onclick="showSection('welcome')" class="block text-white mb-2">Home</a>
-                <a href="#" onclick="showSection('profile')" class="block text-white">Profile</a>
-            </div>
-        </div>
-    </div>
-    <div id="landing-page">
-        <div class="hero" id="hero">
-            <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="w-32 h-32 mx-auto mb-4">
-            <div class="content">
-                <h1>🌙 Shia Islamic Adventure Quest</h1>
-                <p>Embark on an exciting journey to learn about Islam!</p>
-                <button class="btn" onclick="showLoginModal()">Login 🚪</button>
-                <button class="btn" onclick="showSignupModal()">Sign Up 🌟</button>
-                <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔑</button>
-                <div class="lottie-animation" id="robot-animation"></div>
-            </div>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
-            </div>
-        </div>
+    <div id="landing-page" class="hero">
+        <h1 class="text-3xl text-orange-600">🌙 Shia Islamic Adventure Quest</h1>
+        <p class="text-lg mb-4">Embark on a journey of faith and fun! 🌟</p>
+        <button class="btn" onclick="showLoginModal()">Login 🚪</button>
+        <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
+        <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔑</button>
+        <div id="robot-animation" class="lottie-animation" style="width: 200px; height: 200px; margin: 2rem auto;"></div>
     </div>
 
     <!-- Login Modal -->
@@ -1484,10 +1521,9 @@
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="password" id="login-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <button class="btn" onclick="login(); console.log('Login submitted');">Login</button>
-            <button class="btn mt-2" onclick
-"closeModal(event)">Cancel</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
             <p class="mt-2 text-sm"><a href="#" onclick="document.getElementById('reset-password-modal').style.display='flex'; closeModal(event); console.log('Reset password clicked');" class="text-blue-600">Forgot Password?</a></p>
         </div>
     </div>
