@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1001,9 +1002,7 @@
             document.getElementById('landing-page').style.display = 'block';
             document.getElementById('welcome').classList.add('hidden');
             document.getElementById('profile').classList.add('hidden');
-            auth.signOut().then(() => {
-                console.log('Cleared initial auth state');
-            }).catch(error => console.log('Error clearing auth state:', error));
+            // Removed auth.signOut() to prevent immediate logout
         });
     </script>
     <style>
@@ -1509,11 +1508,10 @@
     </div>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="modal">
+    <div id="login-modal"
+<div id="login-modal" class="modal">
         <div class="modal-content">
-            <h
-
-<h2 class="text-2xl text-orange-600 mb-2">Login</h2>
+            <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="login-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <button class="btn" onclick="login(); console.log('Login submitted');">Login</button>
