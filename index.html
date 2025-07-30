@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Fredoka:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
     <!-- Import Firebase libraries from CDN -->
     <script type="module">
@@ -36,10 +35,6 @@
         let score = 0;
         let flippedCards = [];
         let matchedCards = [];
-        let isMuted = false;
-        let lock = false;
-        const backgroundMusic = new Howl({ src: ['https://yourusername.github.io/your-repo/music/background.mp3'], loop: true, volume: 0.3 });
-        const clickSound = new Howl({ src: ['https://yourusername.github.io/your-repo/sounds/click.mp3'] });
         const questions = {
             'Level-1': [
                 { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
@@ -275,25 +270,21 @@
 
         // Expose functions to global scope
         window.showLoginModal = function() {
-            clickSound.play();
             document.getElementById('login-modal').style.display = 'flex';
             console.log('Login modal shown');
         };
 
         window.showSignupModal = function() {
-            clickSound.play();
             document.getElementById('signup-modal').style.display = 'flex';
             console.log('Sign up modal shown');
         };
 
         window.showAdminLoginModal = function() {
-            clickSound.play();
             document.getElementById('admin-login-modal').style.display = 'flex';
             console.log('Admin login modal shown');
         };
 
         window.showSection = function(sectionId) {
-            clickSound.play();
             document.querySelectorAll('.section, #landing-page, #hero').forEach(el => el.classList.add('hidden'));
             const section = document.getElementById(sectionId);
             if (section) {
@@ -313,7 +304,6 @@
         };
 
         window.checkAnswer = function(answer) {
-            clickSound.play();
             const q = questions[userData.year][currentQuestion];
             if (q.type === 'text') answer = document.getElementById('answer-input').value;
             if (answer.toLowerCase() === q.answer.toLowerCase()) {
@@ -384,7 +374,6 @@
         };
 
         window.logout = function() {
-            clickSound.play();
             signOut(auth).then(() => {
                 alert("✅ Logged out successfully!");
                 userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
@@ -394,7 +383,6 @@
                 document.getElementById('profile').classList.add('hidden');
                 document.getElementById('avatar-display').style.display = 'none';
                 document.getElementById('star-count').textContent = '0 ⭐';
-                backgroundMusic.stop();
             }).catch(error => alert("❌ " + error.message));
         };
 
@@ -409,7 +397,6 @@
                 updateStarCounter();
                 updateProgress();
                 updateBadges();
-                if (!isMuted) backgroundMusic.play();
                 document.getElementById('landing-page').style.display = 'none';
                 document.getElementById('welcome').classList.remove('hidden');
                 showSection('welcome'); // Explicitly show welcome section
@@ -427,7 +414,6 @@
 
         document.querySelectorAll('.character').forEach(img => {
             img.addEventListener('click', () => {
-                clickSound.play();
                 document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
                 img.classList.add('selected');
                 userData.character = img.src;
@@ -437,13 +423,11 @@
         });
 
         function toggleMobileMenu() {
-            clickSound.play();
             document.getElementById('mobile-menu').classList.toggle('hidden');
         }
 
         window.closeModal = function(event) {
             if (event.target.id === 'login-modal' || event.target.id === 'signup-modal' || event.target.id === 'admin-login-modal' || event.target.id === 'reset-password-modal' || event.target.classList.contains('btn')) {
-                clickSound.play();
                 document.getElementById('login-modal').style.display = 'none';
                 document.getElementById('signup-modal').style.display = 'none';
                 document.getElementById('admin-login-modal').style.display = 'none';
@@ -453,7 +437,6 @@
         };
 
         function signupUser() {
-            clickSound.play();
             userData.name = document.getElementById('signup-name').value || 'Young Explorer';
             userData.gender = document.querySelector('input[name="gender"]:checked').value;
             userData.year = document.getElementById('year-select').value;
@@ -475,7 +458,6 @@
         }
 
         function loginAdmin() {
-            clickSound.play();
             const username = document.getElementById('admin-username').value;
             const password = document.getElementById('admin-password').value;
             if (username === adminCredentials.username && password === adminCredentials.password) {
@@ -519,7 +501,6 @@
         });
 
         function showQuestion() {
-            clickSound.play();
             currentQuestion = 0;
             score = 0;
             const container = document.getElementById('Level-1');
@@ -545,7 +526,6 @@
         }
 
         function initMemoryGame() {
-            clickSound.play();
             const container = document.getElementById('Level-2');
             container.innerHTML = `
                 <div class="content">
@@ -570,7 +550,6 @@
         }
 
         function flipCard(card) {
-            clickSound.play();
             if (lock || flippedCards.length >= 2 || card.classList.contains('matched')) return;
             card.textContent = card.dataset.name;
             flippedCards.push(card);
@@ -609,7 +588,6 @@
         }
 
         function initWudhuChallenge() {
-            clickSound.play();
             const container = document.getElementById('Level-3');
             container.innerHTML = `
                 <div class="content">
@@ -655,7 +633,6 @@
 
         let draggedWudhu;
         function dragStartWudhu(event) {
-            clickSound.play();
             draggedWudhu = event.target;
             event.dataTransfer.setData('text/plain', draggedWudhu.textContent);
             event.dataTransfer.setData('id', draggedWudhu.dataset.id);
@@ -670,7 +647,6 @@
         }
 
         function dropWudhu(event) {
-            clickSound.play();
             event.preventDefault();
             const dropzone = event.target.closest('#obligatory-dropzone, #mustahab-dropzone');
             if (!dropzone || !draggedWudhu) return;
@@ -697,7 +673,6 @@
         }
 
         function checkWudhuCompletion() {
-            clickSound.play();
             const obligatoryDropzone = document.getElementById('obligatory-dropzone');
             const mustahabDropzone = document.getElementById('mustahab-dropzone');
 
@@ -726,7 +701,6 @@
         }
 
         function resetWudhuChallenge() {
-            clickSound.play();
             const container = document.getElementById('Level-3');
             container.innerHTML = `
                 <div class="content">
@@ -756,7 +730,6 @@
         }
 
         function showKarbala() {
-            clickSound.play();
             const container = document.getElementById('Level-4');
             container.innerHTML = `
                 <div class="content">
@@ -776,7 +749,6 @@
         }
 
         function initArtZone() {
-            clickSound.play();
             const container = document.getElementById('Level-5');
             container.innerHTML = `
                 <div class="content">
@@ -814,14 +786,13 @@
                 }
             });
 
-            window.changeColor = function(newColor) { color = newColor; clickSound.play(); };
-            window.clearCanvas = function() { ctx.clearRect(0, 0, canvas.width, canvas.height); clickSound.play(); };
+            window.changeColor = function(newColor) { color = newColor; };
+            window.clearCanvas = function() { ctx.clearRect(0, 0, canvas.width, canvas.height); };
             window.loadImage = function(src) {
                 const img = new Image();
                 img.onload = () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    clickSound.play();
                 };
                 img.onerror = () => {
                     console.log(`Image load failed for ${src}`);
@@ -841,7 +812,6 @@
         }
 
         function startStory() {
-            clickSound.play();
             userData.storyPath = [];
             const storyOptions = ['mecca', 'kufa'];
             const selectedStory = storyOptions[Math.floor(Math.random() * storyOptions.length)];
@@ -849,7 +819,6 @@
         }
 
         function showStoryScene(sceneId) {
-            clickSound.play();
             const [story, scene] = sceneId.split('.');
             const fullScene = storyData[story][scene];
             userData.storyPath.push({ id: sceneId, choice: null });
@@ -876,7 +845,6 @@
         }
 
         function makeChoice(story, scene, choiceKey, nextScene) {
-            clickSound.play();
             const fullScene = storyData[story][scene];
             userData.storyPath[userData.storyPath.length - 1].choice = choiceKey;
             let nextFullScene = nextScene;
@@ -899,7 +867,6 @@
         }
 
         function goBack() {
-            clickSound.play();
             if (userData.storyPath.length > 1) {
                 userData.storyPath.pop();
                 const prevScene = userData.storyPath[userData.storyPath.length - 1].id;
@@ -948,7 +915,6 @@
         }
 
         function showMissions() {
-            clickSound.play();
             const container = document.getElementById('missions');
             container.innerHTML = `
                 <div class="content">
@@ -968,7 +934,6 @@
         }
 
         function checkMission(id, answer) {
-            clickSound.play();
             const userAnswer = document.getElementById(`mission-${id}-input`).value.toLowerCase();
             if (userAnswer === answer.toLowerCase()) {
                 userData.stars += 2;
@@ -984,7 +949,6 @@
         }
 
         function showProfile() {
-            clickSound.play();
             if (!userData.email) {
                 alert("Please log in to view your profile!");
                 showSection('welcome'); // Redirect to welcome if not logged in
@@ -1028,26 +992,12 @@
             saveUserData();
         }
 
-        function toggleMute() {
-            clickSound.play();
-            isMuted = !isMuted;
-            if (isMuted) {
-                backgroundMusic.pause();
-                document.querySelector('.mute-btn').textContent = '🔇';
-            } else {
-                backgroundMusic.play();
-                document.querySelector('.mute-btn').textContent = '🔊';
-            }
-        }
-
         function confetti() {
-            if (!isMuted) {
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 }
-                });
-            }
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
         }
 
         window.addEventListener('load', () => {
@@ -1407,16 +1357,6 @@
             z-index: 50;
             animation: bounce 2s infinite;
         }
-        .mute-btn {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            background: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            z-index: 50;
-        }
         .lottie-animation {
             width: 200px;
             height: 200px;
@@ -1465,6 +1405,41 @@
             z-index: -1;
             transition: background-image 1s ease;
         }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        @keyframes shine {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -1489,8 +1464,7 @@
     </div>
     <div id="landing-page">
         <div class="hero" id="hero">
-            <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="w-32
-h-32 mx-auto mb-4">
+            <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Mascot" class="w-32 h-32 mx-auto mb-4">
             <div class="content">
                 <h1>🌙 Shia Islamic Adventure Quest</h1>
                 <p>Embark on an exciting journey to learn about Islam!</p>
@@ -1512,7 +1486,9 @@ h-32 mx-auto mb-4">
             <input type="email" id="login-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="login-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <button class="btn" onclick="login(); console.log('Login submitted');">Login</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+            <button class="btn mt-2" onclick
+
+"closeModal(event)">Cancel</button>
             <p class="mt-2 text-sm"><a href="#" onclick="document.getElementById('reset-password-modal').style.display='flex'; closeModal(event); console.log('Reset password clicked');" class="text-blue-600">Forgot Password?</a></p>
         </div>
     </div>
