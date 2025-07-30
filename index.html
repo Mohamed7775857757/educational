@@ -35,6 +35,7 @@
         let score = 0;
         let flippedCards = [];
         let matchedCards = [];
+        let lock = false;
         const questions = {
             'Level-1': [
                 { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
@@ -266,7 +267,7 @@
             { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
             { id: 'dua', title: 'Learn Dua', question: 'Dua before eating?', type: 'text', answer: 'Bismillah' }
         ];
-        const adminCredentials = { username: 'admin', password: 'admin123' }; // Admin credentials (change for security)
+        const adminCredentials = { username: 'admin', password: 'admin123' }; // Change for security
 
         // Expose functions to global scope
         window.showLoginModal = function() {
@@ -297,7 +298,7 @@
                 if (sectionId === 'Level-5') initArtZone();
                 if (sectionId === 'Level-7') startStory();
                 if (sectionId === 'missions') showMissions();
-                if (sectionId === 'profile' && userData.email) showProfile(); // Only show profile if logged in
+                if (sectionId === 'profile' && userData.email) showProfile();
                 updateProgress();
                 updateBadges();
             }
@@ -331,7 +332,6 @@
                 userData.email = user.email;
                 loadUserData();
             } else {
-                // Ensure landing page is shown for unauthenticated users
                 document.getElementById('landing-page').style.display = 'block';
                 document.getElementById('welcome').classList.add('hidden');
                 document.getElementById('profile').classList.add('hidden');
@@ -399,7 +399,7 @@
                 updateBadges();
                 document.getElementById('landing-page').style.display = 'none';
                 document.getElementById('welcome').classList.remove('hidden');
-                showSection('welcome'); // Explicitly show welcome section
+                showSection('welcome');
             } else {
                 document.getElementById('landing-page').style.display = 'block';
                 document.getElementById('welcome').classList.add('hidden');
@@ -421,10 +421,6 @@
                 saveUserData();
             });
         });
-
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        }
 
         window.closeModal = function(event) {
             if (event.target.id === 'login-modal' || event.target.id === 'signup-modal' || event.target.id === 'admin-login-modal' || event.target.id === 'reset-password-modal' || event.target.classList.contains('btn')) {
@@ -451,8 +447,8 @@
                     alert("✅ Sign-up successful!");
                     userData.email = email;
                     closeModal({ target: { id: 'signup-modal' } });
-                    loadUserData(); // Load user data and show welcome screen
-                    showSection('welcome'); // Explicitly show welcome section
+                    loadUserData();
+                    showSection('welcome');
                 })
                 .catch(error => alert("❌ " + error.message));
         }
@@ -470,7 +466,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Force landing page as default view
             document.getElementById('landing-page').style.display = 'block';
             document.getElementById('welcome').classList.add('hidden');
             document.getElementById('profile').classList.add('hidden');
@@ -494,7 +489,6 @@
             document.getElementById('admin-login-modal').addEventListener('touchstart', closeModal, { passive: true });
             document.getElementById('reset-password-modal').addEventListener('touchstart', closeModal, { passive: true });
 
-            // Ensure buttons trigger modals
             document.querySelectorAll('.btn[onclick^="show"]').forEach(btn => {
                 btn.addEventListener('click', eval(btn.getAttribute('onclick')));
             });
@@ -565,10 +559,10 @@
                 card1.classList.add('matched');
                 card2.classList.add('matched');
                 matchedCards.push(card1, card2);
-                userData.stars += 1; // 1 star per match
+                userData.stars += 1;
                 updateStarCounter();
                 if (matchedCards.length === memoryCards.length) {
-                    userData.stars += 10; // Bonus 10 stars for completing all 28 cards
+                    userData.stars += 10;
                     userData.progress = Math.min(userData.progress + 1, 10);
                     userData.badges.push('Memory Master');
                     updateProgress();
@@ -655,7 +649,7 @@
             if ((dropzone.id === 'obligatory-dropzone' && category === 'obligatory') ||
                 (dropzone.id === 'mustahab-dropzone' && category === 'mustahab')) {
                 const existing = dropzone.querySelector(`.wudhu-step[data-id="${event.dataTransfer.getData('id')}"]`);
-                if (existing) existing.remove(); // Remove existing duplicate
+                if (existing) existing.remove();
                 const step = draggedWudhu.cloneNode(true);
                 step.draggable = true;
                 step.dataset.id = event.dataTransfer.getData('id');
@@ -951,7 +945,7 @@
         function showProfile() {
             if (!userData.email) {
                 alert("Please log in to view your profile!");
-                showSection('welcome'); // Redirect to welcome if not logged in
+                showSection('welcome');
                 return;
             }
             const container = document.getElementById('profile');
@@ -980,8 +974,11 @@
         }
 
         function updateProgress() {
-            const progress = (userData.progress / 10) * 100;
-            document.getElementById('progress').style.width = `${progress}%`;
+            const progressElement = document.getElementById('progress');
+            if (progressElement) {
+                const progress = (userData.progress / 10) * 100;
+                progressElement.style.width = `${progress}%`;
+            }
             if (document.getElementById('profile-progress')) document.getElementById('profile-progress').textContent = `${userData.progress}/10`;
             saveUserData();
         }
@@ -1001,11 +998,9 @@
         }
 
         window.addEventListener('load', () => {
-            // Force landing page on load
             document.getElementById('landing-page').style.display = 'block';
             document.getElementById('welcome').classList.add('hidden');
             document.getElementById('profile').classList.add('hidden');
-            // Clear any cached auth state initially
             auth.signOut().then(() => {
                 console.log('Cleared initial auth state');
             }).catch(error => console.log('Error clearing auth state:', error));
@@ -1432,10 +1427,7 @@
             to { transform: translateY(0); opacity: 1; }
         }
         @keyframes pulse {
-
-
-
-0% { transform: scale(1); }
+            0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
@@ -1519,7 +1511,9 @@
     <!-- Login Modal -->
     <div id="login-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
+            <h
+
+<h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="login-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <button class="btn" onclick="login(); console.log('Login submitted');">Login</button>
@@ -1661,6 +1655,11 @@
 
     <!-- Profile Section -->
     <div id="profile" class="section hidden"></div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div id="progress" class="progress" style="width: 0%;"></div>
+    </div>
 
     <div class="star-counter" id="star-count">0 ⭐</div>
     <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display" id="avatar-display" style="display: none;">
