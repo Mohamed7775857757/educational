@@ -369,14 +369,23 @@
                 }
             };
 
-            window.signup = function() {
+            window.signupUser = function() {
+                userData.name = document.getElementById('signup-name').value || 'Young Explorer';
+                userData.gender = document.querySelector('input[name="gender"]:checked').value;
+                userData.year = document.getElementById('year-select').value;
+                const selected = document.querySelector('.character.selected');
+                userData.character = selected ? selected.src : document.querySelector('.character').src;
+                saveUserData();
+
                 const email = document.getElementById('signup-email').value;
                 const password = document.getElementById('signup-password').value;
                 createUserWithEmailAndPassword(auth, email, password)
-                    .then(() => {
+                    .then((userCredential) => {
                         alert("✅ Sign-up successful!");
                         userData.email = email;
-                        showSignupModal(); // Show signup form for additional details
+                        closeModal({ target: { className: 'modal' } });
+                        loadUserData();
+                        showSection('welcome');
                     })
                     .catch(error => alert("❌ " + error.message));
             };
@@ -458,27 +467,6 @@
                     console.log('Modal closed via backdrop or button');
                 }
             };
-
-            function signupUser() {
-                userData.name = document.getElementById('signup-name').value || 'Young Explorer';
-                userData.gender = document.querySelector('input[name="gender"]:checked').value;
-                userData.year = document.getElementById('year-select').value;
-                const selected = document.querySelector('.character.selected');
-                userData.character = selected ? selected.src : document.querySelector('.character').src;
-                saveUserData();
-
-                const email = document.getElementById('signup-email').value;
-                const password = document.getElementById('signup-password').value;
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        alert("✅ Sign-up successful!");
-                        userData.email = email;
-                        closeModal({ target: { className: 'modal' } });
-                        loadUserData();
-                        showSection('welcome');
-                    })
-                    .catch(error => alert("❌ " + error.message));
-            }
 
             function loginAdmin() {
                 const username = document.getElementById('admin-username').value;
@@ -991,12 +979,29 @@
             background-size: cover;
             overflow: hidden;
         }
-        h1, h2, h3 {
-            font-family: 'Comic Neue', cursive;
+        .header-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(90deg, #FFA500, #FF4500);
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-bar h1 {
+            color: #fff;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px #000;
+            animation: bounce 1s ease-out infinite;
         }
         .tree, .cloud, .star, .moon {
             position: absolute;
             animation: float 6s infinite ease-in-out;
+            z-index: 1;
         }
         .tree { content: '🌳'; font-size: 80px; }
         .cloud { content: '☁️'; font-size: 50px; animation: float 8s infinite ease-in-out; }
@@ -1031,6 +1036,7 @@
             border-radius: 30px;
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
+            z-index: 20;
         }
         .hero .btn:hover {
             transform: scale(1.1);
@@ -1043,15 +1049,17 @@
             text-align: center;
             position: relative;
             z-index: 10;
-            background: rgba(255, 255, 255, 0.2); /* Adjusted to semi-transparent to show background */
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding-top: 80px; /* Adjust for header bar */
         }
         .content {
             max-width: 900px;
             margin: 0 auto;
             padding: 2rem;
             color: #000;
+            z-index: 20;
         }
         .card-grid {
             display: flex;
@@ -1061,7 +1069,7 @@
             max-width: 1200px;
             margin: 0 auto;
             position: relative;
-            z-index: 10;
+            z-index: 20;
             flex-wrap: wrap;
         }
         .card {
@@ -1074,6 +1082,7 @@
             text-align: center;
             overflow: hidden;
             width: 250px;
+            z-index: 20;
         }
         .card:hover {
             transform: translateY(-15px);
@@ -1109,6 +1118,8 @@
             font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
+            z-index: 20;
+            position: relative;
         }
         .btn:hover {
             transform: scale(1.1);
@@ -1120,7 +1131,7 @@
         }
         .star-counter {
             position: fixed;
-            top: 1rem;
+            top: 70px;
             right: 1rem;
             background: #fff;
             padding: 0.5rem 1rem;
@@ -1164,6 +1175,7 @@
             text-align: center;
             animation: slideIn 0.5s ease-out;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 201;
         }
         .karbala-img {
             width: 100%;
@@ -1196,6 +1208,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
             overflow: hidden;
+            z-index: 20;
         }
         .memory-card:hover {
             transform: scale(1.05);
@@ -1219,6 +1232,7 @@
             user-select: none;
             margin: 1rem 0;
             position: relative;
+            z-index: 20;
         }
         .wudhu-step:hover {
             transform: rotate(10deg) scale(1.1);
@@ -1253,6 +1267,7 @@
             max-width: 600px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: left;
+            z-index: 20;
         }
         .choice-btn {
             margin: 0.5rem;
@@ -1261,6 +1276,7 @@
             background: #FFA500;
             color: #fff;
             transition: transform 0.3s, background 0.3s;
+            z-index: 20;
         }
         .choice-btn:hover {
             transform: scale(1.05);
@@ -1319,10 +1335,12 @@
             flex-wrap: wrap;
             gap: 1rem;
             justify-content: center;
+            z-index: 20;
         }
         .character {
             transition: transform 0.3s;
             border: 3px solid transparent;
+            z-index: 20;
         }
         .character:hover {
             transform: scale(1.1);
@@ -1433,12 +1451,17 @@
                 width: 100%;
                 margin: 0.5rem 0;
             }
+            .header-bar h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="header-bar">
+        <h1>🌙 Shia Islamic Adventure Quest</h1>
+    </div>
     <div id="landing-page" class="hero">
-        <h1 class="text-3xl text-orange-600">🌙 Shia Islamic Adventure Quest</h1>
         <p class="text-lg mb-4">Embark on a journey of faith and fun! 🌟</p>
         <button class="btn" onclick="showLoginModal()">Login 🚪</button>
         <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
@@ -1476,7 +1499,8 @@
             <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <div class="flex justify-around mb-2">
                 <label><input type="radio" name="gender" value="boy" checked> Boy</label>
-                <label><input type="radio" name="gender" value="girl"> Girl</label>
+                <label><input type="radio" name="gender
+<label><input type="radio" name="gender" value="girl"> Girl</label>
             </div>
             <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
                 <option value="Level-1">Level 1</option>
@@ -1485,10 +1509,7 @@
                 <option value="Level-4">Level 4</option>
                 <option value="Level-5">Level 5</option>
                 <option value="Level-6">Level 6</option>
-                <option value
-
-
-"Level-7">Level 7</option>
+                <option value="Level-7">Level 7</option>
                 <option value="Level-8">Level 8</option>
                 <option value="Level-9">Level 9</option>
                 <option value="Level-10">Level 10</option>
