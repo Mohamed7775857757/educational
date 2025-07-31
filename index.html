@@ -10,11 +10,10 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
     <script type="module">
-        // Import Firebase libraries
+        // Import Firebase
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBD2asTEG40b4hhVmUZKlGd3ZPe-NJctxM",
             authDomain: "shia-kids-learning-tool.firebaseapp.com",
@@ -24,321 +23,98 @@
             appId: "1:786313108719:web:5d4d9ced7abd14b9d18f1a"
         };
 
-        // Initialize Firebase
         const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const auth = getAuth(app);
 
-        // Global variables
-        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'] };
         let currentQuestion = 0;
         let score = 0;
         let flippedCards = [];
         let matchedCards = [];
         let lock = false;
+
         const questions = {
             'Level-1': [
-                { question: 'What is the name of our Creator?', type: 'text', answer: 'Allah' },
-                { question: 'Who is the final Messenger?', type: 'multiple', options: ['Prophet Musa', 'Prophet Muhammad', 'Prophet Isa'], answer: 'Prophet Muhammad' }
+                { question: 'Who is the Creator?', options: ['Allah', 'Adam', 'Noah'], answer: 'Allah' },
+                { question: 'What is the holy book?', options: ['Bible', 'Quran', 'Torah'], answer: 'Quran' }
             ],
             'Level-2': [
-                { question: 'Who was the first Imam?', type: 'text', answer: 'Imam Ali' },
-                { question: 'How many Imams are there?', type: 'text', answer: '12' }
+                { question: 'Who was the first Imam?', options: ['Imam Ali', 'Imam Hassan', 'Imam Hussain'], answer: 'Imam Ali' }
             ],
             'Level-3': [
-                { question: 'What is the first step of Wudhu?', type: 'text', answer: 'Niyyah' },
-                { question: 'What do you wash first in Wudhu?', type: 'text', answer: 'Face' }
+                { question: 'What is the first step of Wudhu?', options: ['Niyyah', 'Wash Face', 'Wash Hands'], answer: 'Niyyah' }
             ],
             'Level-4': [
-                { question: 'Where did the Battle of Karbala take place?', type: 'text', answer: 'Karbala' },
-                { question: 'Who was the leader at Karbala?', type: 'text', answer: 'Imam Hussain' }
+                { question: 'Where did the Battle of Karbala occur?', options: ['Mecca', 'Karbala', 'Medina'], answer: 'Karbala' }
             ],
             'Level-5': [
-                { question: 'What is the Kaaba made of?', type: 'text', answer: 'Stone' },
-                { question: 'Where is the Kaaba located?', type: 'text', answer: 'Mecca' }
+                { question: 'What is Islamic art often based on?', options: ['Animals', 'Geometry', 'Portraits'], answer: 'Geometry' }
             ],
             'Level-6': [
-                { question: 'What is the significance of Hajj?', type: 'text', answer: 'Pilgrimage' },
-                { question: 'How often is Hajj performed?', type: 'text', answer: 'Once' }
+                { question: 'What is the purpose of Hajj?', options: ['Prayer', 'Pilgrimage', 'Fasting'], answer: 'Pilgrimage' }
             ],
             'Level-7': [
-                { question: 'What is the name of the holy book?', type: 'text', answer: 'Quran' },
-                { question: 'How many chapters are in the Quran?', type: 'text', answer: '114' }
-            ],
-            'Level-8': [],
-            'Level-9': [],
-            'Level-10': []
+                { question: 'What is the name of the Prophet’s daughter?', options: ['Fatima', 'Aisha', 'Khadija'], answer: 'Fatima' }
+            ]
         };
+
         const memoryCards = [
             { name: 'Prophet Muhammad(s)', match: 'Prophet Muhammad(s)', id: 1 },
             { name: 'Prophet Muhammad(s)', match: 'Prophet Muhammad(s)', id: 2 },
             { name: 'Imam Ali(as)', match: 'Imam Ali(as)', id: 3 },
-            { name: 'Imam Ali(as)', match: 'Imam Ali(as)', id: 4 },
-            { name: 'Sayeda Fatimah Al-Zahra(as)', match: 'Sayeda Fatimah Al-Zahra(as)', id: 5 },
-            { name: 'Sayeda Fatimah Al-Zahra(as)', match: 'Sayeda Fatimah Al-Zahra(as)', id: 6 },
-            { name: 'Imam Al Hasan(as)', match: 'Imam Al Hasan(as)', id: 7 },
-            { name: 'Imam Al Hasan(as)', match: 'Imam Al Hasan(as)', id: 8 },
-            { name: 'Imam Al Husayn(as)', match: 'Imam Al Husayn(as)', id: 9 },
-            { name: 'Imam Al Husayn(as)', match: 'Imam Al Husayn(as)', id: 10 },
-            { name: 'Imam Al Sajjad(as)', match: 'Imam Al Sajjad(as)', id: 11 },
-            { name: 'Imam Al Sajjad(as)', match: 'Imam Al Sajjad(as)', id: 12 },
-            { name: 'Imam Al Baqir(as)', match: 'Imam Al Baqir(as)', id: 13 },
-            { name: 'Imam Al Baqir(as)', match: 'Imam Al Baqir(as)', id: 14 },
-            { name: 'Imam Al Sadiq(as)', match: 'Imam Al Sadiq(as)', id: 15 },
-            { name: 'Imam Al Sadiq(as)', match: 'Imam Al Sadiq(as)', id: 16 },
-            { name: 'Imam Al Kadhim(as)', match: 'Imam Al Kadhim(as)', id: 17 },
-            { name: 'Imam Al Kadhim(as)', match: 'Imam Al Kadhim(as)', id: 18 },
-            { name: 'Imam Al Ridha(as)', match: 'Imam Al Ridha(as)', id: 19 },
-            { name: 'Imam Al Ridha(as)', match: 'Imam Al Ridha(as)', id: 20 },
-            { name: 'Imam Al Jawad(as)', match: 'Imam Al Jawad(as)', id: 21 },
-            { name: 'Imam Al Jawad(as)', match: 'Imam Al Jawad(as)', id: 22 },
-            { name: 'Imam Al Hadi(as)', match: 'Imam Al Hadi(as)', id: 23 },
-            { name: 'Imam Al Hadi(as)', match: 'Imam Al Hadi(as)', id: 24 },
-            { name: 'Imam Al Askari(as)', match: 'Imam Al Askari(as)', id: 25 },
-            { name: 'Imam Al Askari(as)', match: 'Imam Al Askari(as)', id: 26 },
-            { name: 'Imam Al Mahdi(as)', match: 'Imam Al Mahdi(as)', id: 27 },
-            { name: 'Imam Al Mahdi(as)', match: 'Imam Al Mahdi(as)', id: 28 }
+            { name: 'Imam Ali(as)', match: 'Imam Ali(as)', id: 4 }
         ];
+
         const wudhuSteps = [
-            { name: 'Rinse Mouth', id: 1, category: 'mustahab', order: 1 },
-            { name: 'Rinse Nose', id: 2, category: 'mustahab', order: 2 },
-            { name: 'Wash Hands', id: 3, category: 'mustahab', order: 3 },
-            { name: 'Niyyah', id: 4, category: 'obligatory', order: 1 },
-            { name: 'Wash Face', id: 5, category: 'obligatory', order: 2 },
-            { name: 'Wash Right Arm', id: 6, category: 'obligatory', order: 3 },
-            { name: 'Wash Left Arm', id: 7, category: 'obligatory', order: 4 },
-            { name: 'Wipe Head', id: 8, category: 'obligatory', order: 5 },
-            { name: 'Wipe Right Foot', id: 9, category: 'obligatory', order: 6 },
-            { name: 'Wipe Left Foot', id: 10, category: 'obligatory', order: 7 }
+            { name: 'Niyyah', id: 1, category: 'obligatory', order: 1 },
+            { name: 'Wash Face', id: 2, category: 'obligatory', order: 2 },
+            { name: 'Wash Right Arm', id: 3, category: 'obligatory', order: 3 },
+            { name: 'Wash Left Arm', id: 4, category: 'obligatory', order: 4 }
         ];
+
         const storyData = {
             mecca: {
-                start: {
-                    text: "You are a young child named Amir living in Mecca during the time of Prophet Muhammad (s). One day, you see a group of people gathered near the Kaaba, listening to the Prophet (s) speak. You want to get closer, but it’s crowded. What do you do?",
-                    choices: {
-                        a: { text: "Push through the crowd to get closer.", next: "pushThrough" },
-                        b: { text: "Wait patiently at the edge and listen from afar.", next: "waitPatiently" },
-                        c: { text: "Ask an adult to help you move forward.", next: "askAdult" }
-                    },
-                    background: "https://example.com/desert.jpg",
-                    animation: "happy"
-                },
-                pushThrough: {
-                    text: "You push through the crowd and accidentally bump into an elder. He looks upset but smiles when you apologize. The Prophet (s) notices and praises your honesty. You learn a lesson about respect.",
-                    choices: {
-                        a: { text: "Thank the Prophet (s) and return home.", next: "endGood" },
-                        b: { text: "Stay and listen more.", next: "listenMore" }
-                    },
-                    background: "https://example.com/market.jpg",
-                    animation: "happy"
-                },
-                waitPatiently: {
-                    text: "You wait patiently and hear the Prophet (s) teach about kindness. A kind man offers you a spot to sit. You feel proud of your patience.",
-                    choices: {
-                        a: { text: "Share your spot with another child.", next: "endGood" },
-                        b: { text: "Keep it to yourself.", next: "endBad" }
-                    },
-                    background: "https://example.com/desert.jpg",
-                    animation: "neutral"
-                },
-                askAdult: {
-                    text: "You ask an adult for help, and they kindly guide you closer. The Prophet (s) smiles at you and speaks about helping others. You feel grateful.",
-                    choices: {
-                        a: { text: "Help another child get closer too.", next: "endGood" },
-                        b: { text: "Stay quiet and enjoy the moment.", next: "endNeutral" }
-                    },
-                    background: "https://example.com/market.jpg",
-                    animation: "happy"
-                },
-                listenMore: {
-                    text: "You stay and learn more about faith. The Prophet (s) invites you to join a small gathering later, teaching you about community.",
-                    choices: { a: { text: "Join the gathering.", next: "endGood" } },
-                    background: "https://example.com/night.jpg",
-                    animation: "happy"
-                },
-                endGood: {
-                    text: "Your choice leads to a rewarding lesson! You grow wiser and earn the respect of your community. +5 Stars!",
-                    choices: { a: { text: "See your path.", next: "summary" } },
-                    background: "https://example.com/desert.jpg",
-                    animation: "happy"
-                },
-                endBad: {
-                    text: "Your selfishness disappoints others. You learn to be more generous next time. +1 Star.",
-                    choices: { a: { text: "See your path.", next: "summary" } },
-                    background: "https://example.com/desert.jpg",
-                    animation: "sad"
-                },
-                endNeutral: {
-                    text: "You enjoy the moment but miss a chance to help. +2 Stars.",
-                    choices: { a: { text: "See your path.", next: "summary" } },
-                    background: "https://example.com/market.jpg",
-                    animation: "neutral"
-                },
-                summary: {
-                    text: "Your Journey: [Path will be listed here]. Would you like to start over?",
-                    choices: { a: { text: "Restart", next: "start" } },
-                    background: "https://example.com/desert.jpg",
-                    animation: "neutral"
-                }
-            },
-            kufa: {
-                start: {
-                    text: "You are a young child named Zainab living in Kufa during the holy khilafah of Imam Ali (as). One day, you hear that Imam Ali (as) is teaching justice in the marketplace. You want to learn, but there are challenges. What do you do?",
-                    choices: {
-                        a: { text: "Join the crowd and listen quietly.", next: "listenQuietly" },
-                        b: { text: "Offer to help a struggling elder reach the front.", next: "helpElder" },
-                        c: { text: "Ask a friend to explain later instead.", next: "askFriend" }
-                    },
-                    background: "https://example.com/kufa-market.jpg",
-                    animation: "happy"
-                },
-                listenQuietly: {
-                    text: "You listen quietly and learn about fairness from Imam Ali (as). A guard notices your focus and praises your respect.",
-                    choices: {
-                        a: { text: "Share the lesson with a sibling at home.", next: "shareLesson" },
-                        b: { text: "Keep it to yourself and leave.", next: "keepQuiet" }
-                    },
-                    background: "https://example.com/kufa-day.jpg",
-                    animation: "neutral"
-                },
-                helpElder: {
-                    text: "You help an elder to the front, and Imam Ali (as) smiles at your kindness, teaching about compassion.",
-                    choices: {
-                        a: { text: "Assist another person too.", next: "assistMore" },
-                        b: { text: "Return to your spot after helping.", next: "returnSpot" }
-                    },
-                    background: "https://example.com/kufa-market.jpg",
-                    animation: "happy"
-                },
-                askFriend: {
-                    text: "You ask a friend, but their explanation is unclear. You miss the full lesson but gain a chance to try again.",
-                    choices: {
-                        a: { text: "Go back to the marketplace tomorrow.", next: "tryAgain" },
-                        b: { text: "Give up and play instead.", next: "giveUp" }
-                    },
-                    background: "https://example.com/kufa-night.jpg",
-                    animation: "sad"
-                },
-                shareLesson: {
-                    text: "Sharing the lesson with your sibling earns you praise from your family. +5 Stars!",
-                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
-                    background: "https://example.com/kufa-home.jpg",
-                    animation: "happy"
-                },
-                keepQuiet: {
-                    text: "Keeping it to yourself limits your growth. +1 Star.",
-                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
-                    background: "https://example.com/kufa-day.jpg",
-                    animation: "sad"
-                },
-                assistMore: {
-                    text: "Helping more people impresses Imam Ali (as), who teaches you about community service. +5 Stars!",
-                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
-                    background: "https://example.com/kufa-market.jpg",
-                    animation: "happy"
-                },
-                returnSpot: {
-                    text: "Returning to your spot shows humility. +3 Stars.",
-                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
-                    background: "https://example.com/kufa-day.jpg",
-                    animation: "neutral"
-                },
-                tryAgain: {
-                    text: "Going back tomorrow lets you learn directly from Imam Ali (as). +3 Stars.",
-                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
-                    background: "https://example.com/kufa-market.jpg",
-                    animation: "happy"
-                },
-                giveUp: {
-                    text: "Giving up means missing a valuable lesson. +1 Star.",
-                    choices: { a: { text: "See your path.", next: "summaryKufa" } },
-                    background: "https://example.com/kufa-night.jpg",
-                    animation: "sad"
-                },
-                summaryKufa: {
-                    text: "Your Journey: [Path will be listed here]. Would you like to start over?",
-                    choices: { a: { text: "Restart", next: "start" } },
-                    background: "https://example.com/kufa-home.jpg",
-                    animation: "neutral"
-                }
+                start: { text: "You are in Mecca. What do you do?", choices: { a: { text: "Pray", next: "pray" }, b: { text: "Explore", next: "explore" } }, background: "https://via.placeholder.com/1920x1080?text=Mecca", animation: "happy" },
+                pray: { text: "You prayed. Journey ends.", choices: { a: { text: "Restart", next: "start" } }, background: "https://via.placeholder.com/1920x1080?text=Pray", animation: "happy" },
+                explore: { text: "You explored. Journey ends.", choices: { a: { text: "Restart", next: "start" } }, background: "https://via.placeholder.com/1920x1080?text=Explore", animation: "happy" }
             }
         };
-        const missions = [
-            { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
-            { id: 'dua', title: 'Learn Dua', question: 'Dua before eating?', type: 'text', answer: 'Bismillah' }
-        ];
-        const adminCredentials = { email: 'melzein1987@gmail.com', password: 'admin123' }; // Added email for admin check
+
+        const missions = [{ id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' }];
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Ensure initial UI state
             const landingPage = document.getElementById('landing-page');
             const welcomeSection = document.getElementById('welcome');
-            const profileSection = document.getElementById('profile');
             if (landingPage) landingPage.style.display = 'block';
             if (welcomeSection) welcomeSection.classList.add('hidden');
-            if (profileSection) profileSection.classList.add('hidden');
 
-            // Initialize modals
-            ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
-                const modal = document.getElementById(id);
-                if (modal) modal.style.display = 'none';
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userData.email = user.email;
+                    loadUserData();
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('landing-page').style.display = 'none';
+                    document.getElementById('welcome').classList.remove('hidden');
+                    showSection('welcome');
+                } else {
+                    userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'] };
+                    localStorage.removeItem('userData');
+                    if (landingPage) landingPage.style.display = 'block';
+                    if (welcomeSection) welcomeSection.classList.add('hidden');
+                }
             });
 
-            // Authentication state listener
-            let authInitialized = false;
-            const initAuth = () => {
-                if (authInitialized) return;
-                authInitialized = true;
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userData.email = user.email;
-                        loadUserData();
-                        document.getElementById('login-modal').style.display = 'none';
-                        document.getElementById('landing-page').style.display = 'none';
-                        document.getElementById('welcome').classList.remove('hidden');
-                        showSection('welcome'); // Ensure immediate transition
-                    } else {
-                        userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
-                        localStorage.removeItem('userData');
-                        if (landingPage) landingPage.style.display = 'block';
-                        if (welcomeSection) welcomeSection.classList.add('hidden');
-                        if (profileSection) profileSection.classList.add('hidden');
-                        ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
-                            const modal = document.getElementById(id);
-                            if (modal) modal.style.display = 'none';
-                        });
-                    }
-                }, (error) => {
-                    console.error('Auth error:', error.message);
-                    alert('Authentication failed. Please try again or contact support.');
-                    if (landingPage) landingPage.style.display = 'block';
-                });
-            };
-
-            initAuth();
-
-            window.showLoginModal = function() {
-                document.getElementById('login-modal').style.display = 'flex';
-                console.log('Login modal shown');
-            };
-
-            window.showSignupModal = function() {
-                document.getElementById('signup-modal').style.display = 'flex';
-                console.log('Sign up modal shown');
-            };
-
-            window.showAdminLoginModal = function() {
-                document.getElementById('admin-login-modal').style.display = 'flex';
-                console.log('Admin login modal shown');
-            };
+            window.showLoginModal = () => { document.getElementById('login-modal').style.display = 'flex'; };
+            window.showSignupModal = () => { document.getElementById('signup-modal').style.display = 'flex'; };
+            window.showAdminLoginModal = () => { document.getElementById('admin-login-modal').style.display = 'flex'; };
 
             window.showSection = function(sectionId) {
                 document.querySelectorAll('.section, #landing-page, #hero').forEach(el => el.classList.add('hidden'));
                 const section = document.getElementById(sectionId);
                 if (section) {
                     section.classList.remove('hidden');
-                    gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                    if (sectionId === 'Level-1') showQuestion();
+                    gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 0, y: 50, duration: 0.5 });
+                    if (sectionId === 'Level-1') showQuiz();
                     if (sectionId === 'Level-2') initMemoryGame();
                     if (sectionId === 'Level-3') initWudhuChallenge();
                     if (sectionId === 'Level-4') showKarbala();
@@ -346,184 +122,140 @@
                     if (sectionId === 'Level-6') showHajj();
                     if (sectionId === 'Level-7') startStory();
                     if (sectionId === 'missions') showMissions();
-                    if (sectionId === 'profile' && userData.email) showProfile();
+                    if (sectionId === 'profile') showProfile();
                     updateProgress();
-                    updateBadges();
                 }
             };
 
-            window.checkAnswer = function(answer) {
+            window.checkAnswer = function(selected) {
                 const q = questions[userData.year][currentQuestion];
-                if (q.type === 'text') answer = document.getElementById('answer-input').value;
-                if (answer.toLowerCase() === q.answer.toLowerCase()) {
+                if (selected.toLowerCase() === q.answer.toLowerCase()) {
                     score++;
                     userData.stars += 2;
-                    userData.progress = Math.min(userData.progress + 1, 10);
-                    if (score === 1) userData.badges.push('Scholar');
                     updateStarCounter();
-                    updateProgress();
-                    updateBadges();
-                    document.getElementById('score').innerHTML = `<p class="text-green-600">Correct! 🎉 Score: ${score}/${questions[userData.year].length}</p>`;
                     confetti();
-                } else document.getElementById('score').innerHTML = `<p class="text-red-600">Wrong! 😕 Answer: ${q.answer}</p>`;
+                    document.getElementById('score').innerHTML = '<p class="text-green-600">Correct! 🎉</p>';
+                } else document.getElementById('score').innerHTML = '<p class="text-red-600">Wrong! 😕</p>';
                 currentQuestion++;
-                if (currentQuestion < questions[userData.year].length) {
-                    setTimeout(showNextQuestion, 1000);
-                } else {
-                    document.getElementById('score').innerHTML += '<p class="mt-4 text-green-600">Quest Done! 🎉</p>';
+                if (currentQuestion < questions[userData.year].length) setTimeout(showNextQuestion, 1000);
+                else {
+                    userData.progress += score;
+                    updateProgress();
+                    alert(`Quiz complete! Score: ${score}/${questions[userData.year].length}`);
+                    showSection('welcome');
                 }
             };
 
-            window.signupUser = function() {
-                userData.name = document.getElementById('signup-name').value || 'Young Explorer';
-                userData.gender = document.querySelector('input[name="gender"]:checked').value;
-                userData.year = document.getElementById('year-select').value;
-                const selected = document.querySelector('.character.selected');
-                userData.character = selected ? selected.src : document.querySelector('.character').src;
-                saveUserData();
-
-                const email = document.getElementById('signup-email').value;
-                const password = document.getElementById('signup-password').value;
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        alert("✅ Sign-up successful!");
-                        userData.email = email;
-                        closeModal({ target: { className: 'modal' } });
-                        loadUserData();
-                        showSection('welcome');
-                    })
-                    .catch(error => alert("❌ " + error.message));
-            };
-
-            window.login = function() {
+            window.login = () => {
                 const email = document.getElementById('login-email').value;
                 const password = document.getElementById('login-password').value;
                 signInWithEmailAndPassword(auth, email, password)
                     .then(() => {
-                        alert("✅ Login successful!");
+                        alert('Login successful!');
                         userData.email = email;
                         loadUserData();
+                        closeModal({ target: { className: 'modal' } });
+                        showSection('welcome');
                     })
-                    .catch(error => alert("❌ " + error.message));
+                    .catch(error => alert('Error: ' + error.message));
             };
 
-            window.resetPassword = function() {
+            window.signupUser = () => {
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const name = document.getElementById('signup-name').value;
+                const gender = document.querySelector('input[name="gender"]:checked').value;
+                const year = document.getElementById('year-select').value;
+                const character = document.querySelector('.character.selected') ? document.querySelector('.character.selected').getAttribute('src') : '';
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        userData = { ...userData, name, gender, year, character, email };
+                        alert('Sign-up successful!');
+                        saveUserData();
+                        closeModal({ target: { className: 'modal' } });
+                        showSection('welcome');
+                    })
+                    .catch(error => alert('Error: ' + error.message));
+            };
+
+            window.resetPassword = () => {
                 const email = document.getElementById('reset-email').value;
                 sendPasswordResetEmail(auth, email)
-                    .then(() => alert("📧 Password reset email sent!"))
-                    .catch(error => alert("❌ " + error.message));
+                    .then(() => alert('Password reset email sent!'))
+                    .catch(error => alert('Error: ' + error.message));
             };
 
-            window.logout = function() {
+            window.logout = () => {
                 signOut(auth).then(() => {
-                    alert("✅ Logged out successfully!");
-                    userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+                    alert('Logged out successfully!');
+                    userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'] };
                     localStorage.removeItem('userData');
                     document.getElementById('landing-page').style.display = 'block';
                     document.getElementById('welcome').classList.add('hidden');
-                    document.getElementById('profile').classList.add('hidden');
-                    document.getElementById('avatar-display').style.display = 'none';
-                    document.getElementById('star-count').textContent = '0 ⭐';
-                    ['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7', 'missions'].forEach(id => {
-                        const section = document.getElementById(id);
-                        if (section) section.classList.add('hidden');
-                    });
-                }).catch(error => alert("❌ " + error.message));
+                }).catch(error => alert('Error: ' + error.message));
+            };
+
+            window.loginAdmin = () => {
+                const email = document.getElementById('admin-username').value;
+                const password = document.getElementById('admin-password').value;
+                if (email === 'melzein1987@gmail.com' && password === 'admin123') {
+                    alert('Admin login successful!');
+                    closeModal({ target: { className: 'modal' } });
+                    // Add admin dashboard logic here if needed
+                } else {
+                    alert('Invalid admin credentials!');
+                }
             };
 
             function loadUserData() {
                 const saved = localStorage.getItem('userData');
                 if (saved) {
                     userData = JSON.parse(saved);
-                    if (!userData.badges) userData.badges = ['Explorer'];
-                    document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
-                    document.getElementById('avatar-display').style.display = 'block';
-                    document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
-                    updateStarCounter();
-                    updateProgress();
-                    updateBadges();
-                    document.getElementById('landing-page').style.display = 'none';
-                    document.getElementById('welcome').classList.remove('hidden');
-                    showSection('welcome');
-                } else {
-                    document.getElementById('landing-page').style.display = 'block';
-                    document.getElementById('welcome').classList.add('hidden');
-                    document.getElementById('profile').classList.add('hidden');
+                    if (userData.character) document.getElementById('avatar-display').src = userData.character;
+                    if (userData.character) document.getElementById('avatar-display').style.display = 'block';
                 }
+                document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
+                updateStarCounter();
+                updateProgress();
             }
 
-            function saveUserData() {
-                localStorage.setItem('userData', JSON.stringify(userData));
-            }
+            function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); }
+            window.closeModal = (event) => { if (event.target.classList.contains('modal')) document.getElementById(event.target.id).style.display = 'none'; };
 
-            document.querySelectorAll('.character').forEach(img => {
-                img.addEventListener('click', () => {
-                    document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
-                    img.classList.add('selected');
-                    userData.character = img.src;
-                    document.getElementById('avatar-display').src = userData.character;
-                    saveUserData();
+            document.querySelectorAll('.character').forEach(char => {
+                char.addEventListener('click', () => {
+                    document.querySelectorAll('.character').forEach(c => c.classList.remove('selected'));
+                    char.classList.add('selected');
+                    userData.character = char.getAttribute('src');
                 });
             });
 
-            window.closeModal = function(event) {
-                if (event.target.classList.contains('modal') || event.target.classList.contains('btn')) {
-                    const modalId = event.target.closest('.modal')?.id;
-                    if (modalId) document.getElementById(modalId).style.display = 'none';
-                    document.getElementById('landing-page').style.display = 'block';
-                    document.getElementById('welcome').classList.add('hidden');
-                    document.getElementById('profile').classList.add('hidden');
-                    console.log('Modal closed via backdrop or button');
-                }
-            };
-
-            window.loginAdmin = function() { // Added loginAdmin function
-                const email = document.getElementById('admin-username').value;
-                const password = document.getElementById('admin-password').value;
-                if (email === adminCredentials.email && password === adminCredentials.password) {
-                    alert('Admin login successful!');
-                    closeModal({ target: { className: 'modal' } });
-                    // Add admin dashboard functionality here if needed
-                } else {
-                    alert('Invalid admin credentials!');
-                }
-            };
-
-            function showQuestion() {
+            function showQuiz() {
                 currentQuestion = 0;
                 score = 0;
                 const container = document.getElementById('Level-1');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Quiz Challenge 📖</h2>
-                    <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Quiz" class="karbala-img mx-auto mb-4">
-                    <div id="quiz-container" class="text-lg mb-4"></div>
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Quiz Challenge 📖</h2>
+                    <div id="quiz-container"></div>
                     <div id="score" class="text-xl mb-4"></div>
-                    <button class="btn" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-                container.appendChild(content);
                 showNextQuestion();
             }
 
             function showNextQuestion() {
                 const q = questions[userData.year][currentQuestion];
                 const quizContainer = document.getElementById('quiz-container');
-                quizContainer.innerHTML = `<p class="mb-4">${q.question}</p>` +
-                    (q.type === 'text' ? `<input id="answer-input" class="border rounded-lg p-2 bg-white text-black mx-auto block mt-4 w-1/2" placeholder="Type your answer"><button class="btn ml-2" onclick="checkAnswer()">Submit 🎉</button>` :
-                    q.options.map(o => `<button class="btn ml-2 mt-2" onclick="checkAnswer('${o}')">${o} 🌟</button>`).join(''));
+                quizContainer.innerHTML = `<p>${q.question}</p>${q.options.map(opt => `<button class="btn mt-2" onclick="checkAnswer('${opt}')">${opt}</button>`).join('')}`;
             }
 
             function initMemoryGame() {
                 const container = document.getElementById('Level-2');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Memory Quest 🧠</h2>
-                    <div id="memory-game" class="grid grid-cols-4 md:grid-cols-7 gap-4 p-4"></div>
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Memory Quest 🧠</h2>
+                    <div id="memory-game" class="grid grid-cols-4 gap-4"></div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-                container.appendChild(content);
                 const gameContainer = document.getElementById('memory-game');
                 const shuffledCards = [...memoryCards].sort(() => Math.random() - 0.5);
                 gameContainer.innerHTML = '';
@@ -531,7 +263,6 @@
                     const cardElement = document.createElement('div');
                     cardElement.className = 'memory-card';
                     cardElement.dataset.name = card.name;
-                    cardElement.dataset.match = card.match;
                     cardElement.textContent = '❓';
                     cardElement.addEventListener('click', () => flipCard(cardElement));
                     gameContainer.appendChild(cardElement);
@@ -544,31 +275,18 @@
                 flippedCards.push(card);
                 if (flippedCards.length === 2) {
                     lock = true;
-                    setTimeout(checkMatch, 1000); // Cooldown between flips
+                    setTimeout(checkMatch, 1000);
                 }
             }
 
             function checkMatch() {
                 const [card1, card2] = flippedCards;
-                if (card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
+                if (card1.dataset.name === card2.dataset.name) {
                     card1.classList.add('matched');
                     card2.classList.add('matched');
                     matchedCards.push(card1, card2);
                     userData.stars += 1;
                     updateStarCounter();
-                    if (matchedCards.length === memoryCards.length) {
-                        userData.stars += 10;
-                        userData.progress = Math.min(userData.progress + 1, 10);
-                        userData.badges.push('Memory Master');
-                        updateProgress();
-                        updateBadges();
-                        confetti();
-                        const container = document.getElementById('Level-2');
-                        const message = document.createElement('p');
-                        message.className = 'text-green-600 text-xl mt-4';
-                        message.textContent = 'All 28 cards matched! +10 Bonus Stars! 🎉';
-                        container.appendChild(message);
-                    }
                 } else {
                     setTimeout(() => {
                         card1.textContent = '❓';
@@ -577,53 +295,36 @@
                 }
                 flippedCards = [];
                 lock = false;
+                if (matchedCards.length === memoryCards.length) {
+                    userData.progress += 1;
+                    updateProgress();
+                    alert('Memory Game Complete! +1 Progress!');
+                    showSection('welcome');
+                }
             }
 
             function initWudhuChallenge() {
                 const container = document.getElementById('Level-3');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
                     <div class="wudhu-container">
-                        <div class="wudhu-dropzone" id="obligatory-dropzone">
-                            <h3 class="text-xl mb-4">Obligatory 📖</h3>
-                        </div>
-                        <div class="wudhu-dropzone" id="mustahab-dropzone">
-                            <h3 class="text-xl mb-4">Mustahab 🌱</h3>
-                        </div>
+                        <div class="wudhu-dropzone" id="obligatory-dropzone"><h3>Obligatory</h3></div>
                     </div>
-                    <div id="wudhu-source" class="grid grid-cols-3 gap-2 mt-4"></div>
-                    <div class="mt-4">
-                        <button id="wudhu-submit" class="btn mr-2">Submit 🎉</button>
-                        <button id="wudhu-reset" class="btn">Reset 🔄</button>
-                    </div>
+                    <div id="wudhu-source" class="grid grid-cols-4 gap-2 mt-4"></div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-                container.appendChild(content);
-
                 const source = document.getElementById('wudhu-source');
                 wudhuSteps.forEach(step => {
                     const stepElement = document.createElement('div');
                     stepElement.className = 'wudhu-step';
                     stepElement.draggable = true;
                     stepElement.dataset.id = step.id;
-                    stepElement.dataset.category = step.category;
-                    stepElement.dataset.order = step.order;
                     stepElement.textContent = step.name;
                     stepElement.addEventListener('dragstart', dragStartWudhu);
                     source.appendChild(stepElement);
                 });
-
-                const obligatoryDropzone = document.getElementById('obligatory-dropzone');
-                const mustahabDropzone = document.getElementById('mustahab-dropzone');
-                [obligatoryDropzone, mustahabDropzone].forEach(dropzone => {
-                    dropzone.addEventListener('dragover', dragOverWudhu);
-                    dropzone.addEventListener('drop', dropWudhu);
-                });
-
-                document.getElementById('wudhu-submit').addEventListener('click', checkWudhuCompletion);
-                document.getElementById('wudhu-reset').addEventListener('click', resetWudhuChallenge);
+                document.getElementById('obligatory-dropzone').addEventListener('dragover', dragOverWudhu);
+                document.getElementById('obligatory-dropzone').addEventListener('drop', dropWudhu);
             }
 
             let draggedWudhu;
@@ -631,183 +332,86 @@
                 draggedWudhu = event.target;
                 event.dataTransfer.setData('text/plain', draggedWudhu.textContent);
                 event.dataTransfer.setData('id', draggedWudhu.dataset.id);
-                event.dataTransfer.setData('category', draggedWudhu.dataset.category);
-                event.dataTransfer.setData('order', draggedWudhu.dataset.order);
-                event.dataTransfer.effectAllowed = 'move';
             }
 
-            function dragOverWudhu(event) {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = 'move';
-            }
-
+            function dragOverWudhu(event) { event.preventDefault(); }
             function dropWudhu(event) {
                 event.preventDefault();
-                const dropzone = event.target.closest('.wudhu-dropzone');
-                if (!dropzone || !draggedWudhu) return;
-
-                const category = event.dataTransfer.getData('category');
-                if ((dropzone.id === 'obligatory-dropzone' && category === 'obligatory') ||
-                    (dropzone.id === 'mustahab-dropzone' && category === 'mustahab')) {
-                    const existing = dropzone.querySelector(`.wudhu-step[data-id="${event.dataTransfer.getData('id')}"]`);
-                    if (existing) existing.remove();
+                const dropzone = document.getElementById('obligatory-dropzone');
+                if (draggedWudhu) {
                     const step = draggedWudhu.cloneNode(true);
                     step.draggable = true;
-                    step.dataset.id = event.dataTransfer.getData('id');
-                    step.dataset.category = category;
-                    step.dataset.order = event.dataTransfer.getData('order');
-                    step.addEventListener('dragstart', dragStartWudhu);
                     dropzone.appendChild(step);
-                    if (draggedWudhu.parentElement.id === 'wudhu-source') {
-                        draggedWudhu.remove();
-                    } else {
-                        draggedWudhu.remove();
-                    }
+                    draggedWudhu.remove();
                     draggedWudhu = null;
+                    checkWudhuOrder();
                 }
             }
 
-            function checkWudhuCompletion() {
-                const obligatoryDropzone = document.getElementById('obligatory-dropzone');
-                const mustahabDropzone = document.getElementById('mustahab-dropzone');
-
-                const obligatorySteps = Array.from(obligatoryDropzone.querySelectorAll('.wudhu-step'));
-                const mustahabSteps = Array.from(mustahabDropzone.querySelectorAll('.wudhu-step'));
-
-                const isObligatoryCorrect = obligatorySteps.length === 7 && obligatorySteps.every((step, index) => 
-                    parseInt(step.dataset.order) === index + 1);
-                const isMustahabCorrect = mustahabSteps.length === 3 && mustahabSteps.every((step, index) => 
-                    parseInt(step.dataset.order) === index + 1);
-
-                if (isObligatoryCorrect && isMustahabCorrect) {
-                    obligatorySteps.forEach(step => step.classList.add('correct'));
-                    mustahabSteps.forEach(step => step.classList.add('correct'));
-                    userData.stars += 10;
-                    userData.progress = Math.min(userData.progress + 1, 10);
-                    userData.badges.push('Wudhu Master');
-                    updateStarCounter();
+            function checkWudhuOrder() {
+                const steps = Array.from(document.querySelectorAll('#obligatory-dropzone .wudhu-step'));
+                const correct = steps.every((step, index) => {
+                    const stepData = wudhuSteps.find(s => s.id == step.dataset.id);
+                    return stepData && stepData.order === index + 1;
+                });
+                if (correct && steps.length === wudhuSteps.length) {
+                    userData.progress += 1;
                     updateProgress();
-                    updateBadges();
-                    confetti();
-                    const message = document.createElement('p');
-                    message.className = 'text-green-600 text-xl mt-4';
-                    message.textContent = 'Wudhu Challenge Completed! +10 Stars! 🎉';
-                    document.getElementById('Level-3').appendChild(message);
-                } else {
-                    alert('Please sort and order all 10 steps correctly in their respective sections! 😕');
+                    alert('Wudhu Challenge Complete! +1 Progress!');
+                    showSection('welcome');
                 }
-            }
-
-            function resetWudhuChallenge() {
-                initWudhuChallenge();
             }
 
             function showKarbala() {
                 const container = document.getElementById('Level-4');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Karbala Epic 🏰</h2>
-                    <p class="text-lg mb-4">Discover Imam Hussain's bravery!</p>
-                    <img src="https://yourusername.github.io/your-repo/images/karbala.jpg" alt="Karbala" class="karbala-img mx-auto mb-4">
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Karbala Epic 🏰</h2>
+                    <p>The Battle of Karbala occurred in 61 AH (680 CE) in present-day Iraq. Imam Hussain (as) stood against tyranny.</p>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-                container.appendChild(content);
-                userData.stars += 1;
-                userData.progress = Math.min(userData.progress + 1, 10);
-                updateStarCounter();
-                updateProgress();
-                if (userData.progress === 10) userData.badges.push('Karbala Hero');
-                updateBadges();
-            }
-
-            function showHajj() {
-                const container = document.getElementById('Level-6');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Explore Hajj 🌍</h2>
-                    <p class="text-lg mb-4">Learn about the pilgrimage!</p>
-                    <img src="https://yourusername.github.io/your-repo/images/hajj.jpg" alt="Hajj" class="karbala-img mx-auto mb-4">
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-                container.appendChild(content);
-                userData.stars += 1;
-                userData.progress = Math.min(userData.progress + 1, 10);
-                updateStarCounter();
-                updateProgress();
-                if (userData.progress === 10) userData.badges.push('Hajj Explorer');
-                updateBadges();
             }
 
             function initArtZone() {
                 const container = document.getElementById('Level-5');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Art Quest 🎨</h2>
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Art Quest 🎨</h2>
                     <canvas id="art-canvas" width="600" height="400"></canvas>
-                    <div class="art-tools mt-4">
-                        <button class="btn" onclick="changeColor('red')">Red ❤️</button>
-                        <button class="btn" onclick="changeColor('blue')">Blue 💙</button>
-                        <button class="btn" onclick="changeColor('green')">Green 💚</button>
-                        <button class="btn" onclick="changeColor('yellow')">Yellow 🌟</button>
-                        <button class="btn" onclick="changeColor('pink')">Pink 💗</button>
-                        <button class="btn" onclick="changeColor('purple')">Purple 💜</button>
-                        <button class="btn" onclick="changeColor('orange')">Orange 🍊</button>
-                        <button class="btn" onclick="loadImage('https://yourusername.github.io/your-repo/images/kaaba.jpg')">Kaaba 🕋</button>
-                        <button class="btn" onclick="loadImage('https://via.placeholder.com/600x400?text=Masjid')">Masjid 🕌</button>
-                        <button class="btn" onclick="clearCanvas()">Clear 🧹</button>
-                    </div>
-                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-4" onclick="saveArtwork()">Save Artwork</button>
+                    <button class="btn mt-2" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-                container.appendChild(content);
                 const canvas = document.getElementById('art-canvas');
                 const ctx = canvas.getContext('2d');
                 let drawing = false;
-                let color = 'black';
-
                 canvas.addEventListener('mousedown', () => drawing = true);
                 canvas.addEventListener('mouseup', () => drawing = false);
                 canvas.addEventListener('mousemove', (e) => {
                     if (drawing) {
-                        ctx.fillStyle = color;
+                        ctx.fillStyle = '#000';
                         ctx.beginPath();
                         ctx.arc(e.offsetX, e.offsetY, 5, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 });
-
-                window.changeColor = function(newColor) { color = newColor; };
-                window.clearCanvas = function() { ctx.clearRect(0, 0, canvas.width, canvas.height); };
-                window.loadImage = function(src) {
-                    const img = new Image();
-                    img.onload = () => {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    };
-                    img.onerror = () => {
-                        console.log(`Image load failed for ${src}`);
-                        alert('Failed to load image. Using fallback. Check the URL!');
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        ctx.fillStyle = '#ccc';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    };
-                    img.src = src;
+                window.saveArtwork = () => {
+                    const dataURL = canvas.toDataURL();
+                    userData.artwork = dataURL;
+                    saveUserData();
+                    alert('Artwork saved!');
                 };
-                userData.stars += 1;
-                userData.progress = Math.min(userData.progress + 1, 10);
-                if (userData.progress === 10) userData.badges.push('Art Master');
-                updateStarCounter();
-                updateProgress();
-                updateBadges();
+            }
+
+            function showHajj() {
+                const container = document.getElementById('Level-6');
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Explore Hajj 🌍</h2>
+                    <p>Hajj is the annual Islamic pilgrimage to Mecca, a mandatory religious duty for Muslims who are physically and financially able.</p>
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
             }
 
             function startStory() {
                 userData.storyPath = [];
-                const storyOptions = ['mecca', 'kufa'];
-                const selectedStory = storyOptions[Math.floor(Math.random() * storyOptions.length)];
-                showStoryScene(selectedStory + '.start');
+                showStoryScene('mecca.start');
             }
 
             function showStoryScene(sceneId) {
@@ -815,168 +419,80 @@
                 const fullScene = storyData[story][scene];
                 userData.storyPath.push({ id: sceneId, choice: null });
                 const container = document.getElementById('Level-7');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Choose Your Path 📖</h2>
-                    <div class="story-card">
-                        <p>${fullScene.text}</p>
-                        ${Object.entries(fullScene.choices).map(([key, choice]) => `
-                            <button class="choice-btn" onclick="makeChoice('${story}', '${scene}', '${key}', '${choice.next}')">${choice.text}</button>
-                        `).join('')}
-                        ${['summary', 'summaryKufa'].includes(scene) ? `<p>Your path: ${userData.storyPath.map(s => s.id).join(' -> ')}</p>` : ''}
-                    </div>
-                    ${!['start', 'summary', 'summaryKufa'].includes(scene) ? '<button class="btn mt-4" onclick="goBack()">Back</button>' : ''}
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Choose Your Path 📖</h2>
+                    <div class="story-card"><p>${fullScene.text}</p>${Object.entries(fullScene.choices).map(([key, choice]) => `<button class="btn mt-2" onclick="makeChoice('${story}', '${scene}', '${key}', '${choice.next}')">${choice.text}</button>`).join('')}</div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
-                    <div class="lottie-animation" id="story-animation"></div>`;
-                container.appendChild(content);
+                    <div id="story-animation" class="lottie-animation"></div>`;
                 document.getElementById('story-background').style.backgroundImage = `url(${fullScene.background})`;
                 loadAnimation(fullScene.animation);
-                gsap.from('.story-card', { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
             }
 
             function makeChoice(story, scene, choiceKey, nextScene) {
                 const fullScene = storyData[story][scene];
                 userData.storyPath[userData.storyPath.length - 1].choice = choiceKey;
-                let nextFullScene = nextScene;
-                if (story === 'mecca' && nextScene === 'endGood') { userData.stars += 5; }
-                else if (story === 'mecca' && nextScene === 'endBad') { userData.stars += 1; }
-                else if (story === 'mecca' && nextScene === 'endNeutral') { userData.stars += 2; }
-                else if (story === 'kufa' && nextScene === 'shareLesson') { userData.stars += 5; }
-                else if (story === 'kufa' && nextScene === 'keepQuiet') { userData.stars += 1; }
-                else if (story === 'kufa' && nextScene === 'assistMore') { userData.stars += 5; }
-                else if (story === 'kufa' && nextScene === 'returnSpot') { userData.stars += 3; }
-                else if (story === 'kufa' && nextScene === 'tryAgain') { userData.stars += 3; }
-                else if (story === 'kufa' && nextScene === 'giveUp') { userData.stars += 1; }
-                if (nextScene === 'summary' || nextScene === 'summaryKufa') {
-                    nextFullScene = story + '.' + nextScene;
-                }
-                userData.progress = Math.min(userData.progress + 1, 10);
-                updateStarCounter();
-                updateProgress();
-                showStoryScene(nextFullScene);
-            }
-
-            function goBack() {
-                if (userData.storyPath.length > 1) {
-                    userData.storyPath.pop();
-                    const prevScene = userData.storyPath[userData.storyPath.length - 1].id;
-                    showStoryScene(prevScene);
-                }
+                showStoryScene(`${story}.${nextScene}`);
             }
 
             function loadAnimation(type) {
                 const animationContainer = document.getElementById('story-animation');
                 if (animationContainer) {
-                    let animationData;
-                    try {
-                        switch (type) {
-                            case 'happy':
-                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
-                                break;
-                            case 'sad':
-                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json' };
-                                break;
-                            case 'neutral':
-                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_wl3khqiv.json' };
-                                break;
-                            default:
-                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
-                        }
-                        lottie.loadAnimation({
-                            container: animationContainer,
-                            renderer: 'svg',
-                            loop: true,
-                            autoplay: true,
-                            animationData: animationData
-                        });
-                    } catch (error) {
-                        console.error('Lottie animation error:', error);
-                        animationContainer.innerHTML = '<p>Animation failed to load. Check console for details.</p>';
+                    let animationPath;
+                    switch (type) {
+                        case 'happy': animationPath = 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json'; break;
+                        case 'sad': animationPath = 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json'; break;
+                        default: animationPath = 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json';
                     }
+                    lottie.loadAnimation({
+                        container: animationContainer,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        path: animationPath
+                    }).catch(() => console.log('Animation failed to load'));
                 }
             }
 
             function showMissions() {
                 const container = document.getElementById('missions');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
-                    ${missions.map(mission => `
-                        <div class="story-card mb-4">
-                            <h3 class="text-xl">${mission.title}</h3>
-                            <p>${mission.question}</p>
-                            <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
-                            <button class="btn mt-2" onclick="checkMission('${mission.id}', '${mission.answer}')">Submit 🎉</button>
-                        </div>
-                    `).join('')}
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
+                    <div class="story-card"><h3>${missions[0].title}</h3><p>${missions[0].question}</p><input id="mission-input" class="border rounded-lg p-2"><button class="btn mt-2" onclick="checkMission('${missions[0].id}', '${missions[0].answer}')">Submit</button></div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-                container.appendChild(content);
             }
 
             function checkMission(id, answer) {
-                const userAnswer = document.getElementById(`mission-${id}-input`).value.toLowerCase();
+                const userAnswer = document.getElementById('mission-input').value.toLowerCase();
                 if (userAnswer === answer.toLowerCase()) {
                     userData.stars += 2;
-                    userData.progress = Math.min(userData.progress + 1, 10);
-                    userData.missions[id] = true;
                     updateStarCounter();
-                    updateProgress();
-                    confetti();
-                    const feedback = document.createElement('p');
-                    feedback.className = 'text-green-600 mt-2';
-                    feedback.textContent = 'Mission Complete! +2 Stars! 🎉';
-                    document.getElementById(`mission-${id}-input`).parentElement.appendChild(feedback);
-                } else {
-                    const feedback = document.createElement('p');
-                    feedback.className = 'text-red-600 mt-2';
-                    feedback.textContent = 'Wrong! Try again! 😕';
-                    document.getElementById(`mission-${id}-input`).parentElement.appendChild(feedback);
-                }
+                    alert('Mission Complete! +2 Stars! 🎉');
+                } else alert('Wrong! Try again! 😕');
             }
 
             function showProfile() {
-                if (!userData.email) {
-                    alert("Please log in to view your profile!");
-                    showSection('welcome');
-                    return;
-                }
                 const container = document.getElementById('profile');
-                container.innerHTML = '';
-                const content = document.createElement('div');
-                content.className = 'content';
-                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
+                container.innerHTML = `
+                    <h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
                     <p>Email: ${userData.email || 'Not set'}</p>
-                    <p>Name: ${userData.name}</p>
-                    <p>Level: ${userData.year}</p>
+                    <p>Name: ${userData.name || 'Young Explorer'}</p>
                     <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
-                    <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
-                    <p>Badges: ${userData.badges.join(', ')}</p>
-                    <img src="${userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png'}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
+                    <img src="${userData.character || 'https://via.placeholder.com/100'}" alt="Avatar" class="w-24 h-24 mx-auto">
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-                container.appendChild(content);
-                updateStarCounter();
-                updateProgress();
             }
 
             function updateStarCounter() {
-                document.getElementById('star-count').textContent = userData.stars;
+                document.getElementById('star-count').textContent = userData.stars + ' ⭐';
                 if (document.getElementById('profile-star-count')) document.getElementById('profile-star-count').textContent = userData.stars;
                 saveUserData();
             }
 
             function updateProgress() {
-                const progressElement = document.getElementById('progress');
-                if (progressElement) {
-                    const progress = (userData.progress / 10) * 100;
-                    progressElement.style.width = `${progress}%`;
-                }
-                if (document.getElementById('profile-progress')) document.getElementById('profile-progress').textContent = `${userData.progress}/10`;
-                saveUserData();
+                const progress = document.getElementById('progress');
+                if (progress) progress.style.width = `${(userData.progress / 10) * 100}%`;
             }
 
             function updateBadges() {
@@ -984,20 +500,6 @@
                 if (badgeElement) badgeElement.textContent = `🏅 Badge: ${userData.badges[userData.badges.length - 1] || 'Explorer'}`;
                 saveUserData();
             }
-
-            function confetti() {
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 }
-                });
-            }
-
-            window.addEventListener('load', () => {
-                document.getElementById('landing-page').style.display = 'block';
-                document.getElementById('welcome').classList.add('hidden');
-                document.getElementById('profile').classList.add('hidden');
-            });
         });
     </script>
     <style>
@@ -1005,77 +507,17 @@
             font-family: 'Fredoka', sans-serif;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
-            min-height: 100vh;
+            background: #87CEEB;
             position: relative;
-            background: #87CEEB url('https://yourusername.github.io/your-repo/images/background.jpg') no-repeat center center fixed;
-            background-size: cover;
-            overflow: hidden;
             z-index: 0;
+            overflow-x: hidden;
         }
-        .header-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background: linear-gradient(90deg, #FFA500, #FF4500);
-            z-index: 100;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .header-bar h1 {
-            color: #fff;
-            font-size: 1.8rem;
-            text-shadow: 2px 2px #000;
-            animation: bounce 1s ease-out infinite;
-        }
-        .tree, .cloud, .star, .moon {
-            position: absolute;
-            animation: float 6s infinite ease-in-out;
-            z-index: 1;
-        }
-        .tree { content: '🌳'; font-size: 80px; }
-        .cloud { content: '☁️'; font-size: 50px; animation: float 8s infinite ease-in-out; }
-        .star { content: '⭐'; font-size: 30px; animation: twinkle 2s infinite alternate; }
-        .moon { content: '🌙'; font-size: 60px; animation: shine 4s infinite ease-in-out; top: 10%; left: 10%; }
-        .hero {
+        #hero {
             height: 100vh;
-            position: relative;
-            overflow: hidden;
-            color: #fff;
-            text-align: center;
             padding-top: 10rem;
-            border-radius: 0 0 50px 50px;
-            display: block;
+            text-align: center;
+            position: relative;
             z-index: 10;
-            background: inherit;
-        }
-        .hero h1 {
-            font-size: 3.5rem;
-            animation: bounce 1s ease-out;
-        }
-        .hero p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            animation: fadeIn 1.5s ease-out;
-        }
-        .hero .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            color: #fff;
-            padding: 2rem 4rem;
-            font-size: 2rem;
-            border-radius: 30px;
-            transition: transform 0.3s, background 0.3s;
-            text-shadow: 1px 1px #000;
-            z-index: 30;
-        }
-        .hero .btn:hover {
-            transform: scale(1.1);
-            background: linear-gradient(90deg, #32CD32, #87CEEB);
-            box-shadow: 0 0 10px #32CD32;
         }
         .section {
             min-height: 100vh;
@@ -1083,110 +525,42 @@
             text-align: center;
             position: relative;
             z-index: 10;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding-top: 80px; /* Adjust for header bar */
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            margin: 1rem;
         }
-        .content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem;
-            color: #000;
-            z-index: 20;
+        .btn {
+            background: #FFA500;
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            margin: 0.5rem;
+            z-index: 30;
+            position: relative;
+        }
+        .btn:hover {
+            background: #32CD32;
+            transform: scale(1.05);
         }
         .card-grid {
             display: flex;
             justify-content: center;
             gap: 1.5rem;
-            padding: 4rem 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 20;
             flex-wrap: wrap;
+            padding: 2rem;
+            z-index: 20;
         }
         .card {
-            background: linear-gradient(135deg, #FF69B4, #FFA500);
-            border-radius: 30px;
+            background: #FF69B4;
             padding: 1.5rem;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: 20px;
             cursor: pointer;
-            text-align: center;
-            overflow: hidden;
-            width: 250px;
+            width: 200px;
             z-index: 20;
         }
         .card:hover {
-            transform: translateY(-15px);
-            box-shadow: 0 15px 40px rgba(50, 205, 50, 0.3);
-        }
-        .card h3 {
-            color: #fff;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px #000;
-        }
-        .card p {
-            color: #fff;
-            text-shadow: 1px 1px #000;
-        }
-        .card:before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-            animation: rotate 10s linear infinite;
-            z-index: -1;
-        }
-        .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            color: #fff;
-            padding: 1rem 2rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 1.2rem;
-            transition: transform 0.3s, background 0.3s;
-            text-shadow: 1px 1px #000;
-            z-index: 30;
-            position: relative;
-        }
-        .btn:hover {
-            transform: scale(1.1);
-            background: linear-gradient(90deg, #32CD32, #87CEEB);
-            box-shadow: 0 0 10px #32CD32;
-        }
-        .btn:active {
-            transform: scale(0.95);
-        }
-        .star-counter {
-            position: fixed;
-            top: 70px;
-            right: 1rem;
-            background: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            font-weight: 600;
-            color: #FFA500;
-            z-index: 50;
-            animation: pulse 2s infinite;
-        }
-        .avatar-display {
-            position: fixed;
-            top: 6rem;
-            left: 1rem;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 5px solid #FFA500;
-            object-fit: cover;
-            animation: float 3s infinite ease-in-out;
-            z-index: 50;
+            transform: scale(1.05);
         }
         .modal {
             display: none;
@@ -1203,149 +577,71 @@
         .modal-content {
             background: #fff;
             padding: 2rem;
-            border-radius: 30px;
+            border-radius: 20px;
             width: 90%;
-            max-width: 500px;
-            text-align: center;
-            animation: slideIn 0.5s ease-out;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
             z-index: 201;
         }
-        .karbala-img {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 15px;
-        }
-        #art-canvas {
-            border: 3px solid #87CEEB;
+        .story-card {
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 20px;
-            background: #fff;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .art-tools {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
+            padding: 1rem;
             margin: 1rem 0;
-            flex-wrap: wrap;
+            z-index: 20;
         }
         .memory-card {
-            width: 150px;
-            height: 150px;
+            width: 100px;
+            height: 100px;
             background: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
             cursor: pointer;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            overflow: hidden;
+            border-radius: 10px;
             z-index: 20;
-        }
-        .memory-card:hover {
-            transform: scale(1.05);
         }
         .memory-card.matched {
             background: #32CD32;
             color: #fff;
         }
         .wudhu-step {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             background: #87CEEB;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
             cursor: move;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            user-select: none;
-            margin: 1rem 0;
-            position: relative;
-            z-index: 20;
-        }
-        .wudhu-step:hover {
-            transform: rotate(10deg) scale(1.1);
-        }
-        .wudhu-step.correct {
-            background: #32CD32;
-            color: #fff;
-        }
-        .jigsaw-piece {
-            width: 133px;
-            height: 133px;
-            background-size: cover;
-            border: 2px solid #FFA500;
-            cursor: move;
-            position: absolute;
-            user-select: none;
-        }
-        .jigsaw-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-            margin: 0 auto;
-            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg/400px-Kaaba_at_al-Masjid_al-Haram%2C_Makkah.jpg') no-repeat;
-            background-size: 400px 400px;
-            border: 2px solid #32CD32;
-        }
-        .story-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 1rem auto;
-            max-width: 600px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            z-index: 20;
-        }
-        .choice-btn {
-            margin: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 15px;
-            background: #FFA500;
-            color: #fff;
-            transition: transform 0.3s, background 0.3s;
-            z-index: 30;
-        }
-        .choice-btn:hover {
-            transform: scale(1.05);
-            background: #32CD32;
-        }
-        .progress-bar {
-            position: fixed;
-            bottom: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 500px;
-            height: 20px;
-            background: #fff;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            overflow: hidden;
+            z-index: 20;
         }
-        .progress {
-            height: 100%;
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            transition: width 0.5s ease-in-out;
+        .wudhu-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
         }
-        .badge {
-            position: fixed;
-            top: 50%;
-            left: 1rem;
-            transform: translateY(-50%);
+        .wudhu-dropzone {
+            min-height: 120px;
             background: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            animation: bounce 2s infinite;
+            border: 2px dashed #FFA500;
+            border-radius: 10px;
+            padding: 1rem;
+            z-index: 20;
+        }
+        #art-canvas {
+            border: 2px solid #FFA500;
+            border-radius: 10px;
+            z-index: 20;
+        }
+        .character {
+            border: 2px solid #FFA500;
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 20;
+        }
+        .character.selected {
+            border-color: #32CD32;
         }
         .lottie-animation {
             width: 200px;
@@ -1353,39 +649,19 @@
             margin: 1rem auto;
             z-index: 20;
         }
-        .wudhu-container {
-            display: flex;
-            justify-content: space-around;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        .wudhu-dropzone {
-            min-height: 120px;
+        .progress-bar {
+            width: 80%;
+            height: 20px;
             background: #fff;
-            border: 2px dashed #FFA500;
-            border-radius: 15px;
-            padding: 1rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
+            border-radius: 10px;
+            margin: 1rem auto;
             z-index: 20;
         }
-        .character {
-            transition: transform 0.3s;
-            border: 3px solid transparent;
-            z-index: 20;
-        }
-        .character:hover {
-            transform: scale(1.1);
-        }
-        .character.selected {
-            border-color: #32CD32;
-            box-shadow: 0 0 10px #32CD32;
-        }
-        .hidden {
-            display: none !important;
+        .progress {
+            height: 100%;
+            background: #FFA500;
+            border-radius: 10px;
+            transition: width 0.5s;
         }
         #story-background {
             position: fixed;
@@ -1393,111 +669,64 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
             z-index: -1;
-            transition: background-image 1s ease;
+            background-size: cover;
+            transition: background-image 1s;
         }
-        @keyframes float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0); }
+        .star-counter {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            color: #FFD700;
+            z-index: 30;
         }
-        @keyframes twinkle {
-            0% { opacity: 0.5; }
-            100% { opacity: 1; }
+        .avatar-display {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            width: 100px;
+            height: 100px;
+            z-index: 30;
         }
-        @keyframes shine {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .tree {
+            position: absolute;
+            width: 100px;
+            height: 150px;
+            background: green;
+            border-radius: 50% 50% 0 0;
+            z-index: 1;
         }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .cloud {
+            position: absolute;
+            width: 150px;
+            height: 80px;
+            background: white;
+            border-radius: 50px;
+            z-index: 1;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: yellow;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            z-index: 1;
         }
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .moon {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #FFD700;
+            border-radius: 50%;
+            z-index: 1;
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @media (max-width: 768px) {
-            .hero {
-                padding-top: 5rem;
-            }
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            .hero .btn {
-                padding: 1rem 2rem;
-                font-size: 1.5rem;
-            }
-            .card-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-            .card {
-                width: 150px;
-                padding: 1rem;
-            }
-            .card h3 {
-                font-size: 1.2rem;
-            }
-            .modal-content {
-                width: 95%;
-            }
-            .memory-card {
-                width: 100px;
-                height: 100px;
-                font-size: 0.8rem;
-            }
-            .wudhu-step {
-                width: 100px;
-                height: 100px;
-                font-size: 0.9rem;
-            }
-            .wudhu-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            .wudhu-dropzone {
-                width: 100%;
-                min-height: 100px;
-            }
-            #art-canvas {
-                width: 100%;
-                height: 300px;
-            }
-            .story-card {
-                padding: 1rem;
-            }
-            .choice-btn {
-                width: 100%;
-                margin: 0.5rem 0;
-            }
-            .header-bar h1 {
-                font-size: 1.5rem;
-            }
-        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-    <div class="header-bar">
-        <h1>🌙 Shia Islamic Adventure Quest</h1>
-    </div>
     <div id="landing-page" class="hero">
-        <p class="text-lg mb-4">Embark on a journey of faith and fun! 🌟</p>
+        <h1 class="text-3xl mb-4">Shia Islamic Adventure Quest 🌙</h1>
         <button class="btn" onclick="showLoginModal()">Login 🚪</button>
         <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
         <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔑</button>
@@ -1506,8 +735,7 @@
     <!-- Login Modal -->
     <div id="login-modal" class="modal">
         <div class="modal-content">
-
-<h2 class="text-2xl text-orange-600 mb-2">Login</h2>
+            <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="login-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <p class="text-right mb-2"><a href="#" onclick="document.getElementById('reset-password-modal').style.display='flex'; console.log('Reset password modal shown');">Forgot Password?</a></p>
