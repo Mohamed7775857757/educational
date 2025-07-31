@@ -26,6 +26,11 @@
 
         // Initialize Firebase
         const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+        if (!app) {
+            console.error('Firebase initialization failed');
+            alert('Failed to connect to the app. Please try again later.');
+            return;
+        }
         const auth = getAuth(app);
 
         // Global variables
@@ -266,7 +271,6 @@
             { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
             { id: 'dua', title: 'Learn Dua', question: 'Dua before eating?', type: 'text', answer: 'Bismillah' }
         ];
-        const adminCredentials = { email: 'melzein1987@gmail.com', password: 'admin123' }; // Added email for admin check
 
         document.addEventListener('DOMContentLoaded', () => {
             // Ensure initial UI state
@@ -477,13 +481,15 @@
                 }
             };
 
-            window.loginAdmin = function() { // Added loginAdmin function
+            window.loginAdmin = function() {
                 const email = document.getElementById('admin-username').value;
                 const password = document.getElementById('admin-password').value;
-                if (email === adminCredentials.email && password === adminCredentials.password) {
+                const adminEmail = 'melzein1987@gmail.com';
+                const adminPassword = 'admin123';
+                if (email === adminEmail && password === adminPassword) {
                     alert('Admin login successful!');
                     closeModal({ target: { className: 'modal' } });
-                    // Add admin dashboard functionality here if needed
+                    // Add admin dashboard logic here if needed
                 } else {
                     alert('Invalid admin credentials!');
                 }
@@ -544,13 +550,13 @@
                 flippedCards.push(card);
                 if (flippedCards.length === 2) {
                     lock = true;
-                    setTimeout(checkMatch, 1000); // Cooldown between flips
+                    setTimeout(checkMatch, 1000);
                 }
             }
 
             function checkMatch() {
                 const [card1, card2] = flippedCards;
-                if (card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
+                if (card1.dataset.match === card2.dataset.match) {
                     card1.classList.add('matched');
                     card2.classList.add('matched');
                     matchedCards.push(card1, card2);
@@ -573,7 +579,7 @@
                     setTimeout(() => {
                         card1.textContent = '❓';
                         card2.textContent = '❓';
-                    }, 500);
+                    }, 1000);
                 }
                 flippedCards = [];
                 lock = false;
@@ -659,8 +665,6 @@
                     step.addEventListener('dragstart', dragStartWudhu);
                     dropzone.appendChild(step);
                     if (draggedWudhu.parentElement.id === 'wudhu-source') {
-                        draggedWudhu.remove();
-                    } else {
                         draggedWudhu.remove();
                     }
                     draggedWudhu = null;
@@ -758,6 +762,7 @@
                         <button class="btn" onclick="loadImage('https://yourusername.github.io/your-repo/images/kaaba.jpg')">Kaaba 🕋</button>
                         <button class="btn" onclick="loadImage('https://via.placeholder.com/600x400?text=Masjid')">Masjid 🕌</button>
                         <button class="btn" onclick="clearCanvas()">Clear 🧹</button>
+                        <button class="btn" onclick="undoDrawing()">Undo ↩️</button>
                     </div>
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
@@ -766,9 +771,11 @@
                 const ctx = canvas.getContext('2d');
                 let drawing = false;
                 let color = 'black';
+                let undoStack = [];
 
                 canvas.addEventListener('mousedown', () => drawing = true);
-                canvas.addEventListener('mouseup', () => drawing = false);
+                canvas.addEventListener('mouseup', () => { drawing = false; undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height)); });
+                canvas.addEventListener('mouseleave', () => drawing = false);
                 canvas.addEventListener('mousemove', (e) => {
                     if (drawing) {
                         ctx.fillStyle = color;
@@ -779,12 +786,13 @@
                 });
 
                 window.changeColor = function(newColor) { color = newColor; };
-                window.clearCanvas = function() { ctx.clearRect(0, 0, canvas.width, canvas.height); };
+                window.clearCanvas = function() { ctx.clearRect(0, 0, canvas.width, canvas.height); undoStack = []; };
                 window.loadImage = function(src) {
                     const img = new Image();
                     img.onload = () => {
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
                     };
                     img.onerror = () => {
                         console.log(`Image load failed for ${src}`);
@@ -792,8 +800,15 @@
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         ctx.fillStyle = '#ccc';
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
                     };
                     img.src = src;
+                };
+                window.undoDrawing = function() {
+                    if (undoStack.length > 1) {
+                        undoStack.pop(); // Remove current state
+                        ctx.putImageData(undoStack.pop(), 0, 0);
+                    }
                 };
                 userData.stars += 1;
                 userData.progress = Math.min(userData.progress + 1, 10);
@@ -855,6 +870,7 @@
                 userData.progress = Math.min(userData.progress + 1, 10);
                 updateStarCounter();
                 updateProgress();
+                saveUserData();
                 showStoryScene(nextFullScene);
             }
 
@@ -868,28 +884,23 @@
 
             function loadAnimation(type) {
                 const animationContainer = document.getElementById('story-animation');
-                if (animationContainer) {
+                if (animationContainer && document.getElementById('Level-7').classList.contains('hidden') === false) {
                     let animationData;
                     try {
                         switch (type) {
-                            case 'happy':
-                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
-                                break;
-                            case 'sad':
-                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json' };
-                                break;
-                            case 'neutral':
-                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_wl3khqiv.json' };
-                                break;
-                            default:
-                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
+                            case 'happy': animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' }; break;
+                            case 'sad': animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json' }; break;
+                            case 'neutral': animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_wl3khqiv.json' }; break;
+                            default: animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
                         }
                         lottie.loadAnimation({
                             container: animationContainer,
                             renderer: 'svg',
                             loop: true,
                             autoplay: true,
-                            animationData: animationData
+                            animationData: animationData,
+                            width: 200,
+                            height: 200
                         });
                     } catch (error) {
                         console.error('Lottie animation error:', error);
@@ -1086,7 +1097,7 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding-top: 80px; /* Adjust for header bar */
+            padding-top: 80px;
         }
         .content {
             max-width: 900px;
@@ -1152,7 +1163,7 @@
             font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
-            z-index: 30;
+            z-index: 1000;
             position: relative;
         }
         .btn:hover {
@@ -1316,76 +1327,47 @@
             transform: scale(1.05);
             background: #32CD32;
         }
-        .progress-bar {
-            position: fixed;
-            bottom: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 500px;
+        .progress-bar
+
+.progress-bar {
+            width: 100%;
             height: 20px;
-            background: #fff;
+            background: #ddd;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 50;
             overflow: hidden;
+            margin: 1rem 0;
         }
-        .progress {
+        #progress {
             height: 100%;
             background: linear-gradient(90deg, #FFA500, #FF69B4);
+            width: 0%;
             transition: width 0.5s ease-in-out;
+            border-radius: 10px;
         }
         .badge {
-            position: fixed;
-            top: 50%;
-            left: 1rem;
-            transform: translateY(-50%);
-            background: #fff;
+            background: #FFD700;
+            color: #000;
             padding: 0.5rem 1rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            animation: bounce 2s infinite;
-        }
-        .lottie-animation {
-            width: 200px;
-            height: 200px;
-            margin: 1rem auto;
+            border-radius: 15px;
+            margin: 0.5rem;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             z-index: 20;
         }
         .wudhu-container {
             display: flex;
             justify-content: space-around;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+            margin: 2rem 0;
         }
         .wudhu-dropzone {
-            min-height: 120px;
-            background: #fff;
-            border: 2px dashed #FFA500;
+            width: 45%;
+            min-height: 300px;
+            background: rgba(135, 206, 235, 0.5);
             border-radius: 15px;
             padding: 1rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
             z-index: 20;
-        }
-        .character {
-            transition: transform 0.3s;
-            border: 3px solid transparent;
-            z-index: 20;
-        }
-        .character:hover {
-            transform: scale(1.1);
-        }
-        .character.selected {
-            border-color: #32CD32;
-            box-shadow: 0 0 10px #32CD32;
-        }
-        .hidden {
-            display: none !important;
         }
         #story-background {
             position: fixed;
@@ -1394,9 +1376,15 @@
             width: 100%;
             height: 100%;
             background-size: cover;
-            background-position: center;
-            z-index: -1;
-            transition: background-image 1s ease;
+            z-index: 0;
+        }
+        .lottie-animation {
+            margin: 1rem auto;
+            width: 200px;
+            height: 200px;
+        }
+        .hidden {
+            display: none;
         }
         @keyframes float {
             0% { transform: translateY(0); }
@@ -1412,6 +1400,10 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
@@ -1421,21 +1413,24 @@
             to { opacity: 1; }
         }
         @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
+            from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         @media (max-width: 768px) {
-            .hero {
-                padding-top: 5rem;
+            .card-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            .card {
+                width: 120px;
+                padding: 0.5rem;
+            }
+            .karbala-img {
+                max-width: 200px;
             }
             .hero h1 {
                 font-size: 2.5rem;
@@ -1444,100 +1439,159 @@
                 padding: 1rem 2rem;
                 font-size: 1.5rem;
             }
-            .card-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            .section {
+                padding: 2rem 1rem;
             }
-            .card {
-                width: 150px;
-                padding: 1rem;
-            }
-            .card h3 {
-                font-size: 1.2rem;
-            }
-            .modal-content {
-                width: 95%;
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
             }
             .memory-card {
                 width: 100px;
                 height: 100px;
-                font-size: 0.8rem;
             }
             .wudhu-step {
-                width: 100px;
-                height: 100px;
-                font-size: 0.9rem;
-            }
-            .wudhu-container {
-                flex-direction: column;
-                align-items: center;
+                width: 80px;
+                height: 80px;
             }
             .wudhu-dropzone {
-                width: 100%;
-                min-height: 100px;
-            }
-            #art-canvas {
-                width: 100%;
-                height: 300px;
-            }
-            .story-card {
-                padding: 1rem;
-            }
-            .choice-btn {
-                width: 100%;
-                margin: 0.5rem 0;
-            }
-            .header-bar h1 {
-                font-size: 1.5rem;
+                min-height: 200px;
             }
         }
     </style>
 </head>
 <body>
     <div class="header-bar">
-        <h1>🌙 Shia Islamic Adventure Quest</h1>
+        <h1>Shia Islamic Adventure Quest</h1>
     </div>
-    <div id="landing-page" class="hero">
-        <p class="text-lg mb-4">Embark on a journey of faith and fun! 🌟</p>
+    <div class="star-counter" id="star-count">0 ⭐</div>
+    <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display" id="avatar-display" style="display: none;">
+    <div class="tree" style="top: 20%; left: 5%;"></div>
+    <div class="cloud" style="top: 10%; right: 10%;"></div>
+    <div class="star" style="top: 15%; left: 20%;"></div>
+    <div class="moon" style="top: 10%; left: 10%;"></div>
+    <div class="hero" id="hero">
+        <h1>Welcome to Your Adventure!</h1>
+        <p>Explore, learn, and grow with Shia Islamic teachings.</p>
         <button class="btn" onclick="showLoginModal()">Login 🚪</button>
         <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
-        <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔑</button>
     </div>
-
-    <!-- Login Modal -->
+    <div id="landing-page" class="hidden">
+        <div class="card-grid">
+            <div class="card" onclick="showSection('Level-1')">
+                <h3>Level 1</h3>
+                <p>Quiz Challenge 📖</p>
+            </div>
+            <div class="card" onclick="showSection('Level-2')">
+                <h3>Level 2</h3>
+                <p>Memory Quest 🧠</p>
+            </div>
+            <div class="card" onclick="showSection('Level-3')">
+                <h3>Level 3</h3>
+                <p>Wudhu Challenge 💧</p>
+            </div>
+            <div class="card" onclick="showSection('Level-4')">
+                <h3>Level 4</h3>
+                <p>Karbala Epic 🏰</p>
+            </div>
+            <div class="card" onclick="showSection('Level-5')">
+                <h3>Level 5</h3>
+                <p>Art Quest 🎨</p>
+            </div>
+            <div class="card" onclick="showSection('Level-6')">
+                <h3>Level 6</h3>
+                <p>Explore Hajj 🌍</p>
+            </div>
+            <div class="card" onclick="showSection('Level-7')">
+                <h3>Level 7</h3>
+                <p>Choose Your Path 📖</p>
+            </div>
+            <div class="card" onclick="showSection('missions')">
+                <h3>Missions</h3>
+                <p>Daily Tasks ⭐</p>
+            </div>
+            <div class="card" onclick="showSection('profile')">
+                <h3>Profile</h3>
+                <p>Your Journey 🏡</p>
+            </div>
+        </div>
+    </div>
+    <div id="welcome" class="section hidden">
+        <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</span></h2>
+        <div class="progress-bar">
+            <div id="progress"></div>
+        </div>
+        <p class="badge"></p>
+        <div class="card-grid">
+            <div class="card" onclick="showSection('Level-1')">
+                <h3>Level 1</h3>
+                <p>Quiz Challenge 📖</p>
+            </div>
+            <div class="card" onclick="showSection('Level-2')">
+                <h3>Level 2</h3>
+                <p>Memory Quest 🧠</p>
+            </div>
+            <div class="card" onclick="showSection('Level-3')">
+                <h3>Level 3</h3>
+                <p>Wudhu Challenge 💧</p>
+            </div>
+            <div class="card" onclick="showSection('Level-4')">
+                <h3>Level 4</h3>
+                <p>Karbala Epic 🏰</p>
+            </div>
+            <div class="card" onclick="showSection('Level-5')">
+                <h3>Level 5</h3>
+                <p>Art Quest 🎨</p>
+            </div>
+            <div class="card" onclick="showSection('Level-6')">
+                <h3>Level 6</h3>
+                <p>Explore Hajj 🌍</p>
+            </div>
+            <div class="card" onclick="showSection('Level-7')">
+                <h3>Level 7</h3>
+                <p>Choose Your Path 📖</p>
+            </div>
+            <div class="card" onclick="showSection('missions')">
+                <h3>Missions</h3>
+                <p>Daily Tasks ⭐</p>
+            </div>
+            <div class="card" onclick="showSection('profile')">
+                <h3>Profile</h3>
+                <p>Your Journey 🏡</p>
+            </div>
+        </div>
+        <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
+    </div>
+    <div id="Level-1" class="section hidden"></div>
+    <div id="Level-2" class="section hidden"></div>
+    <div id="Level-3" class="section hidden"></div>
+    <div id="Level-4" class="section hidden"></div>
+    <div id="Level-5" class="section hidden"></div>
+    <div id="Level-6" class="section hidden"></div>
+    <div id="Level-7" class="section hidden">
+        <div id="story-background"></div>
+    </div>
+    <div id="missions" class="section hidden"></div>
+    <div id="profile" class="section hidden"></div>
     <div id="login-modal" class="modal">
         <div class="modal-content">
-
-<h2 class="text-2xl text-orange-600 mb-2">Login</h2>
-            <input type="email" id="login-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="login-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <p class="text-right mb-2"><a href="#" onclick="document.getElementById('reset-password-modal').style.display='flex'; console.log('Reset password modal shown');">Forgot Password?</a></p>
-            <button class="btn" onclick="login(); console.log('Login attempted');">Login</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+            <h2>Login 🚪</h2>
+            <input id="login-email" class="border rounded-lg p-2 bg-white text-black mt-4 w-full" placeholder="Email" type="email">
+            <input id="login-password" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Password" type="password">
+            <button class="btn mt-4" onclick="login()">Login 🎉</button>
+            <button class="btn mt-2" onclick="showResetPasswordModal()">Forgot Password? 🔑</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
         </div>
     </div>
-
-    <!-- Reset Password Modal -->
-    <div id="reset-password-modal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Reset Password</h2>
-            <input type="email" id="reset-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="resetPassword(); console.log('Password reset requested');">Send Reset Email</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Signup Modal -->
     <div id="signup-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
-            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <div id="gender-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-                <label><input type="radio" name="gender" value="boy" checked> Boy</label>
-                <label><input type="radio" name="gender" value="girl"> Girl</label>
+            <h2>Sign Up ✨</h2>
+            <input id="signup-name" class="border rounded-lg p-2 bg-white text-black mt-4 w-full" placeholder="Name">
+            <div class="mt-2">
+                <label><input type="radio" name="gender" value="boy" checked> Boy 👦</label>
+                <label class="ml-4"><input type="radio" name="gender" value="girl"> Girl 👧</label>
             </div>
-            <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <select id="year-select" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
                 <option value="Level-1">Level 1</option>
                 <option value="Level-2">Level 2</option>
                 <option value="Level-3">Level 3</option>
@@ -1545,127 +1599,33 @@
                 <option value="Level-5">Level 5</option>
                 <option value="Level-6">Level 6</option>
                 <option value="Level-7">Level 7</option>
-                <option value="Level-8">Level 8</option>
-                <option value="Level-9">Level 9</option>
-                <option value="Level-10">Level 10</option>
             </select>
-            <div class="flex justify-center gap-2 mb-2">
-                <img src="https://yourusername.github.io/your-repo/images/boy1.png" alt="Boy 1" class="character w-16 h-16 cursor-pointer">
-                <img src="https://yourusername.github.io/your-repo/images/boy2.png" alt="Boy 2" class="character w-16 h-16 cursor-pointer">
-                <img src="https://yourusername.github.io/your-repo/images/girl1.png" alt="Girl 1" class="character w-16 h-16 cursor-pointer">
-                <img src="https://yourusername.github.io/your-repo/images/girl2.png" alt="Girl 2" class="character w-16 h-16 cursor-pointer">
+            <div class="character-select mt-2">
+                <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Boy" class="character w-16 h-16 mr-2">
+                <img src="https://yourusername.github.io/your-repo/images/girl.png" alt="Girl" class="character w-16 h-16">
             </div>
-            <button id="signup-btn" class="btn" onclick="signupUser(); console.log('Sign up submitted');">Sign Up</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+            <input id="signup-email" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Email" type="email">
+            <input id="signup-password" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Password" type="password">
+            <button class="btn mt-4" onclick="signupUser()">Sign Up 🎉</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
         </div>
     </div>
-
-    <!-- Admin Login Modal -->
     <div id="admin-login-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Admin Login</h2>
-            <input type="text" id="admin-username" placeholder="Username" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <input type="password" id="admin-password" placeholder="Password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="loginAdmin(); console.log('Admin login attempted');">Login</button>
-            <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
+            <h2>Admin Login 🔐</h2>
+            <input id="admin-username" class="border rounded-lg p-2 bg-white text-black mt-4 w-full" placeholder="Email" type="email">
+            <input id="admin-password" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Password" type="password">
+            <button class="btn mt-4" onclick="loginAdmin()">Login 🎉</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
         </div>
     </div>
-
-    <!-- Welcome Section -->
-    <div id="welcome" class="section hidden">
-        <div class="content">
-            <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">${userData.name || 'Young Explorer'}</span>! 🌟</h2>
-            <div class="card-grid">
-                <div class="card" onclick="showSection('Level-1')">
-                    <h3>Quiz Challenge 📖</h3>
-                    <p>Test your Islamic knowledge!</p>
-                </div>
-                <div class="card" onclick="showSection('Level-2')">
-                    <h3>Memory Quest 🧠</h3>
-                    <p>Match the Imams!</p>
-                </div>
-                <div class="card" onclick="showSection('Level-3')">
-                    <h3>Wudhu Challenge 💧</h3>
-                    <p>Order the steps!</p>
-                </div>
-                <div class="card" onclick="showSection('Level-4')">
-                    <h3>Karbala Epic 🏰</h3>
-                    <p>Learn about Karbala!</p>
-                </div>
-                <div class="card" onclick="showSection('Level-5')">
-                    <h3>Art Quest 🎨</h3>
-                    <p>Create Islamic art!</p>
-                </div>
-                <div class="card" onclick="showSection('Level-6')">
-                    <h3>Explore Hajj 🌍</h3>
-                    <p>Learn about the pilgrimage!</p>
-                </div>
-                <div class="card" onclick="showSection('Level-7')">
-                    <h3>Choose Your Path 📖</h3>
-                    <p>Live an Islamic story!</p>
-                </div>
-                <div class="card" onclick="showSection('missions')">
-                    <h3>Mission Board ⭐</h3>
-                    <p>Complete daily tasks!</p>
-                </div>
-            </div>
-            <button class="btn mt-4" onclick="showSection('profile')">View Profile 🏡</button>
-            <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+    <div id="reset-password-modal" class="modal">
+        <div class="modal-content">
+            <h2>Reset Password 🔑</h2>
+            <input id="reset-email" class="border rounded-lg p-2 bg-white text-black mt-4 w-full" placeholder="Email" type="email">
+            <button class="btn mt-4" onclick="resetPassword()">Send Reset Email 📧</button>
+            <button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
         </div>
     </div>
-
-    <!-- Level 1 Section -->
-    <div id="Level-1" class="section hidden"></div>
-
-    <!-- Level 2 Section -->
-    <div id="Level-2" class="section hidden"></div>
-
-    <!-- Level 3 Section -->
-    <div id="Level-3" class="section hidden"></div>
-
-    <!-- Level 4 Section -->
-    <div id="Level-4" class="section hidden"></div>
-
-    <!-- Level 5 Section -->
-    <div id="Level-5" class="section hidden"></div>
-
-    <!-- Level 6 Section -->
-    <div id="Level-6" class="section hidden"></div>
-
-    <!-- Level 7 Section -->
-    <div id="Level-7" class="section hidden"></div>
-
-    <!-- Level 8 Section -->
-    <div id="Level-8" class="section hidden"></div>
-
-    <!-- Level 9 Section -->
-    <div id="Level-9" class="section hidden"></div>
-
-    <!-- Level 10 Section -->
-    <div id="Level-10" class="section hidden"></div>
-
-    <!-- Missions Section -->
-    <div id="missions" class="section hidden"></div>
-
-    <!-- Profile Section -->
-    <div id="profile" class="section hidden"></div>
-
-    <!-- Progress Bar -->
-    <div class="progress-bar">
-        <div id="progress" class="progress" style="width: 0%;"></div>
-    </div>
-
-    <div class="star-counter" id="star-count">0 ⭐</div>
-    <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display" id="avatar-display" style="display: none;">
-    <div id="story-background"></div>
-
-    <!-- Dynamic Elements -->
-    <div class="tree" style="left: 10%; top: 60%; animation-delay: 0s;"></div>
-    <div class="tree" style="left: 80%; top: 70%; animation-delay: 2s;"></div>
-    <div class="cloud" style="left: 20%; top: 20%; animation-delay: 1s;"></div>
-    <div class="cloud" style="left: 70%; top: 30%; animation-delay: 3s;"></div>
-    <div class="star" style="left: 30%; top: 15%; animation-delay: 0.5s;"></div>
-    <div class="star" style="left: 50%; top: 10%; animation-delay: 1.5s;"></div>
-    <div class="moon"></div>
 </body>
 </html>
