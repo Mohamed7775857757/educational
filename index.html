@@ -273,6 +273,8 @@
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded, initializing functions...');
+
             // Ensure initial UI state
             const landingPage = document.getElementById('landing-page');
             const welcomeSection = document.getElementById('welcome');
@@ -300,7 +302,7 @@
                         document.getElementById('login-modal').style.display = 'none';
                         document.getElementById('landing-page').style.display = 'none';
                         document.getElementById('welcome').classList.remove('hidden');
-                        showSection('welcome'); // Ensure immediate transition
+                        showSection('welcome');
                     } else {
                         userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
                         localStorage.removeItem('userData');
@@ -321,34 +323,37 @@
 
             initAuth();
 
-            // Define global modal functions
+            // Define and expose global functions
             window.showLoginModal = function() {
+                console.log('Attempting to show login modal...');
                 const modal = document.getElementById('login-modal');
                 if (modal) {
                     modal.style.display = 'flex';
-                    console.log('Login modal shown');
+                    console.log('Login modal displayed');
                 } else {
-                    console.error('Login modal not found');
+                    console.error('Login modal element not found');
                 }
             };
 
             window.showSignupModal = function() {
+                console.log('Attempting to show signup modal...');
                 const modal = document.getElementById('signup-modal');
                 if (modal) {
                     modal.style.display = 'flex';
-                    console.log('Sign up modal shown');
+                    console.log('Signup modal displayed');
                 } else {
-                    console.error('Signup modal not found');
+                    console.error('Signup modal element not found');
                 }
             };
 
             window.showAdminLoginModal = function() {
+                console.log('Attempting to show admin login modal...');
                 const modal = document.getElementById('admin-login-modal');
                 if (modal) {
                     modal.style.display = 'flex';
-                    console.log('Admin login modal shown');
+                    console.log('Admin login modal displayed');
                 } else {
-                    console.error('Admin login modal not found');
+                    console.error('Admin login modal element not found');
                 }
             };
 
@@ -1021,6 +1026,9 @@
             }
 
             window.addEventListener('load', () => {
+                console.log('Window fully loaded, verifying functions...');
+                if (typeof window.showLoginModal !== 'function') console.error('showLoginModal not defined');
+                if (typeof window.showSignupModal !== 'function') console.error('showSignupModal not defined');
                 document.getElementById('landing-page').style.display = 'block';
                 document.getElementById('welcome').classList.add('hidden');
                 document.getElementById('profile').classList.add('hidden');
@@ -1529,6 +1537,10 @@
                 <p>Your Journey 🏡</p>
             </div>
         </div>
+        <!-- Placeholder for first JPEG image -->
+        <div id="image-placeholder-1" class="image-placeholder" style="width: 300px; height: 200px; background-color: #ccc; margin: 20px auto; border: 2px dashed #FFA500; text-align: center; line-height: 200px;">Placeholder for Image 1</div>
+        <!-- Placeholder for second JPEG image -->
+        <div id="image-placeholder-2" class="image-placeholder" style="width: 300px; height: 200px; background-color: #ccc; margin: 20px auto; border: 2px dashed #FFA500; text-align: center; line-height: 200px;">Placeholder for Image 2</div>
         <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
     </div>
     <div id="welcome" class="section hidden">
