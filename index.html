@@ -26,7 +26,7 @@
         const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const auth = getAuth(app);
 
-        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'] };
+        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
         let currentQuestion = 0;
         let score = 0;
         let flippedCards = [];
@@ -55,6 +55,15 @@
             ],
             'Level-7': [
                 { question: 'What is the name of the Prophet’s daughter?', options: ['Fatima', 'Aisha', 'Khadija'], answer: 'Fatima' }
+            ],
+            'Level-8': [
+                { question: 'Who was the second Imam?', options: ['Imam Hassan', 'Imam Hussain', 'Imam Ali'], answer: 'Imam Hassan' }
+            ],
+            'Level-9': [
+                { question: 'What is the significance of Ashura?', options: ['Victory', 'Martyrdom', 'Birth'], answer: 'Martyrdom' }
+            ],
+            'Level-10': [
+                { question: 'Who is the current Imam according to Shia belief?', options: ['Imam Mahdi', 'Imam Ali', 'Imam Hassan'], answer: 'Imam Mahdi' }
             ]
         };
 
@@ -80,7 +89,10 @@
             }
         };
 
-        const missions = [{ id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' }];
+        const missions = [
+            { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
+            { id: 'dua', title: 'Daily Dua', question: 'What is a common dua?', type: 'text', answer: 'Bismillah' }
+        ];
 
         document.addEventListener('DOMContentLoaded', () => {
             const landingPage = document.getElementById('landing-page');
@@ -97,7 +109,7 @@
                     document.getElementById('welcome').classList.remove('hidden');
                     showSection('welcome');
                 } else {
-                    userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'] };
+                    userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
                     localStorage.removeItem('userData');
                     if (landingPage) landingPage.style.display = 'block';
                     if (welcomeSection) welcomeSection.classList.add('hidden');
@@ -188,7 +200,7 @@
             window.logout = () => {
                 signOut(auth).then(() => {
                     alert('Logged out successfully!');
-                    userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'] };
+                    userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
                     localStorage.removeItem('userData');
                     document.getElementById('landing-page').style.display = 'block';
                     document.getElementById('welcome').classList.add('hidden');
@@ -217,6 +229,7 @@
                 document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
                 updateStarCounter();
                 updateProgress();
+                updateBadges();
             }
 
             function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); }
@@ -458,15 +471,23 @@
                 const container = document.getElementById('missions');
                 container.innerHTML = `
                     <h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
-                    <div class="story-card"><h3>${missions[0].title}</h3><p>${missions[0].question}</p><input id="mission-input" class="border rounded-lg p-2"><button class="btn mt-2" onclick="checkMission('${missions[0].id}', '${missions[0].answer}')">Submit</button></div>
+                    ${missions.map(m => `
+                        <div class="story-card">
+                            <h3>${m.title}</h3>
+                            <p>${m.question}</p>
+                            <input id="mission-input-${m.id}" class="border rounded-lg p-2">
+                            <button class="btn mt-2" onclick="checkMission('${m.id}', '${m.answer}')">Submit</button>
+                        </div>
+                    `).join('')}
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
             }
 
             function checkMission(id, answer) {
-                const userAnswer = document.getElementById('mission-input').value.toLowerCase();
+                const userAnswer = document.getElementById(`mission-input-${id}`).value.toLowerCase();
                 if (userAnswer === answer.toLowerCase()) {
                     userData.stars += 2;
+                    userData.missions[id] = true;
                     updateStarCounter();
                     alert('Mission Complete! +2 Stars! 🎉');
                 } else alert('Wrong! Try again! 😕');
@@ -510,7 +531,6 @@
             background: #87CEEB;
             position: relative;
             z-index: 0;
-            overflow-x: hidden;
         }
         #hero {
             height: 100vh;
@@ -518,6 +538,8 @@
             text-align: center;
             position: relative;
             z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 0 0 30px 30px;
         }
         .section {
             min-height: 100vh;
@@ -696,6 +718,12 @@
             background: green;
             border-radius: 50% 50% 0 0;
             z-index: 1;
+            animation: grow 3s infinite;
+        }
+        @keyframes grow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         .cloud {
             position: absolute;
@@ -704,6 +732,12 @@
             background: white;
             border-radius: 50px;
             z-index: 1;
+            animation: float 6s infinite;
+        }
+        @keyframes float {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+            100% { transform: translateX(0); }
         }
         .star {
             position: absolute;
@@ -712,6 +746,12 @@
             background: yellow;
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
             z-index: 1;
+            animation: twinkle 2s infinite;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
         }
         .moon {
             position: absolute;
@@ -720,6 +760,12 @@
             background: #FFD700;
             border-radius: 50%;
             z-index: 1;
+            animation: glow 4s infinite;
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px #FFD700; }
+            50% { box-shadow: 0 0 20px #FFD700; }
+            100% { box-shadow: 0 0 10px #FFD700; }
         }
         .hidden { display: none; }
     </style>
@@ -864,13 +910,28 @@
     <div id="Level-7" class="section hidden"></div>
 
     <!-- Level 8 Section -->
-    <div id="Level-8" class="section hidden"></div>
+    <div id="Level-8" class="section hidden">
+        <h2 class="text-3xl text-orange-600 mb-4">Level 8 Challenge</h2>
+        <p>Content for Level 8 goes here.</p>
+        <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+        <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+    </div>
 
     <!-- Level 9 Section -->
-    <div id="Level-9" class="section hidden"></div>
+    <div id="Level-9" class="section hidden">
+        <h2 class="text-3xl text-orange-600 mb-4">Level 9 Challenge</h2>
+        <p>Content for Level 9 goes here.</p>
+        <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+        <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+    </div>
 
     <!-- Level 10 Section -->
-    <div id="Level-10" class="section hidden"></div>
+    <div id="Level-10" class="section hidden">
+        <h2 class="text-3xl text-orange-600 mb-4">Level 10 Challenge</h2>
+        <p>Content for Level 10 goes here.</p>
+        <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+        <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+    </div>
 
     <!-- Missions Section -->
     <div id="missions" class="section hidden"></div>
