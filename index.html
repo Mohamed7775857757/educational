@@ -13,9 +13,9 @@
     <script type="module">
         // Import Firebase libraries
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Firebase configuration (to be moved to environment variables in production)
+        // Firebase configuration (to be secured with environment variables in production)
         const firebaseConfig = {
             apiKey: "AIzaSyBD2asTEG40b4hhVmUZKlGd3ZPe-NJctxM",
             authDomain: "shia-kids-learning-tool.firebaseapp.com",
@@ -269,738 +269,737 @@
         ];
         const adminCredentials = { username: 'admin', password: 'admin123' }; // Change for security
 
-        // Expose functions to global scope
-        window.showLoginModal = function() {
-            document.getElementById('login-modal').style.display = 'flex';
-            console.log('Login modal shown');
-        };
-
-        window.showSignupModal = function() {
-            document.getElementById('signup-modal').style.display = 'flex';
-            console.log('Sign up modal shown');
-        };
-
-        window.showAdminLoginModal = function() {
-            document.getElementById('admin-login-modal').style.display = 'flex';
-            console.log('Admin login modal shown');
-        };
-
-        window.showSection = function(sectionId) {
-            document.querySelectorAll('.section, #landing-page, #hero').forEach(el => el.classList.add('hidden'));
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.classList.remove('hidden');
-                gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-                if (sectionId === 'Level-1') showQuestion();
-                if (sectionId === 'Level-2') initMemoryGame();
-                if (sectionId === 'Level-3') initWudhuChallenge();
-                if (sectionId === 'Level-4') showKarbala();
-                if (sectionId === 'Level-5') initArtZone();
-                if (sectionId === 'Level-7') startStory();
-                if (sectionId === 'missions') showMissions();
-                if (sectionId === 'profile' && userData.email) showProfile();
-                updateProgress();
-                updateBadges();
-            }
-        };
-
-        window.checkAnswer = function(answer) {
-            const q = questions[userData.year][currentQuestion];
-            if (q.type === 'text') answer = document.getElementById('answer-input').value;
-            if (answer.toLowerCase() === q.answer.toLowerCase()) {
-                score++;
-                userData.stars += 2;
-                userData.progress = Math.min(userData.progress + 1, 10);
-                if (score === 1) userData.badges.push('Scholar');
-                updateStarCounter();
-                updateProgress();
-                updateBadges();
-                document.getElementById('score').innerHTML = `<p class="text-green-600">Correct! 🎉 Score: ${score}/${questions[userData.year].length}</p>`;
-                confetti();
-            } else document.getElementById('score').innerHTML = `<p class="text-red-600">Wrong! 😕 Answer: ${q.answer}</p>`;
-            currentQuestion++;
-            if (currentQuestion < questions[userData.year].length) {
-                setTimeout(showNextQuestion, 1000);
-            } else {
-                document.getElementById('score').innerHTML += '<p class="mt-4 text-green-600">Quest Done! 🎉</p>';
-            }
-        };
-
-        // Firebase Authentication Integration
-        auth.onAuthStateChanged((user) => {
-            const loading = document.createElement('div');
-            loading.textContent = 'Loading...';
-            loading.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; color: #fff; font-size: 1.5rem;';
-            document.body.appendChild(loading);
-            if (user) {
-                userData.email = user.email;
-                loadUserData();
-                loading.remove();
-            } else {
-                document.getElementById('landing-page').style.display = 'block';
-                document.getElementById('welcome').classList.add('hidden');
-                document.getElementById('profile').classList.add('hidden');
-                ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
-                    const modal = document.getElementById(id);
-                    if (modal) modal.style.display = 'none';
-                });
-                loading.remove();
-            }
-        }, (error) => {
-            console.error('Auth error:', error.message);
-            alert('Authentication failed. Please try again or contact support.');
-            loading.remove();
-        });
-
-        window.signup = function() {
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            createUserWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    alert("✅ Sign-up successful!");
-                    userData.email = email;
-                    showSignupModal(); // Show signup form for additional details
-                })
-                .catch(error => alert("❌ " + error.message));
-        };
-
-        window.login = function() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    alert("✅ Login successful!");
-                    userData.email = email;
-                    loadUserData();
-                })
-                .catch(error => alert("❌ " + error.message));
-        };
-
-        window.resetPassword = function() {
-            const email = document.getElementById('reset-email').value;
-            sendPasswordResetEmail(auth, email)
-                .then(() => alert("📧 Password reset email sent!"))
-                .catch(error => alert("❌ " + error.message));
-        };
-
-        window.logout = function() {
-            signOut(auth).then(() => {
-                alert("✅ Logged out successfully!");
-                userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
-                localStorage.removeItem('userData');
-                document.getElementById('landing-page').style.display = 'block';
-                document.getElementById('welcome').classList.add('hidden');
-                document.getElementById('profile').classList.add('hidden');
-                document.getElementById('avatar-display').style.display = 'none';
-                document.getElementById('star-count').textContent = '0 ⭐';
-            }).catch(error => alert("❌ " + error.message));
-        };
-
-        function loadUserData() {
-            const saved = localStorage.getItem('userData');
-            if (saved) {
-                userData = JSON.parse(saved);
-                if (!userData.badges) userData.badges = ['Explorer'];
-                document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
-                document.getElementById('avatar-display').style.display = 'block';
-                document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
-                updateStarCounter();
-                updateProgress();
-                updateBadges();
-                document.getElementById('landing-page').style.display = 'none';
-                document.getElementById('welcome').classList.remove('hidden');
-                showSection('welcome');
-            } else {
-                document.getElementById('landing-page').style.display = 'block';
-                document.getElementById('welcome').classList.add('hidden');
-                document.getElementById('profile').classList.add('hidden');
-            }
-            loadRobotAnimation();
-        }
-
-        function saveUserData() {
-            localStorage.setItem('userData', JSON.stringify(userData));
-        }
-
-        document.querySelectorAll('.character').forEach(img => {
-            img.addEventListener('click', () => {
-                document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
-                img.classList.add('selected');
-                userData.character = img.src;
-                document.getElementById('avatar-display').src = userData.character;
-                saveUserData();
-            });
-        });
-
-        window.closeModal = function(event) {
-            if (event.target.classList.contains('modal')) {
-                document.getElementById('login-modal').style.display = 'none';
-                document.getElementById('signup-modal').style.display = 'none';
-                document.getElementById('admin-login-modal').style.display = 'none';
-                document.getElementById('reset-password-modal').style.display = 'none';
-                console.log('Modal closed via backdrop');
-            }
-        };
-
-        function signupUser() {
-            userData.name = document.getElementById('signup-name').value || 'Young Explorer';
-            userData.gender = document.querySelector('input[name="gender"]:checked').value;
-            userData.year = document.getElementById('year-select').value;
-            const selected = document.querySelector('.character.selected');
-            userData.character = selected ? selected.src : document.querySelector('.character').src;
-            saveUserData();
-
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    alert("✅ Sign-up successful!");
-                    userData.email = email;
-                    closeModal({ target: { className: 'modal' } });
-                    loadUserData();
-                    showSection('welcome');
-                })
-                .catch(error => alert("❌ " + error.message));
-        }
-
-        function loginAdmin() {
-            const username = document.getElementById('admin-username').value;
-            const password = document.getElementById('admin-password').value;
-            if (username === adminCredentials.username && password === adminCredentials.password) {
-                alert('Admin login successful!'); // Implement admin dashboard here
-                closeModal({ target: { className: 'modal' } });
-                // Add admin functionality (e.g., redirect to admin panel)
-            } else {
-                alert('Invalid admin credentials!');
-            }
-        }
-
+        // Wait for DOM to load before setting initial state
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('landing-page').style.display = 'block';
-            document.getElementById('welcome').classList.add('hidden');
-            document.getElementById('profile').classList.add('hidden');
+            // Ensure landing page is visible by default
+            const landingPage = document.getElementById('landing-page');
+            const welcomeSection = document.getElementById('welcome');
+            const profileSection = document.getElementById('profile');
+            if (landingPage) landingPage.style.display = 'block';
+            if (welcomeSection) welcomeSection.classList.add('hidden');
+            if (profileSection) profileSection.classList.add('hidden');
+
+            // Initialize modals
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
             });
 
-            const signupButton = document.getElementById('signup-btn');
-            if (signupButton) {
-                signupButton.addEventListener('click', signupUser);
-                signupButton.addEventListener('touchstart', signupUser, { passive: true });
+            // Authentication state listener with delay to ensure DOM readiness
+            let authInitialized = false;
+            const initAuth = () => {
+                if (authInitialized) return;
+                authInitialized = true;
+
+                onAuthStateChanged(auth, (user) => {
+                    const loading = document.createElement('div');
+                    loading.textContent = 'Loading...';
+                    loading.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; color: #fff; font-size: 1.5rem;';
+                    document.body.appendChild(loading);
+
+                    if (user) {
+                        userData.email = user.email;
+                        loadUserData();
+                        if (loading.parentElement) loading.remove();
+                    } else {
+                        if (landingPage) landingPage.style.display = 'block';
+                        if (welcomeSection) welcomeSection.classList.add('hidden');
+                        if (profileSection) profileSection.classList.add('hidden');
+                        ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
+                            const modal = document.getElementById(id);
+                            if (modal) modal.style.display = 'none';
+                        });
+                        if (loading.parentElement) loading.remove();
+                    }
+                }, (error) => {
+                    console.error('Auth error:', error.message);
+                    alert('Authentication failed. Please try again or contact support.');
+                    if (loading.parentElement) loading.remove();
+                    if (landingPage) landingPage.style.display = 'block';
+                });
+            };
+
+            // Delay auth initialization to ensure DOM is ready
+            setTimeout(initAuth, 500);
+
+            // Expose functions to global scope
+            window.showLoginModal = function() {
+                document.getElementById('login-modal').style.display = 'flex';
+                console.log('Login modal shown');
+            };
+
+            window.showSignupModal = function() {
+                document.getElementById('signup-modal').style.display = 'flex';
+                console.log('Sign up modal shown');
+            };
+
+            window.showAdminLoginModal = function() {
+                document.getElementById('admin-login-modal').style.display = 'flex';
+                console.log('Admin login modal shown');
+            };
+
+            window.showSection = function(sectionId) {
+                document.querySelectorAll('.section, #landing-page, #hero').forEach(el => el.classList.add('hidden'));
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.classList.remove('hidden');
+                    gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
+                    if (sectionId === 'Level-1') showQuestion();
+                    if (sectionId === 'Level-2') initMemoryGame();
+                    if (sectionId === 'Level-3') initWudhuChallenge();
+                    if (sectionId === 'Level-4') showKarbala();
+                    if (sectionId === 'Level-5') initArtZone();
+                    if (sectionId === 'Level-7') startStory();
+                    if (sectionId === 'missions') showMissions();
+                    if (sectionId === 'profile' && userData.email) showProfile();
+                    updateProgress();
+                    updateBadges();
+                }
+            };
+
+            window.checkAnswer = function(answer) {
+                const q = questions[userData.year][currentQuestion];
+                if (q.type === 'text') answer = document.getElementById('answer-input').value;
+                if (answer.toLowerCase() === q.answer.toLowerCase()) {
+                    score++;
+                    userData.stars += 2;
+                    userData.progress = Math.min(userData.progress + 1, 10);
+                    if (score === 1) userData.badges.push('Scholar');
+                    updateStarCounter();
+                    updateProgress();
+                    updateBadges();
+                    document.getElementById('score').innerHTML = `<p class="text-green-600">Correct! 🎉 Score: ${score}/${questions[userData.year].length}</p>`;
+                    confetti();
+                } else document.getElementById('score').innerHTML = `<p class="text-red-600">Wrong! 😕 Answer: ${q.answer}</p>`;
+                currentQuestion++;
+                if (currentQuestion < questions[userData.year].length) {
+                    setTimeout(showNextQuestion, 1000);
+                } else {
+                    document.getElementById('score').innerHTML += '<p class="mt-4 text-green-600">Quest Done! 🎉</p>';
+                }
+            };
+
+            window.signup = function() {
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        alert("✅ Sign-up successful!");
+                        userData.email = email;
+                        showSignupModal(); // Show signup form for additional details
+                    })
+                    .catch(error => alert("❌ " + error.message));
+            };
+
+            window.login = function() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                signInWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        alert("✅ Login successful!");
+                        userData.email = email;
+                        loadUserData();
+                    })
+                    .catch(error => alert("❌ " + error.message));
+            };
+
+            window.resetPassword = function() {
+                const email = document.getElementById('reset-email').value;
+                sendPasswordResetEmail(auth, email)
+                    .then(() => alert("📧 Password reset email sent!"))
+                    .catch(error => alert("❌ " + error.message));
+            };
+
+            window.logout = function() {
+                signOut(auth).then(() => {
+                    alert("✅ Logged out successfully!");
+                    userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+                    localStorage.removeItem('userData');
+                    document.getElementById('landing-page').style.display = 'block';
+                    document.getElementById('welcome').classList.add('hidden');
+                    document.getElementById('profile').classList.add('hidden');
+                    document.getElementById('avatar-display').style.display = 'none';
+                    document.getElementById('star-count').textContent = '0 ⭐';
+                }).catch(error => alert("❌ " + error.message));
+            };
+
+            function loadUserData() {
+                const saved = localStorage.getItem('userData');
+                if (saved) {
+                    userData = JSON.parse(saved);
+                    if (!userData.badges) userData.badges = ['Explorer'];
+                    document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
+                    document.getElementById('avatar-display').style.display = 'block';
+                    document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
+                    updateStarCounter();
+                    updateProgress();
+                    updateBadges();
+                    document.getElementById('landing-page').style.display = 'none';
+                    document.getElementById('welcome').classList.remove('hidden');
+                    showSection('welcome');
+                } else {
+                    document.getElementById('landing-page').style.display = 'block';
+                    document.getElementById('welcome').classList.add('hidden');
+                    document.getElementById('profile').classList.add('hidden');
+                }
+                loadRobotAnimation();
             }
 
-            document.getElementById('login-modal').addEventListener('click', closeModal);
-            document.getElementById('signup-modal').addEventListener('click', closeModal);
-            document.getElementById('admin-login-modal').addEventListener('click', closeModal);
-            document.getElementById('reset-password-modal').addEventListener('click', closeModal);
-            document.getElementById('login-modal').addEventListener('touchstart', closeModal, { passive: true });
-            document.getElementById('signup-modal').addEventListener('touchstart', closeModal, { passive: true });
-            document.getElementById('admin-login-modal').addEventListener('touchstart', closeModal, { passive: true });
-            document.getElementById('reset-password-modal').addEventListener('touchstart', closeModal, { passive: true });
-
-            document.querySelectorAll('.btn[onclick^="show"]').forEach(btn => {
-                btn.addEventListener('click', eval(btn.getAttribute('onclick')));
-            });
-        });
-
-        function showQuestion() {
-            currentQuestion = 0;
-            score = 0;
-            const container = document.getElementById('Level-1');
-            container.innerHTML = ''; // Clear existing content
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Quiz Challenge 📖</h2>
-                <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Quiz" class="karbala-img mx-auto mb-4">
-                <div id="quiz-container" class="text-lg mb-4"></div>
-                <div id="score" class="text-xl mb-4"></div>
-                <button class="btn" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-            container.appendChild(content);
-            showNextQuestion();
-        }
-
-        function showNextQuestion() {
-            const q = questions[userData.year][currentQuestion];
-            const quizContainer = document.getElementById('quiz-container');
-            quizContainer.innerHTML = `<p class="mb-4">${q.question}</p>` +
-                (q.type === 'text' ? `<input id="answer-input" class="border rounded-lg p-2 bg-white text-black mx-auto block mt-4 w-1/2" placeholder="Type your answer"><button class="btn ml-2" onclick="checkAnswer()">Submit 🎉</button>` :
-                q.options.map(o => `<button class="btn ml-2 mt-2" onclick="checkAnswer('${o}')">${o} 🌟</button>`).join(''));
-        }
-
-        function initMemoryGame() {
-            const container = document.getElementById('Level-2');
-            container.innerHTML = '';
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Memory Quest 🧠</h2>
-                <div id="memory-game" class="grid grid-cols-4 md:grid-cols-7 gap-4 p-4"></div>
-                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-            container.appendChild(content);
-            const gameContainer = document.getElementById('memory-game');
-            const shuffledCards = [...memoryCards].sort(() => Math.random() - 0.5);
-            gameContainer.innerHTML = '';
-            shuffledCards.forEach(card => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'memory-card';
-                cardElement.dataset.name = card.name;
-                cardElement.dataset.match = card.match;
-                cardElement.textContent = '❓';
-                cardElement.addEventListener('click', () => flipCard(cardElement));
-                gameContainer.appendChild(cardElement);
-            });
-        }
-
-        function flipCard(card) {
-            if (lock || flippedCards.length >= 2 || card.classList.contains('matched')) return;
-            card.textContent = card.dataset.name;
-            flippedCards.push(card);
-            if (flippedCards.length === 2) {
-                lock = true;
-                setTimeout(checkMatch, 1000); // Cooldown between flips
+            function saveUserData() {
+                localStorage.setItem('userData', JSON.stringify(userData));
             }
-        }
 
-        function checkMatch() {
-            const [card1, card2] = flippedCards;
-            if (card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                matchedCards.push(card1, card2);
-                userData.stars += 1;
-                updateStarCounter();
-                if (matchedCards.length === memoryCards.length) {
+            document.querySelectorAll('.character').forEach(img => {
+                img.addEventListener('click', () => {
+                    document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
+                    img.classList.add('selected');
+                    userData.character = img.src;
+                    document.getElementById('avatar-display').src = userData.character;
+                    saveUserData();
+                });
+            });
+
+            window.closeModal = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('signup-modal').style.display = 'none';
+                    document.getElementById('admin-login-modal').style.display = 'none';
+                    document.getElementById('reset-password-modal').style.display = 'none';
+                    console.log('Modal closed via backdrop');
+                }
+            };
+
+            function signupUser() {
+                userData.name = document.getElementById('signup-name').value || 'Young Explorer';
+                userData.gender = document.querySelector('input[name="gender"]:checked').value;
+                userData.year = document.getElementById('year-select').value;
+                const selected = document.querySelector('.character.selected');
+                userData.character = selected ? selected.src : document.querySelector('.character').src;
+                saveUserData();
+
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        alert("✅ Sign-up successful!");
+                        userData.email = email;
+                        closeModal({ target: { className: 'modal' } });
+                        loadUserData();
+                        showSection('welcome');
+                    })
+                    .catch(error => alert("❌ " + error.message));
+            }
+
+            function loginAdmin() {
+                const username = document.getElementById('admin-username').value;
+                const password = document.getElementById('admin-password').value;
+                if (username === adminCredentials.username && password === adminCredentials.password) {
+                    alert('Admin login successful!'); // Implement admin dashboard here
+                    closeModal({ target: { className: 'modal' } });
+                    // Add admin functionality (e.g., redirect to admin panel)
+                } else {
+                    alert('Invalid admin credentials!');
+                }
+            }
+
+            function showQuestion() {
+                currentQuestion = 0;
+                score = 0;
+                const container = document.getElementById('Level-1');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Quiz Challenge 📖</h2>
+                    <img src="https://yourusername.github.io/your-repo/images/allah_symbol.jpg" alt="Quiz" class="karbala-img mx-auto mb-4">
+                    <div id="quiz-container" class="text-lg mb-4"></div>
+                    <div id="score" class="text-xl mb-4"></div>
+                    <button class="btn" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                container.appendChild(content);
+                showNextQuestion();
+            }
+
+            function showNextQuestion() {
+                const q = questions[userData.year][currentQuestion];
+                const quizContainer = document.getElementById('quiz-container');
+                quizContainer.innerHTML = `<p class="mb-4">${q.question}</p>` +
+                    (q.type === 'text' ? `<input id="answer-input" class="border rounded-lg p-2 bg-white text-black mx-auto block mt-4 w-1/2" placeholder="Type your answer"><button class="btn ml-2" onclick="checkAnswer()">Submit 🎉</button>` :
+                    q.options.map(o => `<button class="btn ml-2 mt-2" onclick="checkAnswer('${o}')">${o} 🌟</button>`).join(''));
+            }
+
+            function initMemoryGame() {
+                const container = document.getElementById('Level-2');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Memory Quest 🧠</h2>
+                    <div id="memory-game" class="grid grid-cols-4 md:grid-cols-7 gap-4 p-4"></div>
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                container.appendChild(content);
+                const gameContainer = document.getElementById('memory-game');
+                const shuffledCards = [...memoryCards].sort(() => Math.random() - 0.5);
+                gameContainer.innerHTML = '';
+                shuffledCards.forEach(card => {
+                    const cardElement = document.createElement('div');
+                    cardElement.className = 'memory-card';
+                    cardElement.dataset.name = card.name;
+                    cardElement.dataset.match = card.match;
+                    cardElement.textContent = '❓';
+                    cardElement.addEventListener('click', () => flipCard(cardElement));
+                    gameContainer.appendChild(cardElement);
+                });
+            }
+
+            function flipCard(card) {
+                if (lock || flippedCards.length >= 2 || card.classList.contains('matched')) return;
+                card.textContent = card.dataset.name;
+                flippedCards.push(card);
+                if (flippedCards.length === 2) {
+                    lock = true;
+                    setTimeout(checkMatch, 1000); // Cooldown between flips
+                }
+            }
+
+            function checkMatch() {
+                const [card1, card2] = flippedCards;
+                if (card1.dataset.match === card2.dataset.name && card2.dataset.match === card1.dataset.name) {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    matchedCards.push(card1, card2);
+                    userData.stars += 1;
+                    updateStarCounter();
+                    if (matchedCards.length === memoryCards.length) {
+                        userData.stars += 10;
+                        userData.progress = Math.min(userData.progress + 1, 10);
+                        userData.badges.push('Memory Master');
+                        updateProgress();
+                        updateBadges();
+                        confetti();
+                        const container = document.getElementById('Level-2');
+                        const message = document.createElement('p');
+                        message.className = 'text-green-600 text-xl mt-4';
+                        message.textContent = 'All 28 cards matched! +10 Bonus Stars! 🎉';
+                        container.appendChild(message);
+                    }
+                } else {
+                    setTimeout(() => {
+                        card1.textContent = '❓';
+                        card2.textContent = '❓';
+                    }, 500);
+                }
+                flippedCards = [];
+                lock = false;
+            }
+
+            function initWudhuChallenge() {
+                const container = document.getElementById('Level-3');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
+                    <div class="wudhu-container">
+                        <div class="wudhu-dropzone" id="obligatory-dropzone">
+                            <h3 class="text-xl mb-4">Obligatory 📖</h3>
+                        </div>
+                        <div class="wudhu-dropzone" id="mustahab-dropzone">
+                            <h3 class="text-xl mb-4">Mustahab 🌱</h3>
+                        </div>
+                    </div>
+                    <div id="wudhu-source" class="grid grid-cols-3 gap-2 mt-4"></div>
+                    <div class="mt-4">
+                        <button id="wudhu-submit" class="btn mr-2">Submit 🎉</button>
+                        <button id="wudhu-reset" class="btn">Reset 🔄</button>
+                    </div>
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                container.appendChild(content);
+
+                const source = document.getElementById('wudhu-source');
+                wudhuSteps.forEach(step => {
+                    const stepElement = document.createElement('div');
+                    stepElement.className = 'wudhu-step';
+                    stepElement.draggable = true;
+                    stepElement.dataset.id = step.id;
+                    stepElement.dataset.category = step.category;
+                    stepElement.dataset.order = step.order;
+                    stepElement.textContent = step.name;
+                    stepElement.addEventListener('dragstart', dragStartWudhu);
+                    source.appendChild(stepElement);
+                });
+
+                const obligatoryDropzone = document.getElementById('obligatory-dropzone');
+                const mustahabDropzone = document.getElementById('mustahab-dropzone');
+                [obligatoryDropzone, mustahabDropzone].forEach(dropzone => {
+                    dropzone.addEventListener('dragover', dragOverWudhu);
+                    dropzone.addEventListener('drop', dropWudhu);
+                });
+
+                document.getElementById('wudhu-submit').addEventListener('click', checkWudhuCompletion);
+                document.getElementById('wudhu-reset').addEventListener('click', resetWudhuChallenge);
+            }
+
+            let draggedWudhu;
+            function dragStartWudhu(event) {
+                draggedWudhu = event.target;
+                event.dataTransfer.setData('text/plain', draggedWudhu.textContent);
+                event.dataTransfer.setData('id', draggedWudhu.dataset.id);
+                event.dataTransfer.setData('category', draggedWudhu.dataset.category);
+                event.dataTransfer.setData('order', draggedWudhu.dataset.order);
+                event.dataTransfer.effectAllowed = 'move';
+            }
+
+            function dragOverWudhu(event) {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+            }
+
+            function dropWudhu(event) {
+                event.preventDefault();
+                const dropzone = event.target.closest('.wudhu-dropzone');
+                if (!dropzone || !draggedWudhu) return;
+
+                const category = event.dataTransfer.getData('category');
+                if ((dropzone.id === 'obligatory-dropzone' && category === 'obligatory') ||
+                    (dropzone.id === 'mustahab-dropzone' && category === 'mustahab')) {
+                    const existing = dropzone.querySelector(`.wudhu-step[data-id="${event.dataTransfer.getData('id')}"]`);
+                    if (existing) existing.remove();
+                    const step = draggedWudhu.cloneNode(true);
+                    step.draggable = true;
+                    step.dataset.id = event.dataTransfer.getData('id');
+                    step.dataset.category = category;
+                    step.dataset.order = event.dataTransfer.getData('order');
+                    step.addEventListener('dragstart', dragStartWudhu);
+                    dropzone.appendChild(step);
+                    if (draggedWudhu.parentElement.id === 'wudhu-source') {
+                        draggedWudhu.remove();
+                    } else {
+                        draggedWudhu.remove();
+                    }
+                    draggedWudhu = null;
+                }
+            }
+
+            function checkWudhuCompletion() {
+                const obligatoryDropzone = document.getElementById('obligatory-dropzone');
+                const mustahabDropzone = document.getElementById('mustahab-dropzone');
+
+                const obligatorySteps = Array.from(obligatoryDropzone.querySelectorAll('.wudhu-step'));
+                const mustahabSteps = Array.from(mustahabDropzone.querySelectorAll('.wudhu-step'));
+
+                const isObligatoryCorrect = obligatorySteps.length === 7 && obligatorySteps.every((step, index) => 
+                    parseInt(step.dataset.order) === index + 1);
+                const isMustahabCorrect = mustahabSteps.length === 3 && mustahabSteps.every((step, index) => 
+                    parseInt(step.dataset.order) === index + 1);
+
+                if (isObligatoryCorrect && isMustahabCorrect) {
+                    obligatorySteps.forEach(step => step.classList.add('correct'));
+                    mustahabSteps.forEach(step => step.classList.add('correct'));
                     userData.stars += 10;
                     userData.progress = Math.min(userData.progress + 1, 10);
-                    userData.badges.push('Memory Master');
+                    userData.badges.push('Wudhu Master');
+                    updateStarCounter();
                     updateProgress();
                     updateBadges();
                     confetti();
-                    const container = document.getElementById('Level-2');
                     const message = document.createElement('p');
                     message.className = 'text-green-600 text-xl mt-4';
-                    message.textContent = 'All 28 cards matched! +10 Bonus Stars! 🎉';
-                    container.appendChild(message);
-                }
-            } else {
-                setTimeout(() => {
-                    card1.textContent = '❓';
-                    card2.textContent = '❓';
-                }, 500);
-            }
-            flippedCards = [];
-            lock = false;
-        }
-
-        function initWudhuChallenge() {
-            const container = document.getElementById('Level-3');
-            container.innerHTML = '';
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
-                <div class="wudhu-container">
-                    <div class="wudhu-dropzone" id="obligatory-dropzone">
-                        <h3 class="text-xl mb-4">Obligatory 📖</h3>
-                    </div>
-                    <div class="wudhu-dropzone" id="mustahab-dropzone">
-                        <h3 class="text-xl mb-4">Mustahab 🌱</h3>
-                    </div>
-                </div>
-                <div id="wudhu-source" class="grid grid-cols-3 gap-2 mt-4"></div>
-                <div class="mt-4">
-                    <button id="wudhu-submit" class="btn mr-2">Submit 🎉</button>
-                    <button id="wudhu-reset" class="btn">Reset 🔄</button>
-                </div>
-                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-            container.appendChild(content);
-
-            const source = document.getElementById('wudhu-source');
-            wudhuSteps.forEach(step => {
-                const stepElement = document.createElement('div');
-                stepElement.className = 'wudhu-step';
-                stepElement.draggable = true;
-                stepElement.dataset.id = step.id;
-                stepElement.dataset.category = step.category;
-                stepElement.dataset.order = step.order;
-                stepElement.textContent = step.name;
-                stepElement.addEventListener('dragstart', dragStartWudhu);
-                source.appendChild(stepElement);
-            });
-
-            const obligatoryDropzone = document.getElementById('obligatory-dropzone');
-            const mustahabDropzone = document.getElementById('mustahab-dropzone');
-            [obligatoryDropzone, mustahabDropzone].forEach(dropzone => {
-                dropzone.addEventListener('dragover', dragOverWudhu);
-                dropzone.addEventListener('drop', dropWudhu);
-            });
-
-            document.getElementById('wudhu-submit').addEventListener('click', checkWudhuCompletion);
-            document.getElementById('wudhu-reset').addEventListener('click', resetWudhuChallenge);
-        }
-
-        let draggedWudhu;
-        function dragStartWudhu(event) {
-            draggedWudhu = event.target;
-            event.dataTransfer.setData('text/plain', draggedWudhu.textContent);
-            event.dataTransfer.setData('id', draggedWudhu.dataset.id);
-            event.dataTransfer.setData('category', draggedWudhu.dataset.category);
-            event.dataTransfer.setData('order', draggedWudhu.dataset.order);
-            event.dataTransfer.effectAllowed = 'move';
-        }
-
-        function dragOverWudhu(event) {
-            event.preventDefault();
-            event.dataTransfer.dropEffect = 'move';
-        }
-
-        function dropWudhu(event) {
-            event.preventDefault();
-            const dropzone = event.target.closest('.wudhu-dropzone');
-            if (!dropzone || !draggedWudhu) return;
-
-            const category = event.dataTransfer.getData('category');
-            if ((dropzone.id === 'obligatory-dropzone' && category === 'obligatory') ||
-                (dropzone.id === 'mustahab-dropzone' && category === 'mustahab')) {
-                const existing = dropzone.querySelector(`.wudhu-step[data-id="${event.dataTransfer.getData('id')}"]`);
-                if (existing) existing.remove();
-                const step = draggedWudhu.cloneNode(true);
-                step.draggable = true;
-                step.dataset.id = event.dataTransfer.getData('id');
-                step.dataset.category = category;
-                step.dataset.order = event.dataTransfer.getData('order');
-                step.addEventListener('dragstart', dragStartWudhu);
-                dropzone.appendChild(step);
-                if (draggedWudhu.parentElement.id === 'wudhu-source') {
-                    draggedWudhu.remove();
+                    message.textContent = 'Wudhu Challenge Completed! +10 Stars! 🎉';
+                    document.getElementById('Level-3').appendChild(message);
                 } else {
-                    draggedWudhu.remove();
+                    alert('Please sort and order all 10 steps correctly in their respective sections! 😕');
                 }
-                draggedWudhu = null;
             }
-        }
 
-        function checkWudhuCompletion() {
-            const obligatoryDropzone = document.getElementById('obligatory-dropzone');
-            const mustahabDropzone = document.getElementById('mustahab-dropzone');
+            function resetWudhuChallenge() {
+                initWudhuChallenge();
+            }
 
-            const obligatorySteps = Array.from(obligatoryDropzone.querySelectorAll('.wudhu-step'));
-            const mustahabSteps = Array.from(mustahabDropzone.querySelectorAll('.wudhu-step'));
-
-            const isObligatoryCorrect = obligatorySteps.length === 7 && obligatorySteps.every((step, index) => 
-                parseInt(step.dataset.order) === index + 1);
-            const isMustahabCorrect = mustahabSteps.length === 3 && mustahabSteps.every((step, index) => 
-                parseInt(step.dataset.order) === index + 1);
-
-            if (isObligatoryCorrect && isMustahabCorrect) {
-                obligatorySteps.forEach(step => step.classList.add('correct'));
-                mustahabSteps.forEach(step => step.classList.add('correct'));
-                userData.stars += 10;
+            function showKarbala() {
+                const container = document.getElementById('Level-4');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Karbala Epic 🏰</h2>
+                    <p class="text-lg mb-4">Discover Imam Hussain's bravery!</p>
+                    <img src="https://yourusername.github.io/your-repo/images/karbala.jpg" alt="Karbala" class="karbala-img mx-auto mb-4">
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                container.appendChild(content);
+                userData.stars += 1;
                 userData.progress = Math.min(userData.progress + 1, 10);
-                userData.badges.push('Wudhu Master');
+                updateStarCounter();
+                updateProgress();
+                if (userData.progress === 10) userData.badges.push('Karbala Hero');
+                updateBadges();
+            }
+
+            function initArtZone() {
+                const container = document.getElementById('Level-5');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Art Quest 🎨</h2>
+                    <canvas id="art-canvas" width="600" height="400"></canvas>
+                    <div class="art-tools mt-4">
+                        <button class="btn" onclick="changeColor('red')">Red ❤️</button>
+                        <button class="btn" onclick="changeColor('blue')">Blue 💙</button>
+                        <button class="btn" onclick="changeColor('green')">Green 💚</button>
+                        <button class="btn" onclick="changeColor('yellow')">Yellow 🌟</button>
+                        <button class="btn" onclick="changeColor('pink')">Pink 💗</button>
+                        <button class="btn" onclick="changeColor('purple')">Purple 💜</button>
+                        <button class="btn" onclick="changeColor('orange')">Orange 🍊</button>
+                        <button class="btn" onclick="loadImage('https://yourusername.github.io/your-repo/images/kaaba.jpg')">Kaaba 🕋</button>
+                        <button class="btn" onclick="loadImage('https://via.placeholder.com/600x400?text=Masjid')">Masjid 🕌</button>
+                        <button class="btn" onclick="clearCanvas()">Clear 🧹</button>
+                    </div>
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                container.appendChild(content);
+                const canvas = document.getElementById('art-canvas');
+                const ctx = canvas.getContext('2d');
+                let drawing = false;
+                let color = 'black';
+
+                canvas.addEventListener('mousedown', () => drawing = true);
+                canvas.addEventListener('mouseup', () => drawing = false);
+                canvas.addEventListener('mousemove', (e) => {
+                    if (drawing) {
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(e.offsetX, e.offsetY, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                window.changeColor = function(newColor) { color = newColor; };
+                window.clearCanvas = function() { ctx.clearRect(0, 0, canvas.width, canvas.height); };
+                window.loadImage = function(src) {
+                    const img = new Image();
+                    img.onload = () => {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    };
+                    img.onerror = () => {
+                        console.log(`Image load failed for ${src}`);
+                        alert('Failed to load image. Using fallback. Check the URL!');
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillStyle = '#ccc';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    };
+                    img.src = src;
+                };
+                userData.stars += 1;
+                userData.progress = Math.min(userData.progress + 1, 10);
+                if (userData.progress === 10) userData.badges.push('Art Master');
                 updateStarCounter();
                 updateProgress();
                 updateBadges();
-                confetti();
-                const message = document.createElement('p');
-                message.className = 'text-green-600 text-xl mt-4';
-                message.textContent = 'Wudhu Challenge Completed! +10 Stars! 🎉';
-                document.getElementById('Level-3').appendChild(message);
-            } else {
-                alert('Please sort and order all 10 steps correctly in their respective sections! 😕');
             }
-        }
 
-        function resetWudhuChallenge() {
-            initWudhuChallenge();
-        }
-
-        function showKarbala() {
-            const container = document.getElementById('Level-4');
-            container.innerHTML = '';
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Karbala Epic 🏰</h2>
-                <p class="text-lg mb-4">Discover Imam Hussain's bravery!</p>
-                <img src="https://yourusername.github.io/your-repo/images/karbala.jpg" alt="Karbala" class="karbala-img mx-auto mb-4">
-                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-            container.appendChild(content);
-            userData.stars += 1;
-            userData.progress = Math.min(userData.progress + 1, 10);
-            updateStarCounter();
-            updateProgress();
-            if (userData.progress === 10) userData.badges.push('Karbala Hero');
-            updateBadges();
-        }
-
-        function initArtZone() {
-            const container = document.getElementById('Level-5');
-            container.innerHTML = '';
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Art Quest 🎨</h2>
-                <canvas id="art-canvas" width="600" height="400"></canvas>
-                <div class="art-tools mt-4">
-                    <button class="btn" onclick="changeColor('red')">Red ❤️</button>
-                    <button class="btn" onclick="changeColor('blue')">Blue 💙</button>
-                    <button class="btn" onclick="changeColor('green')">Green 💚</button>
-                    <button class="btn" onclick="changeColor('yellow')">Yellow 🌟</button>
-                    <button class="btn" onclick="changeColor('pink')">Pink 💗</button>
-                    <button class="btn" onclick="changeColor('purple')">Purple 💜</button>
-                    <button class="btn" onclick="changeColor('orange')">Orange 🍊</button>
-                    <button class="btn" onclick="loadImage('https://yourusername.github.io/your-repo/images/kaaba.jpg')">Kaaba 🕋</button>
-                    <button class="btn" onclick="loadImage('https://via.placeholder.com/600x400?text=Masjid')">Masjid 🕌</button>
-                    <button class="btn" onclick="clearCanvas()">Clear 🧹</button>
-                </div>
-                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-            container.appendChild(content);
-            const canvas = document.getElementById('art-canvas');
-            const ctx = canvas.getContext('2d');
-            let drawing = false;
-            let color = 'black';
-
-            canvas.addEventListener('mousedown', () => drawing = true);
-            canvas.addEventListener('mouseup', () => drawing = false);
-            canvas.addEventListener('mousemove', (e) => {
-                if (drawing) {
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(e.offsetX, e.offsetY, 5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-
-            window.changeColor = function(newColor) { color = newColor; };
-            window.clearCanvas = function() { ctx.clearRect(0, 0, canvas.width, canvas.height); };
-            window.loadImage = function(src) {
-                const img = new Image();
-                img.onload = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                };
-                img.onerror = () => {
-                    console.log(`Image load failed for ${src}`);
-                    alert('Failed to load image. Using fallback. Check the URL!');
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#ccc';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                };
-                img.src = src;
-            };
-            userData.stars += 1;
-            userData.progress = Math.min(userData.progress + 1, 10);
-            if (userData.progress === 10) userData.badges.push('Art Master');
-            updateStarCounter();
-            updateProgress();
-            updateBadges();
-        }
-
-        function startStory() {
-            userData.storyPath = [];
-            const storyOptions = ['mecca', 'kufa'];
-            const selectedStory = storyOptions[Math.floor(Math.random() * storyOptions.length)];
-            showStoryScene(selectedStory + '.start');
-        }
-
-        function showStoryScene(sceneId) {
-            const [story, scene] = sceneId.split('.');
-            const fullScene = storyData[story][scene];
-            userData.storyPath.push({ id: sceneId, choice: null });
-            const container = document.getElementById('Level-7');
-            container.innerHTML = '';
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Choose Your Path 📖</h2>
-                <div class="story-card">
-                    <p>${fullScene.text}</p>
-                    ${Object.entries(fullScene.choices).map(([key, choice]) => `
-                        <button class="choice-btn" onclick="makeChoice('${story}', '${scene}', '${key}', '${choice.next}')">${choice.text}</button>
-                    `).join('')}
-                    ${['summary', 'summaryKufa'].includes(scene) ? `<p>Your path: ${userData.storyPath.map(s => s.id).join(' -> ')}</p>` : ''}
-                </div>
-                ${!['start', 'summary', 'summaryKufa'].includes(scene) ? '<button class="btn mt-4" onclick="goBack()">Back</button>' : ''}
-                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
-                <div class="lottie-animation" id="story-animation"></div>`;
-            container.appendChild(content);
-            document.getElementById('story-background').style.backgroundImage = `url(${fullScene.background})`;
-            loadAnimation(fullScene.animation);
-            gsap.from('.story-card', { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
-        }
-
-        function makeChoice(story, scene, choiceKey, nextScene) {
-            const fullScene = storyData[story][scene];
-            userData.storyPath[userData.storyPath.length - 1].choice = choiceKey;
-            let nextFullScene = nextScene;
-            if (story === 'mecca' && nextScene === 'endGood') { userData.stars += 5; }
-            else if (story === 'mecca' && nextScene === 'endBad') { userData.stars += 1; }
-            else if (story === 'mecca' && nextScene === 'endNeutral') { userData.stars += 2; }
-            else if (story === 'kufa' && nextScene === 'shareLesson') { userData.stars += 5; }
-            else if (story === 'kufa' && nextScene === 'keepQuiet') { userData.stars += 1; }
-            else if (story === 'kufa' && nextScene === 'assistMore') { userData.stars += 5; }
-            else if (story === 'kufa' && nextScene === 'returnSpot') { userData.stars += 3; }
-            else if (story === 'kufa' && nextScene === 'tryAgain') { userData.stars += 3; }
-            else if (story === 'kufa' && nextScene === 'giveUp') { userData.stars += 1; }
-            if (nextScene === 'summary' || nextScene === 'summaryKufa') {
-                nextFullScene = story + '.' + nextScene;
+            function startStory() {
+                userData.storyPath = [];
+                const storyOptions = ['mecca', 'kufa'];
+                const selectedStory = storyOptions[Math.floor(Math.random() * storyOptions.length)];
+                showStoryScene(selectedStory + '.start');
             }
-            userData.progress = Math.min(userData.progress + 1, 10);
-            updateStarCounter();
-            updateProgress();
-            showStoryScene(nextFullScene);
-        }
 
-        function goBack() {
-            if (userData.storyPath.length > 1) {
-                userData.storyPath.pop();
-                const prevScene = userData.storyPath[userData.storyPath.length - 1].id;
-                showStoryScene(prevScene);
-            }
-        }
-
-        function loadAnimation(type) {
-            const animationContainer = document.getElementById('story-animation');
-            if (animationContainer) {
-                let animationData;
-                switch (type) {
-                    case 'happy':
-                        animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
-                        break;
-                    case 'sad':
-                        animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json' };
-                        break;
-                    case 'neutral':
-                        animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_wl3khqiv.json' };
-                        break;
-                    default:
-                        animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
-                }
-                lottie.loadAnimation({
-                    container: animationContainer,
-                    renderer: 'svg',
-                    loop: true,
-                    autoplay: true,
-                    animationData: animationData
-                });
-            }
-        }
-
-        function loadRobotAnimation() {
-            const robotContainer = document.getElementById('robot-animation');
-            if (robotContainer) {
-                lottie.loadAnimation({
-                    container: robotContainer,
-                    renderer: 'svg',
-                    loop: true,
-                    autoplay: true,
-                    path: 'https://assets10.lottiefiles.com/packages/lf20_your-robot-animation.json'
-                });
-            }
-        }
-
-        function showMissions() {
-            const container = document.getElementById('missions');
-            container.innerHTML = '';
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
-                ${missions.map(mission => `
-                    <div class="story-card mb-4">
-                        <h3 class="text-xl">${mission.title}</h3>
-                        <p>${mission.question}</p>
-                        <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
-                        <button class="btn mt-2" onclick="checkMission('${mission.id}', '${mission.answer}')">Submit 🎉</button>
+            function showStoryScene(sceneId) {
+                const [story, scene] = sceneId.split('.');
+                const fullScene = storyData[story][scene];
+                userData.storyPath.push({ id: sceneId, choice: null });
+                const container = document.getElementById('Level-7');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Choose Your Path 📖</h2>
+                    <div class="story-card">
+                        <p>${fullScene.text}</p>
+                        ${Object.entries(fullScene.choices).map(([key, choice]) => `
+                            <button class="choice-btn" onclick="makeChoice('${story}', '${scene}', '${key}', '${choice.next}')">${choice.text}</button>
+                        `).join('')}
+                        ${['summary', 'summaryKufa'].includes(scene) ? `<p>Your path: ${userData.storyPath.map(s => s.id).join(' -> ')}</p>` : ''}
                     </div>
-                `).join('')}
-                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-            container.appendChild(content);
-        }
+                    ${!['start', 'summary', 'summaryKufa'].includes(scene) ? '<button class="btn mt-4" onclick="goBack()">Back</button>' : ''}
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+                    <div class="lottie-animation" id="story-animation"></div>`;
+                container.appendChild(content);
+                document.getElementById('story-background').style.backgroundImage = `url(${fullScene.background})`;
+                loadAnimation(fullScene.animation);
+                gsap.from('.story-card', { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
+            }
 
-        function checkMission(id, answer) {
-            const userAnswer = document.getElementById(`mission-${id}-input`).value.toLowerCase();
-            if (userAnswer === answer.toLowerCase()) {
-                userData.stars += 2;
+            function makeChoice(story, scene, choiceKey, nextScene) {
+                const fullScene = storyData[story][scene];
+                userData.storyPath[userData.storyPath.length - 1].choice = choiceKey;
+                let nextFullScene = nextScene;
+                if (story === 'mecca' && nextScene === 'endGood') { userData.stars += 5; }
+                else if (story === 'mecca' && nextScene === 'endBad') { userData.stars += 1; }
+                else if (story === 'mecca' && nextScene === 'endNeutral') { userData.stars += 2; }
+                else if (story === 'kufa' && nextScene === 'shareLesson') { userData.stars += 5; }
+                else if (story === 'kufa' && nextScene === 'keepQuiet') { userData.stars += 1; }
+                else if (story === 'kufa' && nextScene === 'assistMore') { userData.stars += 5; }
+                else if (story === 'kufa' && nextScene === 'returnSpot') { userData.stars += 3; }
+                else if (story === 'kufa' && nextScene === 'tryAgain') { userData.stars += 3; }
+                else if (story === 'kufa' && nextScene === 'giveUp') { userData.stars += 1; }
+                if (nextScene === 'summary' || nextScene === 'summaryKufa') {
+                    nextFullScene = story + '.' + nextScene;
+                }
                 userData.progress = Math.min(userData.progress + 1, 10);
-                userData.missions[id] = true;
                 updateStarCounter();
                 updateProgress();
-                confetti();
-                const feedback = document.createElement('p');
-                feedback.className = 'text-green-600 mt-2';
-                feedback.textContent = 'Mission Complete! +2 Stars! 🎉';
-                document.getElementById(`mission-${id}-input`).parentElement.appendChild(feedback);
-            } else {
-                const feedback = document.createElement('p');
-                feedback.className = 'text-red-600 mt-2';
-                feedback.textContent = 'Wrong! Try again! 😕';
-                document.getElementById(`mission-${id}-input`).parentElement.appendChild(feedback);
+                showStoryScene(nextFullScene);
             }
-        }
 
-        function showProfile() {
-            if (!userData.email) {
-                alert("Please log in to view your profile!");
-                showSection('welcome');
-                return;
+            function goBack() {
+                if (userData.storyPath.length > 1) {
+                    userData.storyPath.pop();
+                    const prevScene = userData.storyPath[userData.storyPath.length - 1].id;
+                    showStoryScene(prevScene);
+                }
             }
-            const container = document.getElementById('profile');
-            container.innerHTML = '';
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
-                <p>Email: ${userData.email || 'Not set'}</p>
-                <p>Name: ${userData.name}</p>
-                <p>Level: ${userData.year}</p>
-                <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
-                <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
-                <p>Badges: ${userData.badges.join(', ')}</p>
-                <img src="${userData.character}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
-                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-            container.appendChild(content);
-            updateStarCounter();
-            updateProgress();
-        }
 
-        function updateStarCounter() {
-            document.getElementById('star-count').textContent = userData.stars;
-            if (document.getElementById('profile-star-count')) document.getElementById('profile-star-count').textContent = userData.stars;
-            saveUserData();
-        }
-
-        function updateProgress() {
-            const progressElement = document.getElementById('progress');
-            if (progressElement) {
-                const progress = (userData.progress / 10) * 100;
-                progressElement.style.width = `${progress}%`;
+            function loadAnimation(type) {
+                const animationContainer = document.getElementById('story-animation');
+                if (animationContainer) {
+                    let animationData;
+                    switch (type) {
+                        case 'happy':
+                            animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
+                            break;
+                        case 'sad':
+                            animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json' };
+                            break;
+                        case 'neutral':
+                            animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_wl3khqiv.json' };
+                            break;
+                        default:
+                            animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
+                    }
+                    lottie.loadAnimation({
+                        container: animationContainer,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        animationData: animationData
+                    });
+                }
             }
-            if (document.getElementById('profile-progress')) document.getElementById('profile-progress').textContent = `${userData.progress}/10`;
-            saveUserData();
-        }
 
-        function updateBadges() {
-            const badgeElement = document.querySelector('.badge');
-            if (badgeElement) badgeElement.textContent = `🏅 Badge: ${userData.badges[userData.badges.length - 1] || 'Explorer'}`;
-            saveUserData();
-        }
+            function loadRobotAnimation() {
+                const robotContainer = document.getElementById('robot-animation');
+                if (robotContainer) {
+                    lottie.loadAnimation({
+                        container: robotContainer,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        path: 'https://assets10.lottiefiles.com/packages/lf20_your-robot-animation.json'
+                    });
+                }
+            }
 
-        function confetti() {
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
+            function showMissions() {
+                const container = document.getElementById('missions');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
+                    ${missions.map(mission => `
+                        <div class="story-card mb-4">
+                            <h3 class="text-xl">${mission.title}</h3>
+                            <p>${mission.question}</p>
+                            <input id="mission-${mission.id}-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
+                            <button class="btn mt-2" onclick="checkMission('${mission.id}', '${mission.answer}')">Submit 🎉</button>
+                        </div>
+                    `).join('')}
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                container.appendChild(content);
+            }
+
+            function checkMission(id, answer) {
+                const userAnswer = document.getElementById(`mission-${id}-input`).value.toLowerCase();
+                if (userAnswer === answer.toLowerCase()) {
+                    userData.stars += 2;
+                    userData.progress = Math.min(userData.progress + 1, 10);
+                    userData.missions[id] = true;
+                    updateStarCounter();
+                    updateProgress();
+                    confetti();
+                    const feedback = document.createElement('p');
+                    feedback.className = 'text-green-600 mt-2';
+                    feedback.textContent = 'Mission Complete! +2 Stars! 🎉';
+                    document.getElementById(`mission-${id}-input`).parentElement.appendChild(feedback);
+                } else {
+                    const feedback = document.createElement('p');
+                    feedback.className = 'text-red-600 mt-2';
+                    feedback.textContent = 'Wrong! Try again! 😕';
+                    document.getElementById(`mission-${id}-input`).parentElement.appendChild(feedback);
+                }
+            }
+
+            function showProfile() {
+                if (!userData.email) {
+                    alert("Please log in to view your profile!");
+                    showSection('welcome');
+                    return;
+                }
+                const container = document.getElementById('profile');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
+                    <p>Email: ${userData.email || 'Not set'}</p>
+                    <p>Name: ${userData.name}</p>
+                    <p>Level: ${userData.year}</p>
+                    <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
+                    <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
+                    <p>Badges: ${userData.badges.join(', ')}</p>
+                    <img src="${userData.character}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                container.appendChild(content);
+                updateStarCounter();
+                updateProgress();
+            }
+
+            function updateStarCounter() {
+                document.getElementById('star-count').textContent = userData.stars;
+                if (document.getElementById('profile-star-count')) document.getElementById('profile-star-count').textContent = userData.stars;
+                saveUserData();
+            }
+
+            function updateProgress() {
+                const progressElement = document.getElementById('progress');
+                if (progressElement) {
+                    const progress = (userData.progress / 10) * 100;
+                    progressElement.style.width = `${progress}%`;
+                }
+                if (document.getElementById('profile-progress')) document.getElementById('profile-progress').textContent = `${userData.progress}/10`;
+                saveUserData();
+            }
+
+            function updateBadges() {
+                const badgeElement = document.querySelector('.badge');
+                if (badgeElement) badgeElement.textContent = `🏅 Badge: ${userData.badges[userData.badges.length - 1] || 'Explorer'}`;
+                saveUserData();
+            }
+
+            function confetti() {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            window.addEventListener('load', () => {
+                document.getElementById('landing-page').style.display = 'block';
+                document.getElementById('welcome').classList.add('hidden');
+                document.getElementById('profile').classList.add('hidden');
             });
-        }
-
-        window.addEventListener('load', () => {
-            document.getElementById('landing-page').style.display = 'block';
-            document.getElementById('welcome').classList.add('hidden');
-            document.getElementById('profile').classList.add('hidden');
         });
     </script>
     <style>
@@ -1521,8 +1520,7 @@
     <div id="reset-password-modal" class="modal">
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Reset Password</h2>
-            <input type="email" id="reset-email" placeholder="Enter your email"
-class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="email" id="reset-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <button class="btn" onclick="resetPassword(); console.log('Reset password submitted');">Send Reset Email</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
         </div>
@@ -1532,7 +1530,8 @@ class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
     <div id="signup-modal" class="modal">
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
-            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange
+-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <div class="flex justify-center gap-4 mb-2">
