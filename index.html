@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Fredoka:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
     <script type="module">
         // Import Firebase libraries
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -293,9 +294,12 @@
                         userData.email = user.email;
                         loadUserData();
                         document.getElementById('login-modal').style.display = 'none';
-                        document.getElementById('welcome').classList.remove('hidden');
                         document.getElementById('landing-page').style.display = 'none';
+                        document.getElementById('welcome').classList.remove('hidden');
+                        showSection('welcome'); // Ensure immediate transition
                     } else {
+                        userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+                        localStorage.removeItem('userData');
                         if (landingPage) landingPage.style.display = 'block';
                         if (welcomeSection) welcomeSection.classList.add('hidden');
                         if (profileSection) profileSection.classList.add('hidden');
@@ -339,6 +343,7 @@
                     if (sectionId === 'Level-3') initWudhuChallenge();
                     if (sectionId === 'Level-4') showKarbala();
                     if (sectionId === 'Level-5') initArtZone();
+                    if (sectionId === 'Level-6') showHajj();
                     if (sectionId === 'Level-7') startStory();
                     if (sectionId === 'missions') showMissions();
                     if (sectionId === 'profile' && userData.email) showProfile();
@@ -419,6 +424,10 @@
                     document.getElementById('profile').classList.add('hidden');
                     document.getElementById('avatar-display').style.display = 'none';
                     document.getElementById('star-count').textContent = '0 ⭐';
+                    ['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7', 'missions'].forEach(id => {
+                        const section = document.getElementById(id);
+                        if (section) section.classList.add('hidden');
+                    });
                 }).catch(error => alert("❌ " + error.message));
             };
 
@@ -709,6 +718,25 @@
                 updateStarCounter();
                 updateProgress();
                 if (userData.progress === 10) userData.badges.push('Karbala Hero');
+                updateBadges();
+            }
+
+            function showHajj() {
+                const container = document.getElementById('Level-6');
+                container.innerHTML = '';
+                const content = document.createElement('div');
+                content.className = 'content';
+                content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Explore Hajj 🌍</h2>
+                    <p class="text-lg mb-4">Learn about the pilgrimage!</p>
+                    <img src="https://yourusername.github.io/your-repo/images/hajj.jpg" alt="Hajj" class="karbala-img mx-auto mb-4">
+                    <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                    <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                container.appendChild(content);
+                userData.stars += 1;
+                userData.progress = Math.min(userData.progress + 1, 10);
+                updateStarCounter();
+                updateProgress();
+                if (userData.progress === 10) userData.badges.push('Hajj Explorer');
                 updateBadges();
             }
 
@@ -1476,7 +1504,8 @@
             <input type="password" id="login-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <button class="btn" onclick="login(); console.log('Login submitted');">Login</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
-            <p class="mt-2 text-sm"><a href="#" onclick="document.getElementById('reset-password-modal').style.display='flex'; closeModal(event); console.log('Reset password clicked');" class="text-blue-600">Forgot Password?</a></p>
+            <p class="mt-2 text-sm"><a href="#" onclick="document.getElementById('reset
+-password-modal').style.display='flex'; console.log('Reset password modal shown');">Forgot Password?</a></p>
         </div>
     </div>
 
@@ -1485,7 +1514,7 @@
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Reset Password</h2>
             <input type="email" id="reset-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="resetPassword(); console.log('Reset password submitted');">Send Reset Email</button>
+            <button class="btn" onclick="resetPassword(); console.log('Password reset requested');">Send Reset Email</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
         </div>
     </div>
@@ -1497,10 +1526,9 @@
             <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <div class="flex justify-around mb-2">
+            <div id="gender-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
                 <label><input type="radio" name="gender" value="boy" checked> Boy</label>
-                <label><input type="radio" name="gender
-<label><input type="radio" name="gender" value="girl"> Girl</label>
+                <label><input type="radio" name="gender" value="girl"> Girl</label>
             </div>
             <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
                 <option value="Level-1">Level 1</option>
@@ -1623,5 +1651,14 @@
     <div class="star-counter" id="star-count">0 ⭐</div>
     <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display" id="avatar-display" style="display: none;">
     <div id="story-background"></div>
+
+    <!-- Dynamic Elements -->
+    <div class="tree" style="left: 10%; top: 60%; animation-delay: 0s;"></div>
+    <div class="tree" style="left: 80%; top: 70%; animation-delay: 2s;"></div>
+    <div class="cloud" style="left: 20%; top: 20%; animation-delay: 1s;"></div>
+    <div class="cloud" style="left: 70%; top: 30%; animation-delay: 3s;"></div>
+    <div class="star" style="left: 30%; top: 15%; animation-delay: 0.5s;"></div>
+    <div class="star" style="left: 50%; top: 10%; animation-delay: 1.5s;"></div>
+    <div class="moon"></div>
 </body>
 </html>
