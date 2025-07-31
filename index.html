@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Fredoka:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
     <script type="module">
         // Import Firebase libraries
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -290,18 +289,12 @@
                 authInitialized = true;
 
                 onAuthStateChanged(auth, (user) => {
-                    const loading = document.createElement('div');
-                    loading.textContent = 'Loading...';
-                    loading.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; color: #fff; font-size: 1.5rem;';
-                    document.body.appendChild(loading);
-
                     if (user) {
                         userData.email = user.email;
                         loadUserData();
                         document.getElementById('login-modal').style.display = 'none';
                         document.getElementById('welcome').classList.remove('hidden');
                         document.getElementById('landing-page').style.display = 'none';
-                        if (loading.parentElement) loading.remove();
                     } else {
                         if (landingPage) landingPage.style.display = 'block';
                         if (welcomeSection) welcomeSection.classList.add('hidden');
@@ -310,17 +303,15 @@
                             const modal = document.getElementById(id);
                             if (modal) modal.style.display = 'none';
                         });
-                        if (loading.parentElement) loading.remove();
                     }
                 }, (error) => {
                     console.error('Auth error:', error.message);
                     alert('Authentication failed. Please try again or contact support.');
-                    if (loading.parentElement) loading.remove();
                     if (landingPage) landingPage.style.display = 'block';
                 });
             };
 
-            setTimeout(initAuth, 500);
+            initAuth();
 
             window.showLoginModal = function() {
                 document.getElementById('login-modal').style.display = 'flex';
@@ -441,7 +432,6 @@
                     document.getElementById('welcome').classList.add('hidden');
                     document.getElementById('profile').classList.add('hidden');
                 }
-                loadRobotAnimation();
             }
 
             function saveUserData() {
@@ -887,19 +877,6 @@
                 }
             }
 
-            function loadRobotAnimation() {
-                const robotContainer = document.getElementById('robot-animation');
-                if (robotContainer) {
-                    lottie.loadAnimation({
-                        container: robotContainer,
-                        renderer: 'svg',
-                        loop: true,
-                        autoplay: true,
-                        path: 'https://assets10.lottiefiles.com/packages/lf20_your-robot-animation.json'
-                    });
-                }
-            }
-
             function showMissions() {
                 const container = document.getElementById('missions');
                 container.innerHTML = '';
@@ -1017,17 +994,6 @@
         h1, h2, h3 {
             font-family: 'Comic Neue', cursive;
         }
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            z-index: -1;
-            transition: background-image 1s ease;
-        }
         .tree, .cloud, .star, .moon {
             position: absolute;
             animation: float 6s infinite ease-in-out;
@@ -1046,6 +1012,7 @@
             border-radius: 0 0 50px 50px;
             display: block;
             z-index: 10;
+            background: inherit;
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -1076,7 +1043,7 @@
             text-align: center;
             position: relative;
             z-index: 10;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.2); /* Adjusted to semi-transparent to show background */
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
@@ -1476,7 +1443,6 @@
         <button class="btn" onclick="showLoginModal()">Login 🚪</button>
         <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
         <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔑</button>
-        <div id="robot-animation" class="lottie-animation" style="width: 200px; height: 200px; margin: 2rem auto;"></div>
     </div>
 
     <!-- Login Modal -->
@@ -1505,9 +1471,7 @@
     <div id="signup-modal" class="modal">
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
-            <input type="text" id="signup-name
-
-" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <div class="flex justify-around mb-2">
@@ -1521,7 +1485,10 @@
                 <option value="Level-4">Level 4</option>
                 <option value="Level-5">Level 5</option>
                 <option value="Level-6">Level 6</option>
-                <option value="Level-7">Level 7</option>
+                <option value
+
+
+"Level-7">Level 7</option>
                 <option value="Level-8">Level 8</option>
                 <option value="Level-9">Level 9</option>
                 <option value="Level-10">Level 10</option>
