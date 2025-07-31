@@ -298,7 +298,9 @@
                     if (user) {
                         userData.email = user.email;
                         loadUserData();
-                        document.getElementById('login-modal').style.display = 'none'; // Explicitly close login modal
+                        document.getElementById('login-modal').style.display = 'none';
+                        document.getElementById('welcome').classList.remove('hidden');
+                        document.getElementById('landing-page').style.display = 'none';
                         if (loading.parentElement) loading.remove();
                     } else {
                         if (landingPage) landingPage.style.display = 'block';
@@ -457,12 +459,13 @@
             });
 
             window.closeModal = function(event) {
-                if (event.target.classList.contains('modal')) {
-                    document.getElementById('login-modal').style.display = 'none';
-                    document.getElementById('signup-modal').style.display = 'none';
-                    document.getElementById('admin-login-modal').style.display = 'none';
-                    document.getElementById('reset-password-modal').style.display = 'none';
-                    console.log('Modal closed via backdrop');
+                if (event.target.classList.contains('modal') || event.target.classList.contains('btn')) {
+                    const modalId = event.target.closest('.modal')?.id;
+                    if (modalId) document.getElementById(modalId).style.display = 'none';
+                    document.getElementById('landing-page').style.display = 'block';
+                    document.getElementById('welcome').classList.add('hidden');
+                    document.getElementById('profile').classList.add('hidden');
+                    console.log('Modal closed via backdrop or button');
                 }
             };
 
@@ -954,7 +957,7 @@
                     <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
                     <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
                     <p>Badges: ${userData.badges.join(', ')}</p>
-                    <img src="${userData.character}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
+                    <img src="${userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png'}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
                     <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                     <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
                 container.appendChild(content);
@@ -1502,15 +1505,16 @@
     <div id="signup-modal" class="modal">
         <div class="modal-content">
             <h2 class="text-2xl text-orange-600 mb-2">Sign Up</h2>
-            <input type="text" id="signup-name" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
+            <input type="text" id="signup-name
+
+" placeholder="Enter your name" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="email" id="signup-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="signup-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <div class="flex justify-center gap-4 mb-2">
-                <label class="flex items-center"><input type="radio" name="gender" value="boy" class="mr-2" checked> Boy</label>
-                <label class="flex items-center"><input type="radio" name="gender" value="girl" class="mr-2"> Girl</label>
+            <div class="flex justify-around mb-2">
+                <label><input type="radio" name="gender" value="boy" checked> Boy</label>
+                <label><input type="radio" name="gender" value="girl"> Girl</label>
             </div>
-            <select id="year-select" class="border-2 border-orange-500 rounded-lg p-
-2 w-full text-black mb-2">
+            <select id="year-select" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
                 <option value="Level-1">Level 1</option>
                 <option value="Level-2">Level 2</option>
                 <option value="Level-3">Level 3</option>
