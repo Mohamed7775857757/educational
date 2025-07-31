@@ -266,7 +266,7 @@
             { id: 'salah', title: 'Daily Salah', question: 'How many daily prayers?', type: 'text', answer: '5' },
             { id: 'dua', title: 'Learn Dua', question: 'Dua before eating?', type: 'text', answer: 'Bismillah' }
         ];
-        const adminCredentials = { username: 'admin', password: 'admin123' };
+        const adminCredentials = { email: 'melzein1987@gmail.com', password: 'admin123' }; // Added email for admin check
 
         document.addEventListener('DOMContentLoaded', () => {
             // Ensure initial UI state
@@ -477,17 +477,17 @@
                 }
             };
 
-            function loginAdmin() {
-                const username = document.getElementById('admin-username').value;
+            window.loginAdmin = function() { // Added loginAdmin function
+                const email = document.getElementById('admin-username').value;
                 const password = document.getElementById('admin-password').value;
-                if (username === adminCredentials.username && password === adminCredentials.password) {
-                    alert('Admin login successful!'); // Implement admin dashboard here
+                if (email === adminCredentials.email && password === adminCredentials.password) {
+                    alert('Admin login successful!');
                     closeModal({ target: { className: 'modal' } });
-                    // Add admin functionality (e.g., redirect to admin panel)
+                    // Add admin dashboard functionality here if needed
                 } else {
                     alert('Invalid admin credentials!');
                 }
-            }
+            };
 
             function showQuestion() {
                 currentQuestion = 0;
@@ -870,26 +870,31 @@
                 const animationContainer = document.getElementById('story-animation');
                 if (animationContainer) {
                     let animationData;
-                    switch (type) {
-                        case 'happy':
-                            animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
-                            break;
-                        case 'sad':
-                            animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json' };
-                            break;
-                        case 'neutral':
-                            animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_wl3khqiv.json' };
-                            break;
-                        default:
-                            animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
+                    try {
+                        switch (type) {
+                            case 'happy':
+                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
+                                break;
+                            case 'sad':
+                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_6l1q5q8t.json' };
+                                break;
+                            case 'neutral':
+                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_wl3khqiv.json' };
+                                break;
+                            default:
+                                animationData = { path: 'https://assets10.lottiefiles.com/packages/lf20_5d6w4w8k.json' };
+                        }
+                        lottie.loadAnimation({
+                            container: animationContainer,
+                            renderer: 'svg',
+                            loop: true,
+                            autoplay: true,
+                            animationData: animationData
+                        });
+                    } catch (error) {
+                        console.error('Lottie animation error:', error);
+                        animationContainer.innerHTML = '<p>Animation failed to load. Check console for details.</p>';
                     }
-                    lottie.loadAnimation({
-                        container: animationContainer,
-                        renderer: 'svg',
-                        loop: true,
-                        autoplay: true,
-                        animationData: animationData
-                    });
                 }
             }
 
@@ -1006,6 +1011,7 @@
             background: #87CEEB url('https://yourusername.github.io/your-repo/images/background.jpg') no-repeat center center fixed;
             background-size: cover;
             overflow: hidden;
+            z-index: 0;
         }
         .header-bar {
             position: fixed;
@@ -1064,7 +1070,7 @@
             border-radius: 30px;
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
-            z-index: 20;
+            z-index: 30;
         }
         .hero .btn:hover {
             transform: scale(1.1);
@@ -1146,7 +1152,7 @@
             font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
-            z-index: 20;
+            z-index: 30;
             position: relative;
         }
         .btn:hover {
@@ -1304,7 +1310,7 @@
             background: #FFA500;
             color: #fff;
             transition: transform 0.3s, background 0.3s;
-            z-index: 20;
+            z-index: 30;
         }
         .choice-btn:hover {
             transform: scale(1.05);
@@ -1345,6 +1351,7 @@
             width: 200px;
             height: 200px;
             margin: 1rem auto;
+            z-index: 20;
         }
         .wudhu-container {
             display: flex;
@@ -1499,13 +1506,13 @@
     <!-- Login Modal -->
     <div id="login-modal" class="modal">
         <div class="modal-content">
-            <h2 class="text-2xl text-orange-600 mb-2">Login</h2>
+
+<h2 class="text-2xl text-orange-600 mb-2">Login</h2>
             <input type="email" id="login-email" placeholder="Enter your email" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
             <input type="password" id="login-password" placeholder="Enter password" class="border-2 border-orange-500 rounded-lg p-2 w-full text-black mb-2">
-            <button class="btn" onclick="login(); console.log('Login submitted');">Login</button>
+            <p class="text-right mb-2"><a href="#" onclick="document.getElementById('reset-password-modal').style.display='flex'; console.log('Reset password modal shown');">Forgot Password?</a></p>
+            <button class="btn" onclick="login(); console.log('Login attempted');">Login</button>
             <button class="btn mt-2" onclick="closeModal(event)">Cancel</button>
-            <p class="mt-2 text-sm"><a href="#" onclick="document.getElementById('reset
--password-modal').style.display='flex'; console.log('Reset password modal shown');">Forgot Password?</a></p>
         </div>
     </div>
 
