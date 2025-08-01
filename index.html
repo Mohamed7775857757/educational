@@ -87,7 +87,7 @@
             userData.gender = document.querySelector('input[name="gender"]:checked').value;
             userData.year = document.getElementById('year-select').value;
             const selected = document.querySelector('.character.selected');
-            userData.character = selected ? selected.src : 'https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy1.jpg';
+            userData.character = selected ? selected.src : document.querySelector('.character').src;
             saveUserData();
 
             const email = document.getElementById('signup-email').value;
@@ -145,7 +145,7 @@
             if (saved) {
                 userData = JSON.parse(saved);
                 if (!userData.badges) userData.badges = ['Explorer'];
-                document.getElementById('avatar-display').src = userData.character || 'https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy1.jpg';
+                document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
                 document.getElementById('avatar-display').style.display = 'block';
                 document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
                 updateStarCounter();
@@ -261,7 +261,7 @@
                 <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
                 <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
                 <p>Badges: ${userData.badges.join(', ')}</p>
-                <img src="${userData.character || 'https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy1.jpg'}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
+                <img src="${userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png'}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
                 <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
             container.appendChild(content);
@@ -376,7 +376,7 @@
             background: none;
             overflow: hidden;
         }
-        /* Background layer reverted to sky blue with image */
+        /* Background layer with z-index: -1 */
         .background-layer {
             position: fixed;
             top: 0;
@@ -441,13 +441,14 @@
             animation: fadeIn 1.5s ease-out;
         }
         .hero .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            color: #fff;
-            padding: 2rem 4rem;
-            font-size: 2rem;
-            border-radius: 30px;
+            background-color: #fff; /* Solid white background */
+            color: #000; /* Black text for contrast */
+            padding: 12px 24px; /* Increased padding */
+            font-size: 18px; /* Larger font */
+            border: 2px solid #ccc; /* Border for definition */
+            border-radius: 20px;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: 1px 1px #000;
+            text-shadow: none; /* Removed shadow for clarity */
             z-index: 10;
             position: relative;
             cursor: pointer;
@@ -456,13 +457,14 @@
             transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 0 10px #32CD32;
+            color: #fff; /* White text on hover */
         }
         .section {
             min-height: 100vh;
             padding: 4rem 2rem;
             text-align: center;
             position: relative;
-            z-index: 1;
+            z-index: 10;
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             padding-top: 80px;
@@ -473,9 +475,9 @@
             margin: 0 auto;
             padding: 2rem;
             color: #000;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8));
+            background-color: rgba(255, 255, 255, 0.5); /* Translucent white */
             border-radius: 20px;
-            z-index: 1;
+            z-index: 1000;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         .card-grid {
@@ -527,16 +529,17 @@
             z-index: -1;
         }
         .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            color: #fff;
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
+            background-color: #fff; /* Solid white background */
+            color: #000; /* Black text for contrast */
+            padding: 12px 24px; /* Increased padding */
+            font-size: 18px; /* Larger font */
+            border: 2px solid #ccc; /* Border for definition */
             border-radius: 20px;
             font-weight: 600;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: 1px 1px #000;
-            z-index: 10;
-            position: relative;
+            text-shadow: none; /* Removed shadow for clarity */
+            z-index: 10; /* Ensure above background */
+            position: relative; /* Required for z-index */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             cursor: pointer;
         }
@@ -544,6 +547,7 @@
             transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 6px 15px rgba(50, 205, 50, 0.5);
+            color: #fff; /* White text on hover */
         }
         .btn:active {
             transform: scale(0.95);
@@ -623,7 +627,7 @@
             z-index: 20;
         }
         .story-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8));
+            background-color: rgba(255, 255, 255, 0.5); /* Translucent white */
             border-radius: 20px;
             padding: 2rem;
             margin: 1rem auto;
@@ -696,15 +700,15 @@
                 font-size: 2.5rem;
             }
             .hero .btn {
-                padding: 1rem 2rem; /* Adjusted for mobile */
-                font-size: 1.5rem; /* Adjusted for mobile */
+                padding: 1rem 2rem;
+                font-size: 1.5rem;
             }
             .section {
                 padding: 2rem 1rem;
             }
             .btn {
-                padding: 0.75rem 1.5rem; /* Adjusted for mobile */
-                font-size: 1rem; /* Adjusted for mobile */
+                padding: 10px 20px; /* Adjusted for mobile */
+                font-size: 16px; /* Adjusted for mobile */
             }
             .placeholder-images {
                 flex-direction: column;
@@ -724,7 +728,7 @@
             <h1>Shia Islamic Adventure Quest</h1>
         </div>
         <div class="star-counter" id="star-count">0 ⭐</div>
-        <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy1.jpg" alt="Avatar" class="avatar-display" id="avatar-display" style="display: none;">
+        <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display" id="avatar-display" style="display: none;">
         <div class="tree" style="top: 20%; left: 5%;"></div>
         <div class="cloud" style="top: 10%; right: 10%;"></div>
         <div class="star" style="top: 15%; left: 20%;"></div>
@@ -734,12 +738,10 @@
             <p>Explore, learn, and grow with Shia Islamic teachings.</p>
             <button class="btn" onclick="showLoginModal()">Login 🚪</button>
             <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
-            <!-- Updated with corrected raw GitHub URLs -->
+            <!-- Side-by-side placeholders with larger, clearer images -->
             <div class="placeholder-images">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/makkah.jpg" alt="Makkah" class="placeholder-image">
                 <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg" alt="Madinah" class="placeholder-image">
                 <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/najaf.jpg" alt="Najaf" class="placeholder-image">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/karbala.jpg" alt="Karbala" class="placeholder-image">
             </div>
         </div>
         <div id="landing-page" class="hidden">
@@ -824,10 +826,8 @@
                     <option value="Level-7">Level 7</option>
                 </select>
                 <div class="character-select mt-2">
-                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy1.jpg" alt="Boy 1" class="character w-16 h-16 mr-2">
-                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy2.jpg" alt="Boy 2" class="character w-16 h-16 mr-2">
-                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/girl1.jpg" alt="Girl 1" class="character w-16 h-16 mr-2">
-                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/girl2.jpg" alt="Girl 2" class="character w-16 h-16">
+                    <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Boy" class="character w-16 h-16 mr-2">
+                    <img src="https://yourusername.github.io/your-repo/images/girl.png" alt="Girl" class="character w-16 h-16">
                 </div>
                 <input id="signup-email" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Email" type="email">
                 <input id="signup-password" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Password" type="password">
