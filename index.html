@@ -534,9 +534,8 @@
             </div>
         </div>
     </div>
-    <!-- Firebase SDK Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+    <!-- Firebase SDK Script (non-module compatible) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase.js"></script>
     <script>
         console.log('Script loading started...');
 
@@ -563,7 +562,7 @@
                 console.log('Firebase initialized successfully');
             } else {
                 console.error('Firebase library not loaded');
-                alert('Firebase library failed to load. Please check your internet connection.');
+                alert('Firebase library failed to load. Please check your internet connection or contact support.');
             }
         } catch (error) {
             console.error('Firebase initialization error:', error.message);
