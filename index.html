@@ -441,23 +441,21 @@
             animation: fadeIn 1.5s ease-out;
         }
         .hero .btn {
-            background-color: #fff; /* Solid white background */
-            color: #000; /* Black text for contrast */
-            padding: 12px 24px; /* Increased padding */
-            font-size: 18px; /* Larger font */
-            border: 2px solid #ccc; /* Border for definition */
-            border-radius: 20px;
+            background: linear-gradient(90deg, #FFA500, #FF69B4); /* Reverted to original orange gradient */
+            color: #fff;
+            padding: 2rem 4rem; /* Reverted to original larger size */
+            font-size: 2rem; /* Reverted to original larger font */
+            border-radius: 30px;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: none; /* Removed shadow for clarity */
+            text-shadow: 1px 1px #000;
             z-index: 10;
             position: relative;
             cursor: pointer;
         }
         .hero .btn:hover {
             transform: scale(1.1);
-            background: linear-gradient(90deg, #32CD32, #87CEEB);
+            background: linear-gradient(90deg, #32CD32, #87CEEB); /* Reverted to original hover effect */
             box-shadow: 0 0 10px #32CD32;
-            color: #fff; /* White text on hover */
         }
         .section {
             min-height: 100vh;
@@ -477,7 +475,7 @@
             color: #000;
             background-color: rgba(255, 255, 255, 0.5); /* Translucent white */
             border-radius: 20px;
-            z-index: 1000;
+            z-index: 1001; /* Increased to ensure above background */
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         .card-grid {
@@ -529,17 +527,16 @@
             z-index: -1;
         }
         .btn {
-            background-color: #fff; /* Solid white background */
-            color: #000; /* Black text for contrast */
-            padding: 12px 24px; /* Increased padding */
-            font-size: 18px; /* Larger font */
-            border: 2px solid #ccc; /* Border for definition */
+            background: linear-gradient(90deg, #FFA500, #FF69B4); /* Reverted to original orange gradient */
+            color: #fff;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
             border-radius: 20px;
             font-weight: 600;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: none; /* Removed shadow for clarity */
-            z-index: 10; /* Ensure above background */
-            position: relative; /* Required for z-index */
+            text-shadow: 1px 1px #000;
+            z-index: 1002; /* Increased to ensure above content and background */
+            position: relative;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             cursor: pointer;
         }
@@ -547,7 +544,6 @@
             transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 6px 15px rgba(50, 205, 50, 0.5);
-            color: #fff; /* White text on hover */
         }
         .btn:active {
             transform: scale(0.95);
@@ -700,15 +696,15 @@
                 font-size: 2.5rem;
             }
             .hero .btn {
-                padding: 1rem 2rem;
-                font-size: 1.5rem;
+                padding: 1rem 2rem; /* Adjusted for mobile */
+                font-size: 1.5rem; /* Adjusted for mobile */
             }
             .section {
                 padding: 2rem 1rem;
             }
             .btn {
-                padding: 10px 20px; /* Adjusted for mobile */
-                font-size: 16px; /* Adjusted for mobile */
+                padding: 0.75rem 1.5rem; /* Adjusted for mobile */
+                font-size: 1rem; /* Adjusted for mobile */
             }
             .placeholder-images {
                 flex-direction: column;
@@ -738,10 +734,12 @@
             <p>Explore, learn, and grow with Shia Islamic teachings.</p>
             <button class="btn" onclick="showLoginModal()">Login 🚪</button>
             <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
-            <!-- Side-by-side placeholders with larger, clearer images -->
+            <!-- Updated with new images in specified order -->
             <div class="placeholder-images">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg" alt="Madinah" class="placeholder-image">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/najaf.jpg" alt="Najaf" class="placeholder-image">
+                <img src="https://github.com/Mohamed7775857757/educational/images/makkah.jpg" alt="Makkah" class="placeholder-image">
+                <img src="https://github.com/Mohamed7775857757/educational/images/madinah.jpg" alt="Madinah" class="placeholder-image">
+                <img src="https://github.com/Mohamed7775857757/educational/images/najaf.jpg" alt="Najaf" class="placeholder-image">
+                <img src="https://github.com/Mohamed7775857757/educational/images/karbala.jpg" alt="Karbala" class="placeholder-image">
             </div>
         </div>
         <div id="landing-page" class="hidden">
