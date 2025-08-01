@@ -638,5 +638,26 @@
         // Ensure avatar filtering on page load
         document.addEventListener('DOMContentLoaded', filterAvatars);
     </script>
+
+<script>
+function showLoginModal() {
+    var modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.style.display = 'block';
+    } else {
+        console.error('Login modal element not found.');
+    }
+}
+
+function showSignupModal() {
+    var modal = document.getElementById('signupModal');
+    if (modal) {
+        modal.style.display = 'block';
+    } else {
+        console.error('Signup modal element not found.');
+    }
+}
+</script>
+
 </body>
 </html>
