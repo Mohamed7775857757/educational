@@ -441,19 +441,23 @@
             animation: fadeIn 1.5s ease-out;
         }
         .hero .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            color: #fff;
-            padding: 2rem 4rem;
-            font-size: 2rem;
-            border-radius: 30px;
+            background-color: #fff; /* Solid white background */
+            color: #000; /* Black text for contrast */
+            padding: 12px 24px; /* Increased padding */
+            font-size: 18px; /* Larger font */
+            border: 2px solid #ccc; /* Border for definition */
+            border-radius: 20px;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: 1px 1px #000;
-            z-index: 20;
+            text-shadow: none; /* Removed shadow for clarity */
+            z-index: 10;
+            position: relative;
+            cursor: pointer;
         }
         .hero .btn:hover {
             transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 0 10px #32CD32;
+            color: #fff; /* White text on hover */
         }
         .section {
             min-height: 100vh;
@@ -525,22 +529,25 @@
             z-index: -1;
         }
         .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4);
-            color: #fff;
-            padding: 1rem 2rem;
+            background-color: #fff; /* Solid white background */
+            color: #000; /* Black text for contrast */
+            padding: 12px 24px; /* Increased padding */
+            font-size: 18px; /* Larger font */
+            border: 2px solid #ccc; /* Border for definition */
             border-radius: 20px;
             font-weight: 600;
-            font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: 1px 1px #000;
-            z-index: 1001;
-            position: relative;
+            text-shadow: none; /* Removed shadow for clarity */
+            z-index: 10; /* Ensure above background */
+            position: relative; /* Required for z-index */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
         }
         .btn:hover {
             transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 6px 15px rgba(50, 205, 50, 0.5);
+            color: #fff; /* White text on hover */
         }
         .btn:active {
             transform: scale(0.95);
@@ -700,8 +707,8 @@
                 padding: 2rem 1rem;
             }
             .btn {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
+                padding: 10px 20px; /* Adjusted for mobile */
+                font-size: 16px; /* Adjusted for mobile */
             }
             .placeholder-images {
                 flex-direction: column;
