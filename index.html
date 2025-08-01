@@ -373,10 +373,19 @@
             overflow-x: hidden;
             min-height: 100vh;
             position: relative;
+            background: none; /* Remove background from body */
+            overflow: hidden;
+        }
+        /* Background layer with z-index: -1 */
+        .background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: #87CEEB url('https://yourusername.github.io/your-repo/images/background.jpg') no-repeat center center fixed;
             background-size: cover;
-            overflow: hidden;
-            z-index: 0;
+            z-index: -1; /* Ensure it stays behind all content */
         }
         .header-bar {
             position: fixed;
@@ -385,7 +394,7 @@
             width: 100%;
             height: 60px;
             background: linear-gradient(90deg, #FFA500, #FF4500);
-            z-index: 100;
+            z-index: 1000;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
@@ -416,7 +425,7 @@
             border-radius: 0 0 50px 50px;
             display: block;
             z-index: 10;
-            background: inherit;
+            background: none; /* Removed inherit to avoid background issues */
         }
         .hero h1 {
             font-size: 3.5rem;
@@ -428,7 +437,7 @@
             animation: fadeIn 1.5s ease-out;
         }
         .hero .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4); /* Restored original orange gradient */
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
             color: #fff;
             padding: 2rem 4rem;
             font-size: 2rem;
@@ -436,6 +445,7 @@
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
             z-index: 20;
+            opacity: 1; /* Ensure no fade */
         }
         .hero .btn:hover {
             transform: scale(1.1);
@@ -448,19 +458,21 @@
             text-align: center;
             position: relative;
             z-index: 10;
-            /* Removed background to avoid dominance */
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             padding-top: 80px;
+            background: none; /* Remove any section background */
         }
         .content {
             max-width: 900px;
             margin: 0 auto;
             padding: 2rem;
             color: #000;
-            background: rgba(255, 255, 255, 0.7); /* Light overlay for readability */
+            background: #ffffff; /* Solid white to ensure readability */
             border-radius: 20px;
-            z-index: 100; /* Increased to ensure dominance over background */
+            z-index: 1000; /* High z-index to stay on top */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            opacity: 1; /* Ensure no fade */
         }
         .card-grid {
             display: flex;
@@ -511,7 +523,7 @@
             z-index: -1;
         }
         .btn {
-            background: linear-gradient(90deg, #FFA500, #FF69B4); /* Restored original orange gradient */
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
             color: #fff;
             padding: 1rem 2rem;
             border-radius: 20px;
@@ -519,9 +531,10 @@
             font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
-            z-index: 50; /* Ensure buttons are above content */
+            z-index: 1001; /* Highest z-index for buttons */
             position: relative;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            opacity: 1; /* Ensure no fade */
         }
         .btn:hover {
             transform: scale(1.1);
@@ -606,7 +619,7 @@
             z-index: 20;
         }
         .story-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: #ffffff; /* Solid white for readability */
             border-radius: 20px;
             padding: 2rem;
             margin: 1rem auto;
@@ -614,6 +627,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: left;
             z-index: 20;
+            opacity: 1; /* Ensure no fade */
         }
         .placeholder-images {
             display: flex;
@@ -700,6 +714,7 @@
     </style>
 </head>
 <body>
+    <div class="background-layer"></div> <!-- Background layer added here -->
     <div class="header-bar">
         <h1>Shia Islamic Adventure Quest</h1>
     </div>
@@ -734,23 +749,25 @@
         <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
     </div>
     <div id="welcome" class="section hidden">
-        <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
-        <div class="progress-bar">
-            <div id="progress"></div>
-        </div>
-        <p class="badge"></p>
-        <div class="card-grid">
-            <div class="card" onclick="showSection('missions')">
-                <h3>Missions</h3>
-                <p>Daily Tasks ⭐</p>
+        <div class="content">
+            <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
+            <div class="progress-bar">
+                <div id="progress"></div>
             </div>
-            <div class="card" onclick="showSection('profile')">
-                <h3>Profile</h3>
-                <p>Your Journey 🏡</p>
+            <p class="badge"></p>
+            <div class="card-grid">
+                <div class="card" onclick="showSection('missions')">
+                    <h3>Missions</h3>
+                    <p>Daily Tasks ⭐</p>
+                </div>
+                <div class="card" onclick="showSection('profile')">
+                    <h3>Profile</h3>
+                    <p>Your Journey 🏡</p>
+                </div>
             </div>
+            <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
+            <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
         </div>
-        <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
-        <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
     </div>
     <div id="missions" class="section hidden">
         <div class="content">
