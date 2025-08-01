@@ -428,22 +428,19 @@
             animation: fadeIn 1.5s ease-out;
         }
         .hero .btn {
-            background: #fff; /* Solid white background for contrast */
-            color: #FF4500; /* Orange text */
+            background: linear-gradient(90deg, #FFA500, #FF69B4); /* Restored original orange gradient */
+            color: #fff;
             padding: 2rem 4rem;
             font-size: 2rem;
-            border: 3px solid #FFA500; /* Orange border */
             border-radius: 30px;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: none;
-            z-index: 100; /* Ensure buttons are above all layers */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Strong shadow */
+            text-shadow: 1px 1px #000;
+            z-index: 20;
         }
         .hero .btn:hover {
             transform: scale(1.1);
-            background: #FFD700; /* Gold hover background */
-            color: #000;
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.5);
+            background: linear-gradient(90deg, #32CD32, #87CEEB);
+            box-shadow: 0 0 10px #32CD32;
         }
         .section {
             min-height: 100vh;
@@ -451,7 +448,7 @@
             text-align: center;
             position: relative;
             z-index: 10;
-            /* Removed background to rely on content overlay */
+            /* Removed background to avoid dominance */
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             padding-top: 80px;
@@ -461,9 +458,9 @@
             margin: 0 auto;
             padding: 2rem;
             color: #000;
-            background: rgba(255, 255, 255, 0.6); /* Light overlay for content */
+            background: rgba(255, 255, 255, 0.7); /* Light overlay for readability */
             border-radius: 20px;
-            z-index: 20; /* Ensure content is above section */
+            z-index: 100; /* Increased to ensure dominance over background */
         }
         .card-grid {
             display: flex;
@@ -514,24 +511,22 @@
             z-index: -1;
         }
         .btn {
-            background: #fff; /* Solid white background */
-            color: #FF4500; /* Orange text */
+            background: linear-gradient(90deg, #FFA500, #FF69B4); /* Restored original orange gradient */
+            color: #fff;
             padding: 1rem 2rem;
-            border: 3px solid #FFA500; /* Orange border */
             border-radius: 20px;
             font-weight: 600;
             font-size: 1.2rem;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: none;
-            z-index: 100; /* Increased to ensure buttons are above all layers */
+            text-shadow: 1px 1px #000;
+            z-index: 50; /* Ensure buttons are above content */
             position: relative;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Shadow for prominence */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
         .btn:hover {
             transform: scale(1.1);
-            background: #FFD700; /* Gold hover background */
-            color: #000;
-            box-shadow: 0 6px 15px rgba(255, 215, 0, 0.5);
+            background: linear-gradient(90deg, #32CD32, #87CEEB);
+            box-shadow: 0 6px 15px rgba(50, 205, 50, 0.5);
         }
         .btn:active {
             transform: scale(0.95);
@@ -620,9 +615,6 @@
             text-align: left;
             z-index: 20;
         }
-        .hidden {
-            display: none;
-        }
         .placeholder-images {
             display: flex;
             justify-content: center;
@@ -635,6 +627,9 @@
             object-fit: cover;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .hidden {
+            display: none;
         }
         @keyframes float {
             0% { transform: translateY(0); }
@@ -757,7 +752,25 @@
         <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
         <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
     </div>
-    <div id="missions" class="section hidden"></div>
+    <div id="missions" class="section hidden">
+        <div class="content">
+            <h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
+            <div class="story-card mb-4">
+                <h3 class="text-xl">Daily Salah</h3>
+                <p>How many daily prayers?</p>
+                <input id="mission-salah-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
+                <button class="btn mt-2" onclick="checkMission('salah', '5')">Submit 🎉</button>
+            </div>
+            <div class="story-card mb-4">
+                <h3 class="text-xl">Learn Dua</h3>
+                <p>Dua before eating?</p>
+                <input id="mission-dua-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
+                <button class="btn mt-2" onclick="checkMission('dua', 'Bismillah')">Submit 🎉</button>
+            </div>
+            <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+            <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+        </div>
+    </div>
     <div id="profile" class="section hidden"></div>
     <div id="login-modal" class="modal">
         <div class="modal-content">
