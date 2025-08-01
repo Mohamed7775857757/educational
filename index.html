@@ -393,7 +393,6 @@ function showLoginModal() {
         console.error('Login modal element not found.');
     }
 }
-
 function showSignupModal() {
     var modal = document.getElementById('signupModal');
     if (modal) {
@@ -403,7 +402,7 @@ function showSignupModal() {
     }
 }
 </script></head>
-<body>
+<body><div id="loginModal" style="display:none; position:fixed; top:20%; left:30%; background:#fff; padding:20px; border:1px solid #ccc; z-index:1000;">Login Modal Content</div><div id="signupModal" style="display:none; position:fixed; top:20%; left:30%; background:#fff; padding:20px; border:1px solid #ccc; z-index:1000;">Signup Modal Content</div>
 <div class="background-layer"></div>
 <div class="ui-container">
 <div class="header-bar">
