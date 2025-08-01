@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -441,14 +442,13 @@
             animation: fadeIn 1.5s ease-out;
         }
         .hero .btn {
-            background-color: #fff; /* Solid white background */
-            color: #000; /* Black text for contrast */
-            padding: 12px 24px; /* Increased padding */
-            font-size: 18px; /* Larger font */
-            border: 2px solid #ccc; /* Border for definition */
-            border-radius: 20px;
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
+            color: #fff;
+            padding: 2rem 4rem;
+            font-size: 2rem;
+            border-radius: 30px;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: none; /* Removed shadow for clarity */
+            text-shadow: 1px 1px #000;
             z-index: 10;
             position: relative;
             cursor: pointer;
@@ -457,27 +457,26 @@
             transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 0 10px #32CD32;
-            color: #fff; /* White text on hover */
         }
         .section {
             min-height: 100vh;
             padding: 4rem 2rem;
             text-align: center;
             position: relative;
-            z-index: 10;
+            z-index: 1;
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             padding-top: 80px;
-            background: none;
+            background-color: #90EE90; /* Changed to light green */
         }
         .content {
             max-width: 900px;
             margin: 0 auto;
             padding: 2rem;
             color: #000;
-            background-color: rgba(255, 255, 255, 0.5); /* Translucent white */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8));
             border-radius: 20px;
-            z-index: 1000;
+            z-index: 1;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         .card-grid {
@@ -529,17 +528,16 @@
             z-index: -1;
         }
         .btn {
-            background-color: #fff; /* Solid white background */
-            color: #000; /* Black text for contrast */
-            padding: 12px 24px; /* Increased padding */
-            font-size: 18px; /* Larger font */
-            border: 2px solid #ccc; /* Border for definition */
+            background: linear-gradient(90deg, #FFA500, #FF69B4);
+            color: #fff;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
             border-radius: 20px;
             font-weight: 600;
             transition: transform 0.3s, background 0.3s;
-            text-shadow: none; /* Removed shadow for clarity */
-            z-index: 10; /* Ensure above background */
-            position: relative; /* Required for z-index */
+            text-shadow: 1px 1px #000;
+            z-index: 10;
+            position: relative;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             cursor: pointer;
         }
@@ -547,7 +545,6 @@
             transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 6px 15px rgba(50, 205, 50, 0.5);
-            color: #fff; /* White text on hover */
         }
         .btn:active {
             transform: scale(0.95);
@@ -627,7 +624,7 @@
             z-index: 20;
         }
         .story-card {
-            background-color: rgba(255, 255, 255, 0.5); /* Translucent white */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8));
             border-radius: 20px;
             padding: 2rem;
             margin: 1rem auto;
@@ -700,15 +697,15 @@
                 font-size: 2.5rem;
             }
             .hero .btn {
-                padding: 1rem 2rem;
-                font-size: 1.5rem;
+                padding: 1rem 2rem; /* Adjusted for mobile */
+                font-size: 1.5rem; /* Adjusted for mobile */
             }
             .section {
                 padding: 2rem 1rem;
             }
             .btn {
-                padding: 10px 20px; /* Adjusted for mobile */
-                font-size: 16px; /* Adjusted for mobile */
+                padding: 0.75rem 1.5rem; /* Adjusted for mobile */
+                font-size: 1rem; /* Adjusted for mobile */
             }
             .placeholder-images {
                 flex-direction: column;
@@ -738,10 +735,12 @@
             <p>Explore, learn, and grow with Shia Islamic teachings.</p>
             <button class="btn" onclick="showLoginModal()">Login 🚪</button>
             <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
-            <!-- Side-by-side placeholders with larger, clearer images -->
+            <!-- Updated with corrected raw GitHub URLs -->
             <div class="placeholder-images">
+                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/makkah.jpg" alt="Makkah" class="placeholder-image">
                 <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg" alt="Madinah" class="placeholder-image">
                 <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/najaf.jpg" alt="Najaf" class="placeholder-image">
+                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/karbala.jpg" alt="Karbala" class="placeholder-image">
             </div>
         </div>
         <div id="landing-page" class="hidden">
