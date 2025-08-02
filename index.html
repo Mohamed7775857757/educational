@@ -92,11 +92,11 @@
             if (section) {
                 section.classList.remove('hidden');
                 gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 1, y: 50, duration: 0.5, ease: 'power2.out' });
-                if (sectionId === 'missions') showMissions();
-                if (sectionId === 'profile' && userData.email) showProfile();
-                if (sectionId === 'matching-game') initMatchingGame();
+                if (sectionId === 'missions' && !isAdmin) showMissions();
+                if (sectionId === 'profile' && !isAdmin) showProfile();
+                if (sectionId === 'matching-game' && !isAdmin) initMatchingGame();
                 if (sectionId === 'quiz') showQuiz();
-                if (sectionId === 'admin-quiz') showAdminQuiz();
+                if (sectionId === 'admin-quiz' && isAdmin) showAdminQuiz();
                 updateProgress();
                 updateBadges();
             } else {
@@ -648,14 +648,16 @@
             const type = document.getElementById('admin-question-type')?.value;
             const answer = document.getElementById('admin-answer-text')?.value.trim();
             const options = type === 'multiple' ? [
-                document.getElementById('admin-option-1')?.value.trim(),
-                document.getElementById('admin-option-2')?.value.trim(),
-                document.getElementById('admin-option-3')?.value.trim(),
-                document.getElementById('admin-option-4')?.value.trim()
-            ].filter(opt => opt) : [];
+                document.getElementById('admin-option-1')?.value.trim() || '',
+                document.getElementById('admin-option-2')?.value.trim() || '',
+                document.getElementById('admin-option-3')?.value.trim() || '',
+                document.getElementById('admin-option-4')?.value.trim() || ''
+            ].filter(opt => opt.length > 0) : [];
+
+            console.log('Adding question:', { questionText, level, type, answer, options });
 
             if (!questionText || !answer || (type === 'multiple' && options.length < 2)) {
-                alert('Please fill in all required fields (question, answer, and at least 2 options for multiple choice).');
+                alert('Please fill in all required fields (question, answer, and at least 2 non-empty options for multiple choice).');
                 return;
             }
 
@@ -731,9 +733,9 @@
         function updateWelcomeCardGrid() {
             const cardGrid = document.getElementById('welcome-card-grid');
             if (!cardGrid) return;
-            const existingAdminCard = cardGrid.querySelector('div[onclick="showSection(\'admin-quiz\')"]');
-            if (existingAdminCard) existingAdminCard.remove();
+            cardGrid.innerHTML = ''; // Clear existing cards
             if (isAdmin) {
+                // Only show Admin Quiz Management for admins
                 const adminCard = document.createElement('div');
                 adminCard.className = 'card';
                 adminCard.onclick = () => showSection('admin-quiz');
@@ -742,6 +744,24 @@
                     <p>Manage Quiz Questions 🔧</p>
                 `;
                 cardGrid.appendChild(adminCard);
+            } else {
+                // Show all cards except Admin Quiz Management for non-admins
+                const cards = [
+                    { id: 'missions', title: 'Missions', desc: 'Daily Tasks ⭐' },
+                    { id: 'profile', title: 'Profile', desc: 'Your Journey 🏡' },
+                    { id: 'matching-game', title: 'Matching Game', desc: 'Match Holy Individuals 🧠' },
+                    { id: 'quiz', title: 'Quiz', desc: 'Test Your Knowledge 📚' }
+                ];
+                cards.forEach(card => {
+                    const cardElement = document.createElement('div');
+                    cardElement.className = 'card';
+                    cardElement.onclick = () => showSection(card.id);
+                    cardElement.innerHTML = `
+                        <h3>${card.title}</h3>
+                        <p>${card.desc}</p>
+                    `;
+                    cardGrid.appendChild(cardElement);
+                });
             }
         }
 
@@ -1279,22 +1299,6 @@
 </div>
 <p class="badge"></p>
 <div class="card-grid" id="welcome-card-grid">
-<div class="card" onclick="showSection('missions')">
-<h3>Missions</h3>
-<p>Daily Tasks ⭐</p>
-</div>
-<div class="card" onclick="showSection('profile')">
-<h3>Profile</h3>
-<p>Your Journey 🏡</p>
-</div>
-<div class="card" onclick="showSection('matching-game')">
-<h3>Matching Game</h3>
-<p>Match Holy Individuals 🧠</p>
-</div>
-<div class="card" onclick="showSection('quiz')">
-<h3>Quiz</h3>
-<p>Test Your Knowledge 📚</p>
-</div>
 </div>
 <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
 </div>
