@@ -442,10 +442,6 @@
             animation: fadeIn 1.5s ease-out;
         }
         .hero .btn {
-  color: #fff !important;
-  text-shadow: 1px 1px #000;
-  z-index: 1001;
-
             background: linear-gradient(90deg, #FFA500, #FF69B4);
             color: #fff;
             padding: 2rem 4rem;
@@ -476,7 +472,7 @@
             margin: 0 auto;
             padding: 2rem;
             color: #000;
-            background-color: rgba(255, 255, 255, 0.85); /* Translucent white */
+            background-color: rgba(255, 255, 255, 0.5); /* Translucent white */
             border-radius: 20px;
             z-index: 1000;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -493,9 +489,6 @@
             flex-wrap: wrap;
         }
         .card {
-  position: relative;
-  z-index: 1001;
-
             background: linear-gradient(135deg, #FF69B4, #FFA500);
             border-radius: 30px;
             padding: 1.5rem;
@@ -533,10 +526,6 @@
             z-index: -1;
         }
         .btn {
-  color: #fff !important;
-  text-shadow: 1px 1px #000;
-  z-index: 1001;
-
             background: linear-gradient(90deg, #FFA500, #FF69B4);
             color: #fff;
             padding: 1rem 2rem;
@@ -632,7 +621,7 @@
             z-index: 20;
         }
         .story-card {
-            background-color: rgba(255, 255, 255, 0.85); /* Translucent white */
+            background-color: rgba(255, 255, 255, 0.5); /* Translucent white */
             border-radius: 20px;
             padding: 2rem;
             margin: 1rem auto;
@@ -698,9 +687,6 @@
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
             .card {
-  position: relative;
-  z-index: 1001;
-
                 width: 120px;
                 padding: 0.5rem;
             }
@@ -708,10 +694,6 @@
                 font-size: 2.5rem;
             }
             .hero .btn {
-  color: #fff !important;
-  text-shadow: 1px 1px #000;
-  z-index: 1001;
-
                 padding: 1rem 2rem;
                 font-size: 1.5rem;
             }
@@ -719,10 +701,6 @@
                 padding: 2rem 1rem;
             }
             .btn {
-  color: #fff !important;
-  text-shadow: 1px 1px #000;
-  z-index: 1001;
-
                 padding: 0.75rem 1.5rem;
                 font-size: 1rem;
             }
@@ -735,7 +713,18 @@
                 height: 200px; /* Adjusted for mobile */
             }
         }
-    </style>
+    
+.section, .content, .card, .story-card {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    z-index: 1000 !important;
+}
+.btn {
+    color: #ffffff !important;
+    text-shadow: 1px 1px #000000 !important;
+    z-index: 1001 !important;
+}
+</style>
 </head>
 <body>
 <div class="background-layer"></div>
