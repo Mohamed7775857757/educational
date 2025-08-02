@@ -33,7 +33,7 @@
         const auth = getAuth(app);
 
         // Global variables
-        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
 
         // Define functions globally within the module
         window.showLoginModal = function() {
@@ -78,6 +78,7 @@
                 if (sectionId === 'missions') showMissions();
                 if (sectionId === 'profile' && userData.email) showProfile();
                 if (sectionId === 'matching-game') initMatchingGame();
+                if (sectionId === 'quiz') showQuiz();
                 updateProgress();
                 updateBadges();
             }
@@ -126,14 +127,14 @@
         window.logout = function() {
             signOut(auth).then(() => {
                 alert("✅ Logged out successfully!");
-                userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+                userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                 localStorage.removeItem('userData');
                 document.getElementById('landing-page').classList.add('hidden');
                 document.getElementById('welcome').classList.add('hidden');
                 document.getElementById('profile').classList.add('hidden');
                 document.getElementById('avatar-display').style.display = 'none';
                 document.getElementById('star-count').textContent = '0 ⭐';
-                ['missions', 'matching-game'].forEach(id => {
+                ['missions', 'matching-game', 'quiz'].forEach(id => {
                     const section = document.getElementById(id);
                     if (section) section.classList.add('hidden');
                 });
@@ -146,6 +147,7 @@
             if (saved) {
                 userData = JSON.parse(saved);
                 if (!userData.badges) userData.badges = ['Explorer'];
+                if (!userData.quiz) userData.quiz = {};
                 document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
                 document.getElementById('avatar-display').style.display = 'block';
                 document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
@@ -379,7 +381,7 @@
                         userData.progress = Math.min(userData.progress + 1, 10);
                         updateStarCounter();
                         updateProgress();
-                        confetti(); // Confetti only on game completion
+                        confetti();
                         document.getElementById('game-feedback').innerHTML = '<span class="text-green-600 text-xl">Congratulations! All pairs matched! +14 Stars! 🎉</span>';
                         console.log('Game completed! Stars awarded:', userData.stars);
                     }
@@ -407,6 +409,113 @@
             console.log('Game reset');
         };
 
+        // Quiz Logic
+        const quizQuestions = {
+            'Level-1': [
+                { id: 'q1', type: 'text', question: 'What is the name of the creator of the universe?', answer: 'Allah' },
+                { id: 'q2', type: 'text', question: 'What is the name of the book that was revealed to Prophet Muhammad(s)?', answer: 'Quran' },
+                { id: 'q3', type: 'multiple', question: 'Which Prophet was stuck in the belly of the whale?', options: ['Yusuf', 'Yunus', 'Ibrahim'], answer: 'Yunus' }
+            ]
+        };
+
+        let currentQuestionIndex = 0;
+        let quizCompleted = false;
+
+        function showQuiz() {
+            if (!userData.email) {
+                alert("Please log in to take the quiz!");
+                showSection('welcome');
+                return;
+            }
+            const container = document.getElementById('quiz');
+            container.innerHTML = '';
+            const content = document.createElement('div');
+            content.className = 'content';
+            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Quiz Time 📚</h2>
+                <p>Test your knowledge for ${userData.year}!</p>
+                <div id="quiz-content" class="story-card mb-4"></div>
+                <p id="quiz-feedback" class="mt-4"></p>
+                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+            container.appendChild(content);
+
+            currentQuestionIndex = 0;
+            quizCompleted = userData.quiz[userData.year]?.completed || false;
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            const quizContent = document.getElementById('quiz-content');
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.textContent = '';
+            const questions = quizQuestions[userData.year] || [];
+            
+            if (quizCompleted) {
+                quizContent.innerHTML = `
+                    <h3 class="text-xl">Quiz Completed!</h3>
+                    <p>You've already completed the quiz for ${userData.year}. Try another activity!</p>
+                `;
+                return;
+            }
+
+            if (currentQuestionIndex >= questions.length) {
+                quizCompleted = true;
+                userData.quiz[userData.year] = { completed: true };
+                userData.progress = Math.min(userData.progress + 1, 10);
+                updateProgress();
+                saveUserData();
+                confetti();
+                quizContent.innerHTML = `
+                    <h3 class="text-xl">Congratulations!</h3>
+                    <p class="text-green-600 text-xl">You've completed the ${userData.year} quiz! 🎉</p>
+                `;
+                return;
+            }
+
+            const question = questions[currentQuestionIndex];
+            quizContent.innerHTML = `
+                <h3 class="text-xl">Question ${currentQuestionIndex + 1}</h3>
+                <p>${question.question}</p>
+                ${question.type === 'text' ? 
+                    `<input id="quiz-answer-${question.id}" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Type your answer">` :
+                    `<div class="mt-2">${question.options.map(option => `
+                        <label class="block"><input type="radio" name="quiz-${question.id}" value="${option}" class="mr-2">${option}</label>
+                    `).join('')}</div>`}
+                <button class="btn mt-2" onclick="checkQuizAnswer('${question.id}', '${question.answer}')">Submit 🎉</button>
+            `;
+        }
+
+        window.checkQuizAnswer = function(id, correctAnswer) {
+            const question = quizQuestions[userData.year][currentQuestionIndex];
+            let userAnswer;
+            if (question.type === 'text') {
+                userAnswer = document.getElementById(`quiz-answer-${id}`).value.trim().toLowerCase();
+            } else {
+                const selected = document.querySelector(`input[name="quiz-${id}"]:checked`);
+                userAnswer = selected ? selected.value.toLowerCase() : '';
+            }
+
+            const feedback = document.getElementById('quiz-feedback');
+            if (userAnswer === correctAnswer.toLowerCase()) {
+                if (!userData.quiz[userData.year]?.[id]) {
+                    userData.stars += 2;
+                    userData.quiz[userData.year] = userData.quiz[userData.year] || {};
+                    userData.quiz[userData.year][id] = true;
+                    updateStarCounter();
+                    saveUserData();
+                }
+                feedback.className = 'text-green-600 mt-2';
+                feedback.textContent = 'Correct! +2 Stars! 🎉';
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    showQuizQuestion();
+                }, 1000);
+            } else {
+                feedback.className = 'text-red-600 mt-2';
+                feedback.textContent = 'Wrong! Try again! 😕';
+            }
+        };
+
         // Initialize on DOM load
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM fully loaded, initializing app...');
@@ -416,10 +525,12 @@
             const welcomeSection = document.getElementById('welcome');
             const profileSection = document.getElementById('profile');
             const matchingGameSection = document.getElementById('matching-game');
+            const quizSection = document.getElementById('quiz');
             if (hero) hero.classList.remove('hidden');
             if (welcomeSection) welcomeSection.classList.add('hidden');
             if (profileSection) profileSection.classList.add('hidden');
             if (matchingGameSection) matchingGameSection.classList.add('hidden');
+            if (quizSection) quizSection.classList.add('hidden');
 
             // Initialize modals
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
@@ -442,12 +553,13 @@
                         document.getElementById('welcome').classList.remove('hidden');
                         showSection('welcome');
                     } else {
-                        userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, artwork: {}, storyPath: [] };
+                        userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                         localStorage.removeItem('userData');
                         if (hero) hero.classList.remove('hidden');
                         if (welcomeSection) welcomeSection.classList.add('hidden');
                         if (profileSection) profileSection.classList.add('hidden');
                         if (matchingGameSection) matchingGameSection.classList.add('hidden');
+                        if (quizSection) quizSection.classList.add('hidden');
                         ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                             const modal = document.getElementById(id);
                             if (modal) modal.style.display = 'none';
@@ -474,6 +586,7 @@
                 document.getElementById('welcome').classList.add('hidden');
                 document.getElementById('profile').classList.add('hidden');
                 document.getElementById('matching-game').classList.add('hidden');
+                document.getElementById('quiz').classList.add('hidden');
             });
         });
 </script>
@@ -922,6 +1035,10 @@
 <h3>Matching Game</h3>
 <p>Match Holy Individuals 🧠</p>
 </div>
+<div class="card" onclick="showSection('quiz')">
+<h3>Quiz</h3>
+<p>Test Your Knowledge 📚</p>
+</div>
 </div>
 <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
 </div>
@@ -944,6 +1061,10 @@
 <div class="card" onclick="showSection('matching-game')">
 <h3>Matching Game</h3>
 <p>Match Holy Individuals 🧠</p>
+</div>
+<div class="card" onclick="showSection('quiz')">
+<h3>Quiz</h3>
+<p>Test Your Knowledge 📚</p>
 </div>
 </div>
 <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
@@ -971,6 +1092,7 @@
 </div>
 <div class="section hidden" id="profile"></div>
 <div class="section hidden" id="matching-game"></div>
+<div class="section hidden" id="quiz"></div>
 <div class="modal" id="login-modal">
 <div class="modal-content">
 <h2>Login 🚪</h2>
