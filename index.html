@@ -332,6 +332,8 @@
             const cards = [...individuals, ...individuals]; // Duplicate for pairs
             cards.sort(() => Math.random() - 0.5); // Shuffle
 
+            // Clear any existing event listeners by cloning nodes
+            gameGrid.innerHTML = '';
             cards.forEach((name, index) => {
                 const card = document.createElement('div');
                 card.className = 'game-card';
@@ -357,22 +359,23 @@
                 return;
             }
 
+            console.log('Flipping card:', card.dataset.name);
             card.classList.add('flipped');
             flippedCards.push(card);
-            console.log('Flipped card:', card.dataset.name, 'Total flipped:', flippedCards.length);
 
             if (flippedCards.length === 2) {
                 canFlip = false;
                 const [card1, card2] = flippedCards;
                 console.log('Comparing:', card1.dataset.name, 'and', card2.dataset.name);
 
+                // Ensure dataset.name is compared correctly
                 if (card1.dataset.name === card2.dataset.name) {
+                    console.log('Match found!');
                     card1.classList.add('matched');
                     card2.classList.add('matched');
                     matchedPairs++;
-                    confetti(); // Sprinkle confetti on match
                     document.getElementById('game-feedback').textContent = 'Match found! Keep going!';
-                    console.log('Match found! Pairs matched:', matchedPairs);
+                    confetti(); // Sprinkle confetti on match
                     if (matchedPairs === individuals.length) {
                         userData.stars += 14;
                         userData.progress = Math.min(userData.progress + 1, 10);
@@ -383,13 +386,11 @@
                         console.log('Game completed! Stars awarded:', userData.stars);
                     }
                     flippedCards = [];
-                    setTimeout(() => {
-                        canFlip = true;
-                        console.log('Flipping enabled after match');
-                    }, 500); // Short delay to prevent rapid clicks
+                    canFlip = true;
+                    console.log('Flipping enabled after match, matchedPairs:', matchedPairs);
                 } else {
+                    console.log('No match.');
                     document.getElementById('game-feedback').textContent = 'No match. Try again!';
-                    console.log('No match. Flipping back cards.');
                     setTimeout(() => {
                         card1.classList.remove('flipped');
                         card2.classList.remove('flipped');
@@ -398,6 +399,8 @@
                         console.log('Flipping enabled after non-match');
                     }, 1000);
                 }
+            } else {
+                console.log('Waiting for second card, flippedCards:', flippedCards.length);
             }
         }
 
