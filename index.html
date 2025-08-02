@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -177,6 +176,7 @@
                 document.getElementById('landing-page').classList.add('hidden');
                 document.getElementById('welcome').classList.remove('hidden');
                 showSection('welcome');
+                updateWelcomeCardGrid();
             } else {
                 document.getElementById('hero').classList.remove('hidden');
                 document.getElementById('welcome').classList.add('hidden');
@@ -202,9 +202,11 @@
             if (event.target.classList.contains('modal') || event.target.classList.contains('btn')) {
                 const modalId = event.target.closest('.modal')?.id;
                 if (modalId) document.getElementById(modalId).style.display = 'none';
-                document.getElementById('hero').classList.remove('hidden');
-                document.getElementById('welcome').classList.add('hidden');
-                document.getElementById('profile').classList.add('hidden');
+                if (!userData.email) {
+                    document.getElementById('hero').classList.remove('hidden');
+                    document.getElementById('welcome').classList.add('hidden');
+                    document.getElementById('profile').classList.add('hidden');
+                }
                 console.log('Modal closed via backdrop or button');
             }
         };
@@ -212,18 +214,16 @@
         window.loginAdmin = function() {
             const email = document.getElementById('admin-username').value;
             const password = document.getElementById('admin-password').value;
-            const adminEmail = 'melzein1987@gmail.com';
-            const adminPassword = 'admin123';
-            if (email === adminEmail && password === adminPassword) {
-                alert('Admin login successful!');
-                isAdmin = true;
-                userData.email = email;
-                closeModal({ target: { className: 'modal' } });
-                loadUserData();
-                showSection('welcome');
-            } else {
-                alert('Invalid admin credentials!');
-            }
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    alert("✅ Admin login successful!");
+                    userData.email = email;
+                    isAdmin = email === 'melzein1987@gmail.com';
+                    closeModal({ target: { className: 'modal' } });
+                    loadUserData();
+                    showSection('welcome');
+                })
+                .catch(error => alert("❌ " + error.message));
         };
 
         function showMissions() {
@@ -669,6 +669,25 @@
             });
         }
 
+        // Dynamically add Admin Quiz Management card for admin user
+        function updateWelcomeCardGrid() {
+            const cardGrid = document.getElementById('welcome-card-grid');
+            if (!cardGrid) return;
+            // Clear existing admin card to avoid duplicates
+            const existingAdminCard = cardGrid.querySelector('div[onclick="showSection(\'admin-quiz\')"]');
+            if (existingAdminCard) existingAdminCard.remove();
+            if (isAdmin) {
+                const adminCard = document.createElement('div');
+                adminCard.className = 'card';
+                adminCard.onclick = () => showSection('admin-quiz');
+                adminCard.innerHTML = `
+                    <h3>Admin Quiz Management</h3>
+                    <p>Manage Quiz Questions 🔧</p>
+                `;
+                cardGrid.appendChild(adminCard);
+            }
+        }
+
         // Initialize on DOM load
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM fully loaded, initializing app...');
@@ -735,7 +754,8 @@
             // Verify function availability
             console.log('Functions defined:', {
                 showLoginModal: typeof window.showLoginModal,
-                showSignupModal: typeof window.showSignupModal
+                showSignupModal: typeof window.showSignupModal,
+                showAdminLoginModal: typeof window.showAdminLoginModal
             });
 
             window.addEventListener('load', () => {
@@ -832,6 +852,7 @@
             transition: transform 0.3s, background 0.3s;
             text-shadow: 1px 1px #000;
             z-index: 20;
+            margin: 0.5rem;
         }
         .hero .btn:hover {
             transform: scale(1.1);
@@ -1175,31 +1196,11 @@
 <p>Explore, learn, and grow with Shia Islamic teachings.</p>
 <button class="btn" onclick="showLoginModal()">Login 🚪</button>
 <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
+<button class="btn" onclick="showAdminLoginModal()">Admin Login 🔐</button>
 <div class="placeholder-images">
 <img alt="Madinah" class="placeholder-image" src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg"/>
 <img alt="Najaf" class="placeholder-image" src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/najaf.jpg"/>
 </div>
-</div>
-<div class="hidden" id="landing-page">
-<div class="card-grid">
-<div class="card" onclick="showSection('missions')">
-<h3>Missions</h3>
-<p>Daily Tasks ⭐</p>
-</div>
-<div class="card" onclick="showSection('profile')">
-<h3>Profile</h3>
-<p>Your Journey 🏡</p>
-</div>
-<div class="card" onclick="showSection('matching-game')">
-<h3>Matching Game</h3>
-<p>Match Holy Individuals 🧠</p>
-</div>
-<div class="card" onclick="showSection('quiz')">
-<h3>Quiz</h3>
-<p>Test Your Knowledge 📚</p>
-</div>
-</div>
-<button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
 </div>
 <div class="section hidden" id="welcome" style="opacity: 30.00">
 <div class="content">
@@ -1226,7 +1227,6 @@
 <p>Test Your Knowledge 📚</p>
 </div>
 </div>
-<button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
 <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
 </div>
 </div>
@@ -1307,54 +1307,5 @@
 <button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
 </div>
 </div>
-</div>
-<script>
-    // Dynamically add Admin Quiz Management card for admin user
-    document.addEventListener('DOMContentLoaded', () => {
-        function updateWelcomeCardGrid() {
-            const cardGrid = document.getElementById('welcome-card-grid');
-            if (isAdmin) {
-                const adminCard = document.createElement('div');
-                adminCard.className = 'card';
-                adminCard.onclick = () => showSection('admin-quiz');
-                adminCard.innerHTML = `
-                    <h3>Admin Quiz Management</h3>
-                    <p>Manage Quiz Questions 🔧</p>
-                `;
-                if (!cardGrid.querySelector('div[onclick="showSection(\'admin-quiz\')"]')) {
-                    cardGrid.appendChild(adminCard);
-                }
-            }
-        }
-
-        // Update card grid when user data is loaded
-        const originalLoadUserData = loadUserData;
-        loadUserData = function() {
-            originalLoadUserData();
-            updateWelcomeCardGrid();
-        };
-
-        // Update card grid on admin login
-        const originalLoginAdmin = window.loginAdmin;
-        window.loginAdmin = function() {
-            originalLoginAdmin();
-            updateWelcomeCardGrid();
-        };
-
-        // Update card grid on regular login
-        const originalLogin = window.login;
-        window.login = function() {
-            originalLogin();
-            updateWelcomeCardGrid();
-        };
-
-        // Update card grid on signup
-        const originalSignupUser = window.signupUser;
-        window.signupUser = function() {
-            originalSignupUser();
-            updateWelcomeCardGrid();
-        };
-    });
-</script>
 </body>
 </html>
