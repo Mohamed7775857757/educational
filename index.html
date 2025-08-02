@@ -588,6 +588,9 @@
         };
 
         // Admin Quiz Management
+        let currentPage = 1;
+        const questionsPerPage = 10;
+
         function showAdminQuiz() {
             if (!isAdmin) {
                 alert("Access denied. Admin login required!");
@@ -598,7 +601,7 @@
             if (!container) return;
             container.innerHTML = '';
             const content = document.createElement('div');
-            content.className = 'content';
+            content.className = 'content admin-content';
             content.innerHTML = `
                 <h2 class="text-3xl text-orange-600 mb-4">Admin Quiz Management 🔧</h2>
                 <div class="story-card mb-4">
@@ -617,14 +620,20 @@
                     <div id="multiple-choice-fields" class="hidden">
                         <input id="admin-option-1" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 1">
                         <input id="admin-option-2" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 2">
-                        <input id="admin-option-3" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 3">
-                        <input id="admin-option-4" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 4">
+                        <input id="admin-option-3" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 3 (optional)">
+                        <input id="admin-option-4" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 4 (optional)">
                     </div>
                     <button class="btn mt-2" onclick="addQuestion()">Add Question ➕</button>
                 </div>
                 <div id="question-list" class="story-card mb-4">
                     <h3 class="text-xl">Existing Questions</h3>
+                    <input id="question-search" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Search questions...">
                     <div id="questions-display"></div>
+                    <div class="pagination mt-4">
+                        <button class="btn mr-2" onclick="changePage(-1)">Previous</button>
+                        <span id="page-info"></span>
+                        <button class="btn ml-2" onclick="changePage(1)">Next</button>
+                    </div>
                 </div>
                 <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
@@ -643,26 +652,40 @@
         };
 
         window.addQuestion = function() {
-            const questionText = document.getElementById('admin-question-text')?.value.trim();
-            const level = document.getElementById('admin-question-level')?.value;
-            const type = document.getElementById('admin-question-type')?.value;
-            const answer = document.getElementById('admin-answer-text')?.value.trim();
+            const questionText = document.getElementById('admin-question-text')?.value?.trim() || '';
+            const level = document.getElementById('admin-question-level')?.value || '';
+            const type = document.getElementById('admin-question-type')?.value || '';
+            const answer = document.getElementById('admin-answer-text')?.value?.trim() || '';
             const options = type === 'multiple' ? [
-                document.getElementById('admin-option-1')?.value.trim() || '',
-                document.getElementById('admin-option-2')?.value.trim() || '',
-                document.getElementById('admin-option-3')?.value.trim() || '',
-                document.getElementById('admin-option-4')?.value.trim() || ''
+                document.getElementById('admin-option-1')?.value?.trim() || '',
+                document.getElementById('admin-option-2')?.value?.trim() || '',
+                document.getElementById('admin-option-3')?.value?.trim() || '',
+                document.getElementById('admin-option-4')?.value?.trim() || ''
             ].filter(opt => opt.length > 0) : [];
 
-            console.log('Adding question:', { questionText, level, type, answer, options });
+            console.log('Adding question:', { questionText, level, type, answer, options, optionCount: options.length });
 
-            if (!questionText || !answer || (type === 'multiple' && options.length < 2)) {
-                alert('Please fill in all required fields (question, answer, and at least 2 non-empty options for multiple choice).');
+            if (!questionText || !level || !type) {
+                alert('Please fill in question text, level, and type.');
+                console.log('Validation failed: Missing question, level, or type');
+                return;
+            }
+
+            if (!answer) {
+                alert('Please provide a correct answer.');
+                console.log('Validation failed: Missing answer');
+                return;
+            }
+
+            if (type === 'multiple' && options.length < 2) {
+                alert('Please provide at least 2 non-empty options for multiple choice.');
+                console.log('Validation failed: Fewer than 2 options');
                 return;
             }
 
             if (type === 'multiple' && !options.includes(answer)) {
                 alert('The correct answer must be one of the multiple-choice options.');
+                console.log('Validation failed: Answer not in options');
                 return;
             }
 
@@ -679,6 +702,7 @@
             saveQuizQuestions();
             displayQuestions();
             alert('Question added successfully!');
+            console.log('Question added:', { id, questionText, level, type, answer, options });
             document.getElementById('admin-question-text').value = '';
             document.getElementById('admin-answer-text').value = '';
             if (type === 'multiple') {
@@ -707,13 +731,49 @@
 
         function displayQuestions() {
             const display = document.getElementById('questions-display');
-            if (!display) return;
-            display.innerHTML = '';
+            const pageInfo = document.getElementById('page-info');
+            const searchInput = document.getElementById('question-search');
+            if (!display || !pageInfo) return;
+
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const filteredQuestions = {};
             Object.keys(quizQuestions).forEach(level => {
-                if (quizQuestions[level].length > 0) {
-                    const levelDiv = document.createElement('div');
-                    levelDiv.innerHTML = `<h4 class="text-lg mt-4">${level}</h4>`;
-                    quizQuestions[level].forEach(q => {
+                filteredQuestions[level] = quizQuestions[level].filter(q => 
+                    q.question.toLowerCase().includes(searchTerm) || 
+                    q.answer.toLowerCase().includes(searchTerm) ||
+                    (q.options && q.options.some(opt => opt.toLowerCase().includes(searchTerm)))
+                );
+            });
+
+            display.innerHTML = '';
+            let totalQuestions = 0;
+            Object.values(filteredQuestions).forEach(levelQuestions => {
+                totalQuestions += levelQuestions.length;
+            });
+            const totalPages = Math.ceil(totalQuestions / questionsPerPage);
+            currentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+            let startIndex = (currentPage - 1) * questionsPerPage;
+            let currentIndex = 0;
+            let renderedQuestions = 0;
+
+            Object.keys(filteredQuestions).forEach(level => {
+                if (renderedQuestions >= questionsPerPage) return;
+                const levelQuestions = filteredQuestions[level];
+                if (levelQuestions.length === 0) return;
+
+                const levelDiv = document.createElement('div');
+                levelDiv.className = 'level-section';
+                levelDiv.innerHTML = `
+                    <h4 class="text-lg mt-4 cursor-pointer flex justify-between items-center" onclick="toggleLevelSection(this)">
+                        ${level} <span>▼</span>
+                    </h4>
+                    <div class="level-questions"></div>
+                `;
+                const questionsContainer = levelDiv.querySelector('.level-questions');
+
+                levelQuestions.forEach((q, index) => {
+                    if (currentIndex >= startIndex && renderedQuestions < questionsPerPage) {
                         const qDiv = document.createElement('div');
                         qDiv.className = 'border-b py-2';
                         qDiv.innerHTML = `
@@ -723,12 +783,33 @@
                             ${q.options ? `<p><strong>Options:</strong> ${q.options.join(', ')}</p>` : ''}
                             <button class="btn mt-2 bg-red-500 hover:bg-red-700" onclick="removeQuestion('${level}', '${q.id}')">Remove 🗑️</button>
                         `;
-                        levelDiv.appendChild(qDiv);
-                    });
+                        questionsContainer.appendChild(qDiv);
+                        renderedQuestions++;
+                    }
+                    currentIndex++;
+                });
+
+                if (questionsContainer.children.length > 0) {
                     display.appendChild(levelDiv);
                 }
             });
+
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+            document.querySelector('.pagination button:first-child').disabled = currentPage === 1;
+            document.querySelector('.pagination button:last-child').disabled = currentPage === totalPages;
         }
+
+        window.changePage = function(delta) {
+            currentPage += delta;
+            displayQuestions();
+        };
+
+        window.toggleLevelSection = function(header) {
+            const questionsDiv = header.nextElementSibling;
+            questionsDiv.classList.toggle('hidden');
+            const toggleIcon = header.querySelector('span');
+            toggleIcon.textContent = questionsDiv.classList.contains('hidden') ? '▼' : '▲';
+        };
 
         function updateWelcomeCardGrid() {
             const cardGrid = document.getElementById('welcome-card-grid');
@@ -856,6 +937,14 @@
                 if (quiz) quiz.classList.add('hidden');
                 if (adminQuiz) adminQuiz.classList.add('hidden');
             });
+
+            // Add search functionality
+            document.addEventListener('input', (e) => {
+                if (e.target.id === 'question-search') {
+                    currentPage = 1;
+                    displayQuestions();
+                }
+            });
         });
 </script>
 <style>
@@ -969,6 +1058,23 @@
             z-index: 1000;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
+        .admin-content {
+            max-height: 70vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #FFA500 #ddd;
+        }
+        .admin-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .admin-content::-webkit-scrollbar-track {
+            background: #ddd;
+            border-radius: 4px;
+        }
+        .admin-content::-webkit-scrollbar-thumb {
+            background: #FFA500;
+            border-radius: 4px;
+        }
         .card-grid {
             display: flex;
             justify-content: center;
@@ -1037,6 +1143,12 @@
         }
         .btn:active {
             transform: scale(0.95);
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         .star-counter {
             position: fixed;
@@ -1185,6 +1297,14 @@
             transform: rotateY(180deg);
             font-size: 0.8rem;
         }
+        .level-section .level-questions.hidden {
+            display: none;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         .hidden {
             display: none;
         }
@@ -1264,6 +1384,9 @@
             }
             .card-back {
                 font-size: 0.6rem;
+            }
+            .admin-content {
+                max-height: 60vh;
             }
         }
 </style>
