@@ -1,5 +1,4 @@
-f<!DOCTYPE html>
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -78,6 +77,7 @@ f<!DOCTYPE html>
                 gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 1, y: 50, duration: 0.5, ease: 'power2.out' });
                 if (sectionId === 'missions') showMissions();
                 if (sectionId === 'profile' && userData.email) showProfile();
+                if (sectionId === 'matching-game') initMatchingGame();
                 updateProgress();
                 updateBadges();
             }
@@ -133,7 +133,7 @@ f<!DOCTYPE html>
                 document.getElementById('profile').classList.add('hidden');
                 document.getElementById('avatar-display').style.display = 'none';
                 document.getElementById('star-count').textContent = '0 ⭐';
-                ['missions'].forEach(id => {
+                ['missions', 'matching-game'].forEach(id => {
                     const section = document.getElementById(id);
                     if (section) section.classList.add('hidden');
                 });
@@ -271,7 +271,7 @@ f<!DOCTYPE html>
         }
 
         function updateStarCounter() {
-            document.getElementById('star-count').textContent = userData.stars;
+            document.getElementById('star-count').textContent = `${userData.stars} ⭐`;
             if (document.getElementById('profile-star-count')) document.getElementById('profile-star-count').textContent = userData.stars;
             saveUserData();
         }
@@ -300,6 +300,97 @@ f<!DOCTYPE html>
             });
         }
 
+        // Matching Game Logic
+        const individuals = [
+            'Prophet Muhammad(s)', 'Imam Ali(as)', 'Sayeda Fatimah Al Zahraa(as)', 'Imam Al Hasan(as)',
+            'Imam Al Hussain(as)', 'Imam Al Sajjad(as)', 'Imam Al Baqir(as)', 'Imam Al Sadiq(as)',
+            'Imam Al Kathim(as)', 'Imam Al Redha(as)', 'Imam Al Jawad(as)', 'Imam Al Hadi(as)',
+            'Imam Al Askari(as)', 'Imam Al Mahdi(as)'
+        ];
+
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let canFlip = true;
+
+        function initMatchingGame() {
+            const container = document.getElementById('matching-game');
+            container.innerHTML = '';
+            const content = document.createElement('div');
+            content.className = 'content';
+            content.innerHTML = `
+                <h2 class="text-3xl text-orange-600 mb-4">Matching Game 🧠</h2>
+                <p>Match the names of the holy individuals!</p>
+                <div id="game-grid" class="game-grid"></div>
+                <p id="game-feedback" class="mt-4"></p>
+                <button class="btn mt-4" onclick="resetMatchingGame()">Reset Game 🔄</button>
+                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+            `;
+            container.appendChild(content);
+
+            const gameGrid = document.getElementById('game-grid');
+            const cards = [...individuals, ...individuals]; // Duplicate for pairs
+            cards.sort(() => Math.random() - 0.5); // Shuffle
+
+            cards.forEach((name, index) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.dataset.name = name;
+                card.innerHTML = `
+                    <div class="card-front">?</div>
+                    <div class="card-back">${name}</div>
+                `;
+                card.addEventListener('click', () => flipCard(card));
+                gameGrid.appendChild(card);
+            });
+
+            flippedCards = [];
+            matchedPairs = 0;
+            canFlip = true;
+            document.getElementById('game-feedback').textContent = '';
+        }
+
+        function flipCard(card) {
+            if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                canFlip = false;
+                const [card1, card2] = flippedCards;
+                if (card1.dataset.name === card2.dataset.name) {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    matchedPairs++;
+                    if (matchedPairs === individuals.length) {
+                        userData.stars += 14;
+                        userData.progress = Math.min(userData.progress + 1, 10);
+                        updateStarCounter();
+                        updateProgress();
+                        confetti();
+                        document.getElementById('game-feedback').textContent = 'Congratulations! All pairs matched! +14 Stars! 🎉';
+                    } else {
+                        document.getElementById('game-feedback').textContent = 'Match found! Keep going!';
+                    }
+                    flippedCards = [];
+                    canFlip = true;
+                } else {
+                    document.getElementById('game-feedback').textContent = 'No match. Try again!';
+                    setTimeout(() => {
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        flippedCards = [];
+                        canFlip = true;
+                    }, 1000);
+                }
+            }
+        }
+
+        window.resetMatchingGame = function() {
+            initMatchingGame();
+        };
+
         // Initialize on DOM load
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM fully loaded, initializing app...');
@@ -308,9 +399,11 @@ f<!DOCTYPE html>
             const hero = document.getElementById('hero');
             const welcomeSection = document.getElementById('welcome');
             const profileSection = document.getElementById('profile');
+            const matchingGameSection = document.getElementById('matching-game');
             if (hero) hero.classList.remove('hidden');
             if (welcomeSection) welcomeSection.classList.add('hidden');
             if (profileSection) profileSection.classList.add('hidden');
+            if (matchingGameSection) matchingGameSection.classList.add('hidden');
 
             // Initialize modals
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
@@ -338,6 +431,7 @@ f<!DOCTYPE html>
                         if (hero) hero.classList.remove('hidden');
                         if (welcomeSection) welcomeSection.classList.add('hidden');
                         if (profileSection) profileSection.classList.add('hidden');
+                        if (matchingGameSection) matchingGameSection.classList.add('hidden');
                         ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                             const modal = document.getElementById(id);
                             if (modal) modal.style.display = 'none';
@@ -363,9 +457,10 @@ f<!DOCTYPE html>
                 document.getElementById('hero').classList.remove('hidden');
                 document.getElementById('welcome').classList.add('hidden');
                 document.getElementById('profile').classList.add('hidden');
+                document.getElementById('matching-game').classList.add('hidden');
             });
         });
-    </script>
+</script>
 <style>
         body {
             font-family: 'Fredoka', sans-serif;
@@ -644,6 +739,55 @@ f<!DOCTYPE html>
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+        .game-card {
+            width: 100px;
+            height: 100px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+        .game-card.flipped {
+            transform: rotateY(180deg);
+        }
+        .game-card.matched {
+            background: #32CD32;
+            cursor: default;
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            text-align: center;
+            padding: 5px;
+            border-radius: 10px;
+        }
+        .card-front {
+            background: linear-gradient(135deg, #FFA500, #FF69B4);
+            color: #fff;
+            font-size: 2rem;
+        }
+        .card-back {
+            background: #fff;
+            color: #000;
+            transform: rotateY(180deg);
+            font-size: 0.8rem;
+        }
         .hidden {
             display: none;
         }
@@ -712,8 +856,20 @@ f<!DOCTYPE html>
                 width: 100%;
                 height: 200px; /* Adjusted for mobile */
             }
+            .game-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 5px;
+            }
+            .game-card {
+                width: 70px;
+                height: 70px;
+                font-size: 0.7rem;
+            }
+            .card-back {
+                font-size: 0.6rem;
+            }
         }
-    </style>
+</style>
 </head>
 <body>
 <div class="background-layer"></div>
@@ -748,6 +904,10 @@ f<!DOCTYPE html>
 <h3>Profile</h3>
 <p>Your Journey 🏡</p>
 </div>
+<div class="card" onclick="showSection('matching-game')">
+<h3>Matching Game</h3>
+<p>Match Holy Individuals 🧠</p>
+</div>
 </div>
 <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
 </div>
@@ -766,6 +926,10 @@ f<!DOCTYPE html>
 <div class="card" onclick="showSection('profile')">
 <h3>Profile</h3>
 <p>Your Journey 🏡</p>
+</div>
+<div class="card" onclick="showSection('matching-game')">
+<h3>Matching Game</h3>
+<p>Match Holy Individuals 🧠</p>
 </div>
 </div>
 <button class="btn mt-4" onclick="showAdminLoginModal()">Admin Login 🔐</button>
@@ -792,6 +956,7 @@ f<!DOCTYPE html>
 </div>
 </div>
 <div class="section hidden" id="profile"></div>
+<div class="section hidden" id="matching-game"></div>
 <div class="modal" id="login-modal">
 <div class="modal-content">
 <h2>Login 🚪</h2>
