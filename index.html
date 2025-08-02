@@ -85,7 +85,9 @@
         };
 
         window.showSection = function(sectionId) {
-            document.querySelectorAll('.section, #landing-page, #hero').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.section, #landing-page, #hero').forEach(el => {
+                if (el) el.classList.add('hidden');
+            });
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
@@ -97,25 +99,32 @@
                 if (sectionId === 'admin-quiz') showAdminQuiz();
                 updateProgress();
                 updateBadges();
+            } else {
+                console.error(`Section ${sectionId} not found`);
             }
         };
 
         window.signupUser = function() {
-            userData.name = document.getElementById('signup-name').value || 'Young Explorer';
-            userData.gender = document.querySelector('input[name="gender"]:checked').value;
-            userData.year = document.getElementById('year-select').value;
+            userData.name = document.getElementById('signup-name')?.value || 'Young Explorer';
+            userData.gender = document.querySelector('input[name="gender"]:checked')?.value || 'boy';
+            userData.year = document.getElementById('year-select')?.value || 'Level-1';
             const selected = document.querySelector('.character.selected');
-            userData.character = selected ? selected.src : document.querySelector('.character').src;
+            userData.character = selected ? selected.src : document.querySelector('.character')?.src || 'https://yourusername.github.io/your-repo/images/mascot.png';
             saveUserData();
 
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
+            const email = document.getElementById('signup-email')?.value;
+            const password = document.getElementById('signup-password')?.value;
+            if (!email || !password) {
+                alert('❌ Please enter email and password');
+                return;
+            }
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     alert("✅ Sign-up successful!");
                     userData.email = email;
                     isAdmin = email === 'melzein1987@gmail.com';
-                    closeModal({ target: { className: 'modal' } });
+                    const signupModal = document.getElementById('signup-modal');
+                    if (signupModal) signupModal.style.display = 'none';
                     loadUserData();
                     showSection('welcome');
                 })
@@ -123,20 +132,51 @@
         };
 
         window.login = function() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+            const email = document.getElementById('login-email')?.value;
+            const password = document.getElementById('login-password')?.value;
+            if (!email || !password) {
+                alert('❌ Please enter email and password');
+                return;
+            }
             signInWithEmailAndPassword(auth, email, password)
                 .then(() => {
                     alert("✅ Login successful!");
                     userData.email = email;
                     isAdmin = email === 'melzein1987@gmail.com';
+                    const loginModal = document.getElementById('login-modal');
+                    if (loginModal) loginModal.style.display = 'none';
                     loadUserData();
+                    showSection('welcome');
+                })
+                .catch(error => alert("❌ " + error.message));
+        };
+
+        window.loginAdmin = function() {
+            const email = document.getElementById('admin-username')?.value;
+            const password = document.getElementById('admin-password')?.value;
+            if (!email || !password) {
+                alert('❌ Please enter email and password');
+                return;
+            }
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    alert("✅ Admin login successful!");
+                    userData.email = email;
+                    isAdmin = email === 'melzein1987@gmail.com';
+                    const adminModal = document.getElementById('admin-login-modal');
+                    if (adminModal) adminModal.style.display = 'none';
+                    loadUserData();
+                    showSection('welcome');
                 })
                 .catch(error => alert("❌ " + error.message));
         };
 
         window.resetPassword = function() {
-            const email = document.getElementById('reset-email').value;
+            const email = document.getElementById('reset-email')?.value;
+            if (!email) {
+                alert('❌ Please enter an email');
+                return;
+            }
             sendPasswordResetEmail(auth, email)
                 .then(() => alert("📧 Password reset email sent!"))
                 .catch(error => alert("❌ " + error.message));
@@ -148,15 +188,14 @@
                 userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                 isAdmin = false;
                 localStorage.removeItem('userData');
-                document.getElementById('landing-page').classList.add('hidden');
-                document.getElementById('welcome').classList.add('hidden');
-                document.getElementById('profile').classList.add('hidden');
-                document.getElementById('avatar-display').style.display = 'none';
-                document.getElementById('star-count').textContent = '0 ⭐';
-                ['missions', 'matching-game', 'quiz', 'admin-quiz'].forEach(id => {
-                    const section = document.getElementById(id);
-                    if (section) section.classList.add('hidden');
+                const sections = ['landing-page', 'welcome', 'profile', 'avatar-display', 'missions', 'matching-game', 'quiz', 'admin-quiz'];
+                sections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
                 });
+                const avatar = document.getElementById('avatar-display');
+                if (avatar) avatar.style.display = 'none';
+                document.getElementById('star-count').textContent = '0 ⭐';
                 document.getElementById('hero').classList.remove('hidden');
             }).catch(error => alert("❌ " + error.message));
         };
@@ -167,20 +206,31 @@
                 userData = JSON.parse(saved);
                 if (!userData.badges) userData.badges = ['Explorer'];
                 if (!userData.quiz) userData.quiz = {};
-                document.getElementById('avatar-display').src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
-                document.getElementById('avatar-display').style.display = 'block';
-                document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
+                const avatar = document.getElementById('avatar-display');
+                if (avatar) {
+                    avatar.src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
+                    avatar.style.display = 'block';
+                }
+                const welcomeName = document.getElementById('welcome-name');
+                if (welcomeName) welcomeName.textContent = userData.name || 'Young Explorer';
                 updateStarCounter();
                 updateProgress();
                 updateBadges();
-                document.getElementById('landing-page').classList.add('hidden');
-                document.getElementById('welcome').classList.remove('hidden');
+                const landingPage = document.getElementById('landing-page');
+                const welcome = document.getElementById('welcome');
+                const profile = document.getElementById('profile');
+                if (landingPage) landingPage.classList.add('hidden');
+                if (welcome) welcome.classList.remove('hidden');
+                if (profile) profile.classList.add('hidden');
                 showSection('welcome');
                 updateWelcomeCardGrid();
             } else {
-                document.getElementById('hero').classList.remove('hidden');
-                document.getElementById('welcome').classList.add('hidden');
-                document.getElementById('profile').classList.add('hidden');
+                const hero = document.getElementById('hero');
+                const welcome = document.getElementById('welcome');
+                const profile = document.getElementById('profile');
+                if (hero) hero.classList.remove('hidden');
+                if (welcome) welcome.classList.add('hidden');
+                if (profile) profile.classList.add('hidden');
             }
         }
 
@@ -193,41 +243,35 @@
                 document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
                 img.classList.add('selected');
                 userData.character = img.src;
-                document.getElementById('avatar-display').src = userData.character;
+                const avatar = document.getElementById('avatar-display');
+                if (avatar) avatar.src = userData.character;
                 saveUserData();
             });
         });
 
         window.closeModal = function(event) {
-            if (event.target.classList.contains('modal') || event.target.classList.contains('btn')) {
-                const modalId = event.target.closest('.modal')?.id;
-                if (modalId) document.getElementById(modalId).style.display = 'none';
+            if (!event || !event.target) return;
+            const className = event.target.className || '';
+            if (className.includes('modal') || className.includes('btn')) {
+                const modal = event.target.closest('.modal');
+                if (modal && modal.id) {
+                    document.getElementById(modal.id).style.display = 'none';
+                }
                 if (!userData.email) {
-                    document.getElementById('hero').classList.remove('hidden');
-                    document.getElementById('welcome').classList.add('hidden');
-                    document.getElementById('profile').classList.add('hidden');
+                    const hero = document.getElementById('hero');
+                    const welcome = document.getElementById('welcome');
+                    const profile = document.getElementById('profile');
+                    if (hero) hero.classList.remove('hidden');
+                    if (welcome) welcome.classList.add('hidden');
+                    if (profile) profile.classList.add('hidden');
                 }
                 console.log('Modal closed via backdrop or button');
             }
         };
 
-        window.loginAdmin = function() {
-            const email = document.getElementById('admin-username').value;
-            const password = document.getElementById('admin-password').value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    alert("✅ Admin login successful!");
-                    userData.email = email;
-                    isAdmin = email === 'melzein1987@gmail.com';
-                    closeModal({ target: { className: 'modal' } });
-                    loadUserData();
-                    showSection('welcome');
-                })
-                .catch(error => alert("❌ " + error.message));
-        };
-
         function showMissions() {
             const container = document.getElementById('missions');
+            if (!container) return;
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
@@ -250,7 +294,9 @@
         }
 
         function checkMission(id, answer) {
-            const userAnswer = document.getElementById(`mission-${id}-input`).value.toLowerCase();
+            const input = document.getElementById(`mission-${id}-input`);
+            if (!input) return;
+            const userAnswer = input.value.toLowerCase();
             if (userAnswer === answer.toLowerCase()) {
                 userData.stars += 2;
                 userData.progress = Math.min(userData.progress + 1, 10);
@@ -261,12 +307,12 @@
                 const feedback = document.createElement('p');
                 feedback.className = 'text-green-600 mt-2';
                 feedback.textContent = 'Mission Complete! +2 Stars! 🎉';
-                document.getElementById(`mission-${id}-input`).parentElement.appendChild(feedback);
+                input.parentElement.appendChild(feedback);
             } else {
                 const feedback = document.createElement('p');
                 feedback.className = 'text-red-600 mt-2';
                 feedback.textContent = 'Wrong! Try again! 😕';
-                document.getElementById(`mission-${id}-input`).parentElement.appendChild(feedback);
+                input.parentElement.appendChild(feedback);
             }
         }
 
@@ -277,6 +323,7 @@
                 return;
             }
             const container = document.getElementById('profile');
+            if (!container) return;
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
@@ -296,8 +343,10 @@
         }
 
         function updateStarCounter() {
-            document.getElementById('star-count').textContent = `${userData.stars} ⭐`;
-            if (document.getElementById('profile-star-count')) document.getElementById('profile-star-count').textContent = userData.stars;
+            const starCount = document.getElementById('star-count');
+            if (starCount) starCount.textContent = `${userData.stars} ⭐`;
+            const profileStarCount = document.getElementById('profile-star-count');
+            if (profileStarCount) profileStarCount.textContent = userData.stars;
             saveUserData();
         }
 
@@ -307,7 +356,8 @@
                 const progress = (userData.progress / 10) * 100;
                 progressElement.style.width = `${progress}%`;
             }
-            if (document.getElementById('profile-progress')) document.getElementById('profile-progress').textContent = `${userData.progress}/10`;
+            const profileProgress = document.getElementById('profile-progress');
+            if (profileProgress) profileProgress.textContent = `${userData.progress}/10`;
             saveUserData();
         }
 
@@ -339,6 +389,7 @@
 
         function initMatchingGame() {
             const container = document.getElementById('matching-game');
+            if (!container) return;
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
@@ -354,8 +405,8 @@
             container.appendChild(content);
 
             const gameGrid = document.getElementById('game-grid');
-            const cards = [...individuals, ...individuals]; // Duplicate for pairs
-            cards.sort(() => Math.random() - 0.5); // Shuffle
+            const cards = [...individuals, ...individuals];
+            cards.sort(() => Math.random() - 0.5);
 
             gameGrid.innerHTML = '';
             cards.forEach((name, index) => {
@@ -442,6 +493,7 @@
                 return;
             }
             const container = document.getElementById('quiz');
+            if (!container) return;
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
@@ -461,6 +513,7 @@
         function showQuizQuestion() {
             const quizContent = document.getElementById('quiz-content');
             const feedback = document.getElementById('quiz-feedback');
+            if (!quizContent || !feedback) return;
             feedback.textContent = '';
             const questions = quizQuestions[userData.year] || [];
             
@@ -504,13 +557,16 @@
             const question = quizQuestions[userData.year][currentQuestionIndex];
             let userAnswer;
             if (question.type === 'text') {
-                userAnswer = document.getElementById(`quiz-answer-${id}`).value.trim().toLowerCase();
+                const input = document.getElementById(`quiz-answer-${id}`);
+                if (!input) return;
+                userAnswer = input.value.trim().toLowerCase();
             } else {
                 const selected = document.querySelector(`input[name="quiz-${id}"]:checked`);
                 userAnswer = selected ? selected.value.toLowerCase() : '';
             }
 
             const feedback = document.getElementById('quiz-feedback');
+            if (!feedback) return;
             if (userAnswer === correctAnswer.toLowerCase()) {
                 if (!userData.quiz[userData.year]?.[id]) {
                     userData.stars += 2;
@@ -539,6 +595,7 @@
                 return;
             }
             const container = document.getElementById('admin-quiz');
+            if (!container) return;
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
@@ -547,12 +604,12 @@
                 <div class="story-card mb-4">
                     <h3 class="text-xl">Add New Question</h3>
                     <input id="admin-question-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Question text">
-                    <select id="admin-question-level" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
-                        ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}">${level}</option>`).join('')}
-                    </select>
                     <select id="admin-question-type" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" onchange="toggleAnswerFields()">
                         <option value="text">Free Text</option>
                         <option value="multiple">Multiple Choice</option>
+                    </select>
+                    <select id="admin-question-level" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
+                        ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}">${level}</option>`).join('')}
                     </select>
                     <div id="answer-fields">
                         <input id="admin-answer-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Correct answer">
@@ -578,21 +635,23 @@
         }
 
         window.toggleAnswerFields = function() {
-            const type = document.getElementById('admin-question-type').value;
-            document.getElementById('answer-fields').classList.toggle('hidden', type === 'multiple');
-            document.getElementById('multiple-choice-fields').classList.toggle('hidden', type === 'text');
+            const type = document.getElementById('admin-question-type')?.value;
+            const answerFields = document.getElementById('answer-fields');
+            const multipleChoiceFields = document.getElementById('multiple-choice-fields');
+            if (answerFields) answerFields.classList.toggle('hidden', type === 'multiple');
+            if (multipleChoiceFields) multipleChoiceFields.classList.toggle('hidden', type === 'text');
         };
 
         window.addQuestion = function() {
-            const questionText = document.getElementById('admin-question-text').value.trim();
-            const level = document.getElementById('admin-question-level').value;
-            const type = document.getElementById('admin-question-type').value;
-            const answer = document.getElementById('admin-answer-text').value.trim();
+            const questionText = document.getElementById('admin-question-text')?.value.trim();
+            const level = document.getElementById('admin-question-level')?.value;
+            const type = document.getElementById('admin-question-type')?.value;
+            const answer = document.getElementById('admin-answer-text')?.value.trim();
             const options = type === 'multiple' ? [
-                document.getElementById('admin-option-1').value.trim(),
-                document.getElementById('admin-option-2').value.trim(),
-                document.getElementById('admin-option-3').value.trim(),
-                document.getElementById('admin-option-4').value.trim()
+                document.getElementById('admin-option-1')?.value.trim(),
+                document.getElementById('admin-option-2')?.value.trim(),
+                document.getElementById('admin-option-3')?.value.trim(),
+                document.getElementById('admin-option-4')?.value.trim()
             ].filter(opt => opt) : [];
 
             if (!questionText || !answer || (type === 'multiple' && options.length < 2)) {
@@ -605,7 +664,7 @@
                 return;
             }
 
-            const id = `q${Date.now()}`; // Unique ID based on timestamp
+            const id = `q${Date.now()}`;
             quizQuestions[level] = quizQuestions[level] || [];
             quizQuestions[level].push({
                 id,
@@ -630,7 +689,6 @@
 
         window.removeQuestion = function(level, id) {
             quizQuestions[level] = quizQuestions[level].filter(q => q.id !== id);
-            // Clear user progress for this question
             Object.keys(userData.quiz).forEach(lvl => {
                 if (userData.quiz[lvl]?.[id]) {
                     delete userData.quiz[lvl][id];
@@ -647,6 +705,7 @@
 
         function displayQuestions() {
             const display = document.getElementById('questions-display');
+            if (!display) return;
             display.innerHTML = '';
             Object.keys(quizQuestions).forEach(level => {
                 if (quizQuestions[level].length > 0) {
@@ -669,11 +728,9 @@
             });
         }
 
-        // Dynamically add Admin Quiz Management card for admin user
         function updateWelcomeCardGrid() {
             const cardGrid = document.getElementById('welcome-card-grid');
             if (!cardGrid) return;
-            // Clear existing admin card to avoid duplicates
             const existingAdminCard = cardGrid.querySelector('div[onclick="showSection(\'admin-quiz\')"]');
             if (existingAdminCard) existingAdminCard.remove();
             if (isAdmin) {
@@ -692,27 +749,24 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM fully loaded, initializing app...');
 
-            // Ensure initial UI state
             const hero = document.getElementById('hero');
-            const welcomeSection = document.getElementById('welcome');
-            const profileSection = document.getElementById('profile');
-            const matchingGameSection = document.getElementById('matching-game');
-            const quizSection = document.getElementById('quiz');
-            const adminQuizSection = document.getElementById('admin-quiz');
+            const welcome = document.getElementById('welcome');
+            const profile = document.getElementById('profile');
+            const matchingGame = document.getElementById('matching-game');
+            const quiz = document.getElementById('quiz');
+            const adminQuiz = document.getElementById('admin-quiz');
             if (hero) hero.classList.remove('hidden');
-            if (welcomeSection) welcomeSection.classList.add('hidden');
-            if (profileSection) profileSection.classList.add('hidden');
-            if (matchingGameSection) matchingGameSection.classList.add('hidden');
-            if (quizSection) quizSection.classList.add('hidden');
-            if (adminQuizSection) adminQuizSection.classList.add('hidden');
+            if (welcome) welcome.classList.add('hidden');
+            if (profile) profile.classList.add('hidden');
+            if (matchingGame) matchingGame.classList.add('hidden');
+            if (quiz) quiz.classList.add('hidden');
+            if (adminQuiz) adminQuiz.classList.add('hidden');
 
-            // Initialize modals
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
             });
 
-            // Authentication state listener
             let authInitialized = false;
             const initAuth = () => {
                 if (authInitialized) return;
@@ -723,20 +777,29 @@
                         userData.email = user.email;
                         isAdmin = user.email === 'melzein1987@gmail.com';
                         loadUserData();
-                        document.getElementById('login-modal').style.display = 'none';
-                        document.getElementById('hero').classList.add('hidden');
-                        document.getElementById('welcome').classList.remove('hidden');
+                        const loginModal = document.getElementById('login-modal');
+                        const hero = document.getElementById('hero');
+                        const welcome = document.getElementById('welcome');
+                        if (loginModal) loginModal.style.display = 'none';
+                        if (hero) hero.classList.add('hidden');
+                        if (welcome) welcome.classList.remove('hidden');
                         showSection('welcome');
                     } else {
                         userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                         isAdmin = false;
                         localStorage.removeItem('userData');
+                        const hero = document.getElementById('hero');
+                        const welcome = document.getElementById('welcome');
+                        const profile = document.getElementById('profile');
+                        const matchingGame = document.getElementById('matching-game');
+                        const quiz = document.getElementById('quiz');
+                        const adminQuiz = document.getElementById('admin-quiz');
                         if (hero) hero.classList.remove('hidden');
-                        if (welcomeSection) welcomeSection.classList.add('hidden');
-                        if (profileSection) profileSection.classList.add('hidden');
-                        if (matchingGameSection) matchingGameSection.classList.add('hidden');
-                        if (quizSection) quizSection.classList.add('hidden');
-                        if (adminQuizSection) adminQuizSection.classList.add('hidden');
+                        if (welcome) welcome.classList.add('hidden');
+                        if (profile) profile.classList.add('hidden');
+                        if (matchingGame) matchingGame.classList.add('hidden');
+                        if (quiz) quiz.classList.add('hidden');
+                        if (adminQuiz) adminQuiz.classList.add('hidden');
                         ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                             const modal = document.getElementById(id);
                             if (modal) modal.style.display = 'none';
@@ -745,13 +808,13 @@
                 }, (error) => {
                     console.error('Auth error:', error.message);
                     alert('Authentication failed. Please try again or contact support.');
+                    const hero = document.getElementById('hero');
                     if (hero) hero.classList.remove('hidden');
                 });
             };
 
             initAuth();
 
-            // Verify function availability
             console.log('Functions defined:', {
                 showLoginModal: typeof window.showLoginModal,
                 showSignupModal: typeof window.showSignupModal,
@@ -760,12 +823,18 @@
 
             window.addEventListener('load', () => {
                 console.log('Window fully loaded, verifying UI...');
-                document.getElementById('hero').classList.remove('hidden');
-                document.getElementById('welcome').classList.add('hidden');
-                document.getElementById('profile').classList.add('hidden');
-                document.getElementById('matching-game').classList.add('hidden');
-                document.getElementById('quiz').classList.add('hidden');
-                document.getElementById('admin-quiz').classList.add('hidden');
+                const hero = document.getElementById('hero');
+                const welcome = document.getElementById('welcome');
+                const profile = document.getElementById('profile');
+                const matchingGame = document.getElementById('matching-game');
+                const quiz = document.getElementById('quiz');
+                const adminQuiz = document.getElementById('admin-quiz');
+                if (hero) hero.classList.remove('hidden');
+                if (welcome) welcome.classList.add('hidden');
+                if (profile) profile.classList.add('hidden');
+                if (matchingGame) matchingGame.classList.add('hidden');
+                if (quiz) quiz.classList.add('hidden');
+                if (adminQuiz) adminQuiz.classList.add('hidden');
             });
         });
 </script>
@@ -1202,7 +1271,7 @@
 <img alt="Najaf" class="placeholder-image" src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/najaf.jpg"/>
 </div>
 </div>
-<div class="section hidden" id="welcome" style="opacity: 30.00">
+<div class="section hidden" id="welcome">
 <div class="content">
 <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
 <div class="progress-bar">
@@ -1230,25 +1299,7 @@
 <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
 </div>
 </div>
-<div class="section hidden" id="missions">
-<div class="content">
-<h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
-<div class="story-card mb-4">
-<h3 class="text-xl">Daily Salah</h3>
-<p>How many daily prayers?</p>
-<input class="border rounded-lg p-2 bg-white text-black mt-2" id="mission-salah-input" placeholder="Type your answer"/>
-<button class="btn mt-2" onclick="checkMission('salah', '5')">Submit 🎉</button>
-</div>
-<div class="story-card mb-4">
-<h3 class="text-xl">Learn Dua</h3>
-<p>Dua before eating?</p>
-<input class="border rounded-lg p-2 bg-white text-black mt-2" id="mission-dua-input" placeholder="Type your answer"/>
-<button class="btn mt-2" onclick="checkMission('dua', 'Bismillah')">Submit 🎉</button>
-</div>
-<button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-<button class="btn mt-2" onclick="logout()">Logout 🚪</button>
-</div>
-</div>
+<div class="section hidden" id="missions"></div>
 <div class="section hidden" id="profile"></div>
 <div class="section hidden" id="matching-game"></div>
 <div class="section hidden" id="quiz"></div>
