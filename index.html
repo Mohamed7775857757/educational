@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -36,13 +35,14 @@
         // Global variables
         let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
         let isAdmin = false;
+        let selectedQuizCategory = null;
 
         // Quiz questions stored in localStorage
         let quizQuestions = JSON.parse(localStorage.getItem('quizQuestions')) || {
             'Level-1': [
-                { id: 'q1', type: 'text', question: 'What is the name of the creator of the universe?', answer: 'Allah' },
-                { id: 'q2', type: 'text', question: 'What is the name of the book that was revealed to Prophet Muhammad(s)?', answer: 'Quran' },
-                { id: 'q3', type: 'multiple', question: 'Which Prophet was stuck in the belly of the whale?', options: ['Yusuf', 'Yunus', 'Ibrahim'], answer: 'Yunus' }
+                { id: 'q1', type: 'text', question: 'What is the name of the creator of the universe?', answer: 'Allah', category: 'Islamic Beliefs' },
+                { id: 'q2', type: 'text', question: 'What is the name of the book that was revealed to Prophet Muhammad(s)?', answer: 'Quran', category: 'Quran' },
+                { id: 'q3', type: 'multiple', question: 'Which Prophet was stuck in the belly of the whale?', options: ['Yusuf', 'Yunus', 'Ibrahim'], answer: 'Yunus', category: 'Islamic Personalities' }
             ],
             'Level-2': [], 'Level-3': [], 'Level-4': [], 'Level-5': [], 'Level-6': [], 'Level-7': []
         };
@@ -188,6 +188,7 @@
                 alert("✅ Logged out successfully!");
                 userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                 isAdmin = false;
+                selectedQuizCategory = null;
                 localStorage.removeItem('userData');
                 const sections = ['landing-page', 'welcome', 'profile', 'avatar-display', 'missions', 'matching-game', 'quiz', 'admin-quiz'];
                 sections.forEach(id => {
@@ -498,30 +499,60 @@
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Quiz Time 📚</h2>
-                <p>Test your knowledge for ${userData.year}!</p>
-                <div id="quiz-content" class="story-card mb-4"></div>
+            content.innerHTML = `
+                <h2 class="text-3xl text-orange-600 mb-4">Quiz Time 📚</h2>
+                <div id="quiz-content" class="story-card mb-4">
+                    <h3 class="text-xl">Select a Category</h3>
+                    <select id="quiz-category-select" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
+                        <option value="">Select a category</option>
+                        <option value="Islamic Laws">Islamic Laws</option>
+                        <option value="Islamic Beliefs">Islamic Beliefs</option>
+                        <option value="Quran">Quran</option>
+                        <option value="Islamic Personalities">Islamic Personalities</option>
+                        <option value="Islamic History">Islamic History</option>
+                    </select>
+                    <button class="btn mt-2" onclick="startQuiz()">Start Quiz 🎉</button>
+                </div>
                 <p id="quiz-feedback" class="mt-4"></p>
                 <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
             container.appendChild(content);
-
-            currentQuestionIndex = 0;
-            quizCompleted = userData.quiz[userData.year]?.completed || false;
-            showQuizQuestion();
         }
+
+        window.startQuiz = function() {
+            const categorySelect = document.getElementById('quiz-category-select');
+            if (!categorySelect) return;
+            selectedQuizCategory = categorySelect.value;
+            if (!selectedQuizCategory) {
+                alert('Please select a quiz category!');
+                return;
+            }
+            currentQuestionIndex = 0;
+            quizCompleted = userData.quiz[userData.year]?.[selectedQuizCategory]?.completed || false;
+            showQuizQuestion();
+        };
 
         function showQuizQuestion() {
             const quizContent = document.getElementById('quiz-content');
             const feedback = document.getElementById('quiz-feedback');
             if (!quizContent || !feedback) return;
             feedback.textContent = '';
-            const questions = quizQuestions[userData.year] || [];
+            const questions = (quizQuestions[userData.year] || []).filter(q => q.category === selectedQuizCategory);
             
+            if (questions.length === 0) {
+                quizContent.innerHTML = `
+                    <h3 class="text-xl">No Questions Available</h3>
+                    <p>No questions found for ${selectedQuizCategory} in ${userData.year}. Try another category!</p>
+                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>
+                `;
+                return;
+            }
+
             if (quizCompleted) {
                 quizContent.innerHTML = `
                     <h3 class="text-xl">Quiz Completed!</h3>
-                    <p>You've already completed the quiz for ${userData.year}. Try another activity!</p>
+                    <p>You've already completed the ${selectedQuizCategory} quiz for ${userData.year}. Try another category!</p>
+                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>
                 `;
                 return;
             }
@@ -529,14 +560,16 @@
             if (currentQuestionIndex >= questions.length) {
                 quizCompleted = true;
                 userData.quiz[userData.year] = userData.quiz[userData.year] || {};
-                userData.quiz[userData.year].completed = true;
+                userData.quiz[userData.year][selectedQuizCategory] = userData.quiz[userData.year][selectedQuizCategory] || {};
+                userData.quiz[userData.year][selectedQuizCategory].completed = true;
                 userData.progress = Math.min(userData.progress + 1, 10);
                 updateProgress();
                 saveUserData();
                 confetti();
                 quizContent.innerHTML = `
                     <h3 class="text-xl">Congratulations!</h3>
-                    <p class="text-green-600 text-xl">You've completed the ${userData.year} quiz! 🎉</p>
+                    <p class="text-green-600 text-xl">You've completed the ${selectedQuizCategory} quiz for ${userData.year}! 🎉</p>
+                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>
                 `;
                 return;
             }
@@ -551,11 +584,12 @@
                         <label class="block"><input type="radio" name="quiz-${question.id}" value="${option}" class="mr-2">${option}</label>
                     `).join('')}</div>`}
                 <button class="btn mt-2" onclick="checkQuizAnswer('${question.id}', '${question.answer}')">Submit 🎉</button>
+                <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>
             `;
         }
 
         window.checkQuizAnswer = function(id, correctAnswer) {
-            const question = quizQuestions[userData.year][currentQuestionIndex];
+            const question = (quizQuestions[userData.year] || []).find(q => q.id === id);
             let userAnswer;
             if (question.type === 'text') {
                 const input = document.getElementById(`quiz-answer-${id}`);
@@ -569,10 +603,11 @@
             const feedback = document.getElementById('quiz-feedback');
             if (!feedback) return;
             if (userAnswer === correctAnswer.toLowerCase()) {
-                if (!userData.quiz[userData.year]?.[id]) {
+                if (!userData.quiz[userData.year]?.[selectedQuizCategory]?.[id]) {
                     userData.stars += 2;
                     userData.quiz[userData.year] = userData.quiz[userData.year] || {};
-                    userData.quiz[userData.year][id] = true;
+                    userData.quiz[userData.year][selectedQuizCategory] = userData.quiz[userData.year][selectedQuizCategory] || {};
+                    userData.quiz[userData.year][selectedQuizCategory][id] = true;
                     updateStarCounter();
                     saveUserData();
                 }
@@ -615,14 +650,34 @@
                     <select id="admin-question-level" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
                         ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}">${level}</option>`).join('')}
                     </select>
+                    <select id="admin-question-category" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
+                        <option value="">Select a category</option>
+                        <option value="Islamic Laws">Islamic Laws</option>
+                        <option value="Islamic Beliefs">Islamic Beliefs</option>
+                        <option value="Quran">Quran</option>
+                        <option value="Islamic Personalities">Islamic Personalities</option>
+                        <option value="Islamic History">Islamic History</option>
+                    </select>
                     <div id="answer-fields">
                         <input id="admin-answer-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Correct answer">
                     </div>
                     <div id="multiple-choice-fields" class="hidden">
-                        <input id="admin-option-1" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 1">
-                        <input id="admin-option-2" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 2">
-                        <input id="admin-option-3" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 3 (optional)">
-                        <input id="admin-option-4" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Option 4 (optional)">
+                        <div class="mt-2">
+                            <input id="admin-option-1" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 1">
+                            <label class="ml-2"><input type="checkbox" id="correct-option-1" onchange="ensureSingleCorrectAnswer(1)"> Correct</label>
+                        </div>
+                        <div class="mt-2">
+                            <input id="admin-option-2" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 2">
+                            <label class="ml-2"><input type="checkbox" id="correct-option-2" onchange="ensureSingleCorrectAnswer(2)"> Correct</label>
+                        </div>
+                        <div class="mt-2">
+                            <input id="admin-option-3" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 3 (optional)">
+                            <label class="ml-2"><input type="checkbox" id="correct-option-3" onchange="ensureSingleCorrectAnswer(3)"> Correct</label>
+                        </div>
+                        <div class="mt-2">
+                            <input id="admin-option-4" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 4 (optional)">
+                            <label class="ml-2"><input type="checkbox" id="correct-option-4" onchange="ensureSingleCorrectAnswer(4)"> Correct</label>
+                        </div>
                     </div>
                     <button class="btn mt-2" onclick="addQuestion()">Add Question ➕</button>
                 </div>
@@ -652,28 +707,63 @@
             if (multipleChoiceFields) multipleChoiceFields.classList.toggle('hidden', type === 'text');
         };
 
+        window.ensureSingleCorrectAnswer = function(index) {
+            const checkboxes = [1, 2, 3, 4].map(i => document.getElementById(`correct-option-${i}`));
+            checkboxes.forEach((cb, i) => {
+                if (i + 1 !== index) cb.checked = false;
+            });
+        };
+
         window.addQuestion = function() {
             const questionText = document.getElementById('admin-question-text')?.value?.trim() || '';
             const level = document.getElementById('admin-question-level')?.value || '';
             const type = document.getElementById('admin-question-type')?.value || '';
-            const answer = document.getElementById('admin-answer-text')?.value?.trim() || '';
-            const options = type === 'multiple' ? [
-                document.getElementById('admin-option-1')?.value?.trim() || '',
-                document.getElementById('admin-option-2')?.value?.trim() || '',
-                document.getElementById('admin-option-3')?.value?.trim() || '',
-                document.getElementById('admin-option-4')?.value?.trim() || ''
-            ].filter(opt => opt.length > 0) : [];
+            const category = document.getElementById('admin-question-category')?.value || '';
+            let answer = '';
+            let options = [];
 
-            console.log('Adding question:', { questionText, level, type, answer, options, optionCount: options.length });
+            if (type === 'multiple') {
+                options = [
+                    document.getElementById('admin-option-1')?.value?.trim() || '',
+                    document.getElementById('admin-option-2')?.value?.trim() || '',
+                    document.getElementById('admin-option-3')?.value?.trim() || '',
+                    document.getElementById('admin-option-4')?.value?.trim() || ''
+                ].filter(opt => opt.length > 0);
+                const correctCheckboxes = [1, 2, 3, 4].map(i => document.getElementById(`correct-option-${i}`)?.checked);
+                const correctIndex = correctCheckboxes.findIndex(checked => checked);
+                answer = correctIndex >= 0 ? options[correctIndex] : '';
+            } else {
+                answer = document.getElementById('admin-answer-text')?.value?.trim() || '';
+            }
 
-            if (!questionText || !level || !type) {
-                alert('Please fill in question text, level, and type.');
-                console.log('Validation failed: Missing question, level, or type');
+            console.log('Adding question:', { questionText, level, type, category, answer, options, optionCount: options.length });
+
+            if (!questionText) {
+                alert('Please fill in the question text.');
+                console.log('Validation failed: Missing question text');
+                return;
+            }
+
+            if (!level) {
+                alert('Please select a level.');
+                console.log('Validation failed: Missing level');
+                return;
+            }
+
+            if (!type) {
+                alert('Please select a question type.');
+                console.log('Validation failed: Missing type');
+                return;
+            }
+
+            if (!category) {
+                alert('Please select a category.');
+                console.log('Validation failed: Missing category');
                 return;
             }
 
             if (!answer) {
-                alert('Please provide a correct answer.');
+                alert('Please provide a correct answer' + (type === 'multiple' ? ' by selecting one option.' : '.'));
                 console.log('Validation failed: Missing answer');
                 return;
             }
@@ -697,32 +787,37 @@
                 type,
                 question: questionText,
                 answer,
+                category,
                 ...(type === 'multiple' && { options })
             });
 
             saveQuizQuestions();
             displayQuestions();
             alert('Question added successfully!');
-            console.log('Question added:', { id, questionText, level, type, answer, options });
+            console.log('Question added:', { id, questionText, level, type, category, answer, options });
             document.getElementById('admin-question-text').value = '';
-            document.getElementById('admin-answer-text').value = '';
-            if (type === 'multiple') {
-                document.getElementById('admin-option-1').value = '';
-                document.getElementById('admin-option-2').value = '';
-                document.getElementById('admin-option-3').value = '';
-                document.getElementById('admin-option-4').value = '';
+            document.getElementById('admin-question-category').value = '';
+            if (type === 'text') {
+                document.getElementById('admin-answer-text').value = '';
+            } else {
+                [1, 2, 3, 4].forEach(i => {
+                    document.getElementById(`admin-option-${i}`).value = '';
+                    document.getElementById(`correct-option-${i}`).checked = false;
+                });
             }
         };
 
         window.removeQuestion = function(level, id) {
             quizQuestions[level] = quizQuestions[level].filter(q => q.id !== id);
             Object.keys(userData.quiz).forEach(lvl => {
-                if (userData.quiz[lvl]?.[id]) {
-                    delete userData.quiz[lvl][id];
-                    if (Object.keys(userData.quiz[lvl]).length === 1 && userData.quiz[lvl].completed) {
-                        delete userData.quiz[lvl].completed;
+                Object.keys(userData.quiz[lvl] || {}).forEach(cat => {
+                    if (userData.quiz[lvl][cat]?.[id]) {
+                        delete userData.quiz[lvl][cat][id];
+                        if (Object.keys(userData.quiz[lvl][cat]).length === 1 && userData.quiz[lvl][cat].completed) {
+                            delete userData.quiz[lvl][cat].completed;
+                        }
                     }
-                }
+                });
             });
             saveQuizQuestions();
             saveUserData();
@@ -742,7 +837,8 @@
                 filteredQuestions[level] = quizQuestions[level].filter(q => 
                     q.question.toLowerCase().includes(searchTerm) || 
                     q.answer.toLowerCase().includes(searchTerm) ||
-                    (q.options && q.options.some(opt => opt.toLowerCase().includes(searchTerm)))
+                    (q.options && q.options.some(opt => opt.toLowerCase().includes(searchTerm))) ||
+                    q.category.toLowerCase().includes(searchTerm)
                 );
             });
 
@@ -780,6 +876,7 @@
                         qDiv.innerHTML = `
                             <p><strong>Question:</strong> ${q.question}</p>
                             <p><strong>Type:</strong> ${q.type === 'text' ? 'Free Text' : 'Multiple Choice'}</p>
+                            <p><strong>Category:</strong> ${q.category}</p>
                             <p><strong>Answer:</strong> ${q.answer}</p>
                             ${q.options ? `<p><strong>Options:</strong> ${q.options.join(', ')}</p>` : ''}
                             <button class="btn mt-2 bg-red-500 hover:bg-red-700" onclick="removeQuestion('${level}', '${q.id}')">Remove 🗑️</button>
@@ -889,6 +986,7 @@
                     } else {
                         userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                         isAdmin = false;
+                        selectedQuizCategory = null;
                         localStorage.removeItem('userData');
                         const hero = document.getElementById('hero');
                         const welcome = document.getElementById('welcome');
@@ -1050,7 +1148,7 @@
             background: none;
         }
         .content {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem;
             color: #000;
@@ -1060,7 +1158,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         .admin-content {
-            max-height: 70vh;
+            max-height: 80vh;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #FFA500 #ddd;
@@ -1387,7 +1485,11 @@
                 font-size: 0.6rem;
             }
             .admin-content {
-                max-height: 60vh;
+                max-height: 75vh;
+            }
+            .content {
+                max-width: 100%;
+                padding: 1rem;
             }
         }
 </style>
