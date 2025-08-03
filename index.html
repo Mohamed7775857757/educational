@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Shia Islamic Adventure Quest</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Fredoka:wght@400;500&display=swap" rel="stylesheet"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-    <script defer type="module">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shia Islamic Adventure Quest</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;family=Fredoka:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
+<script defer="" type="module">
         // Import Firebase libraries
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -36,8 +36,6 @@
         let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
         let isAdmin = false;
         let selectedQuizCategory = null;
-        let editQuestionId = null;
-        let editQuestionLevel = null;
 
         // Quiz questions stored in localStorage
         let quizQuestions = JSON.parse(localStorage.getItem('quizQuestions')) || {
@@ -53,6 +51,7 @@
             localStorage.setItem('quizQuestions', JSON.stringify(quizQuestions));
         }
 
+        // Define functions globally within the module
         window.showLoginModal = function() {
             console.log('Attempting to show login modal...');
             const modal = document.getElementById('login-modal');
@@ -107,7 +106,7 @@
         };
 
         window.signupUser = function() {
-            userData.name = document.getElementById('signup-name')?.value?.trim() || 'Young Explorer';
+            userData.name = document.getElementById('signup-name')?.value || 'Young Explorer';
             userData.gender = document.querySelector('input[name="gender"]:checked')?.value || 'boy';
             userData.year = document.getElementById('year-select')?.value || 'Level-1';
             const selected = document.querySelector('.character.selected');
@@ -190,8 +189,6 @@
                 userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                 isAdmin = false;
                 selectedQuizCategory = null;
-                editQuestionId = null;
-                editQuestionLevel = null;
                 localStorage.removeItem('userData');
                 const sections = ['landing-page', 'welcome', 'profile', 'avatar-display', 'missions', 'matching-game', 'quiz', 'admin-quiz'];
                 sections.forEach(id => {
@@ -209,10 +206,8 @@
             const saved = localStorage.getItem('userData');
             if (saved) {
                 userData = JSON.parse(saved);
-                console.log('Loaded userData:', userData);
                 if (!userData.badges) userData.badges = ['Explorer'];
                 if (!userData.quiz) userData.quiz = {};
-                if (!userData.name) userData.name = 'Young Explorer';
                 const avatar = document.getElementById('avatar-display');
                 if (avatar) {
                     avatar.src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
@@ -243,7 +238,6 @@
 
         function saveUserData() {
             localStorage.setItem('userData', JSON.stringify(userData));
-            console.log('Saved userData:', userData);
         }
 
         document.querySelectorAll('.character').forEach(img => {
@@ -332,24 +326,16 @@
             }
             const container = document.getElementById('profile');
             if (!container) return;
-            console.log('Showing profile for user:', userData.name);
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
-            content.innerHTML = `
-                <h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
-                <p><strong>Name:</strong> ${userData.name || 'Young Explorer'}</p>
-                <p><strong>Email:</strong> ${userData.email || 'Not set'}</p>
-                ${!isAdmin ? `
-                <p><strong>Level:</strong> ${userData.year}</p>
-                <select id="profile-level-select" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
-                    ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}" ${level === userData.year ? 'selected' : ''}>${level}</option>`).join('')}
-                </select>
-                <button class="btn mt-2" onclick="updateUserLevel()">Update Level 🔄</button>
-                ` : `<p><strong>Level:</strong> Admin (Quiz Management Only)</p>`}
-                <p><strong>Stars:</strong> <span id="profile-star-count">${userData.stars}</span> ⭐</p>
-                <p><strong>Progress:</strong> <span id="profile-progress">${userData.progress}/10</span></p>
-                <p><strong>Badges:</strong> ${userData.badges.join(', ')}</p>
+            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
+                <p>Email: ${userData.email || 'Not set'}</p>
+                <p>Name: ${userData.name}</p>
+                <p>Level: ${userData.year}</p>
+                <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
+                <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
+                <p>Badges: ${userData.badges.join(', ')}</p>
                 <img src="${userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png'}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
                 <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
@@ -357,21 +343,6 @@
             updateStarCounter();
             updateProgress();
         }
-
-        window.updateUserLevel = function() {
-            if (isAdmin) {
-                alert("Admins cannot change levels.");
-                return;
-            }
-            const newLevel = document.getElementById('profile-level-select')?.value;
-            if (newLevel && newLevel !== userData.year) {
-                userData.year = newLevel;
-                saveUserData();
-                showProfile();
-                alert('Level updated successfully!');
-                console.log('User level updated to:', userData.year);
-            }
-        };
 
         function updateStarCounter() {
             const starCount = document.getElementById('star-count');
@@ -428,7 +399,7 @@
                 <h2 class="text-3xl text-orange-600 mb-4">Matching Game 🧠</h2>
                 <p>Match the names of the holy individuals!</p>
                 <div id="game-grid" class="game-grid"></div>
-                <p id="game-feedback" class="mt-4 text-lg font-bold"></p>
+                <p id="game-feedback" class="mt-4"></p>
                 <button class="btn mt-4" onclick="resetMatchingGame()">Reset Game 🔄</button>
                 <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
@@ -481,16 +452,12 @@
                     matchedPairs++;
                     document.getElementById('game-feedback').textContent = 'Match found! Keep going!';
                     if (matchedPairs === individuals.length) {
-                        console.log('All pairs matched! Triggering completion...');
                         userData.stars += 14;
                         userData.progress = Math.min(userData.progress + 1, 10);
                         updateStarCounter();
                         updateProgress();
                         confetti();
-                        const feedback = document.getElementById('game-feedback');
-                        if (feedback) {
-                            feedback.innerHTML = '<span class="text-green-600 text-xl font-bold">Congratulations! All pairs matched! +14 Stars! 🎉</span>';
-                        }
+                        document.getElementById('game-feedback').innerHTML = '<span class="text-green-600 text-xl">Congratulations! All pairs matched! +14 Stars! 🎉</span>';
                         console.log('Game completed! Stars awarded:', userData.stars);
                     }
                     flippedCards = [];
@@ -571,7 +538,7 @@
             if (!quizContent || !feedback) return;
             feedback.textContent = '';
             const questions = (quizQuestions[userData.year] || []).filter(q => q.category === selectedQuizCategory);
-
+            
             if (questions.length === 0) {
                 quizContent.innerHTML = `
                     <h3 class="text-xl">No Questions Available</h3>
@@ -611,7 +578,7 @@
             quizContent.innerHTML = `
                 <h3 class="text-xl">Question ${currentQuestionIndex + 1}</h3>
                 <p>${question.question}</p>
-                ${question.type === 'text' ?
+                ${question.type === 'text' ? 
                     `<input id="quiz-answer-${question.id}" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Type your answer">` :
                     `<div class="mt-2">${question.options.map(option => `
                         <label class="block"><input type="radio" name="quiz-${question.id}" value="${option}" class="mr-2">${option}</label>
@@ -674,7 +641,7 @@
             content.innerHTML = `
                 <h2 class="text-3xl text-orange-600 mb-4">Admin Quiz Management 🔧</h2>
                 <div class="story-card mb-4">
-                    <h3 class="text-xl" id="admin-form-title">Add New Question</h3>
+                    <h3 class="text-xl">Add New Question</h3>
                     <input id="admin-question-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Question text">
                     <select id="admin-question-type" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" onchange="toggleAnswerFields()">
                         <option value="text">Free Text</option>
@@ -713,7 +680,6 @@
                         </div>
                     </div>
                     <button class="btn mt-2" onclick="addQuestion()">Add Question ➕</button>
-                    <button class="btn mt-2 hidden" id="cancel-edit-btn" onclick="cancelEdit()">Cancel Edit ❌</button>
                 </div>
                 <div id="question-list" class="story-card mb-4">
                     <h3 class="text-xl">Existing Questions</h3>
@@ -748,50 +714,6 @@
             });
         };
 
-        window.editQuestion = function(level, id) {
-            const question = quizQuestions[level].find(q => q.id === id);
-            if (!question) return;
-
-            editQuestionId = id;
-            editQuestionLevel = level;
-            document.getElementById('admin-form-title').textContent = 'Edit Question';
-            document.getElementById('admin-question-text').value = question.question;
-            document.getElementById('admin-question-type').value = question.type;
-            document.getElementById('admin-question-level').value = level;
-            document.getElementById('admin-question-category').value = question.category;
-            toggleAnswerFields();
-            if (question.type === 'text') {
-                document.getElementById('admin-answer-text').value = question.answer;
-            } else {
-                [1, 2, 3, 4].forEach(i => {
-                    document.getElementById(`admin-option-${i}`).value = question.options[i - 1] || '';
-                    document.getElementById(`correct-option-${i}`).checked = question.options[i - 1] === question.answer;
-                });
-            }
-            document.getElementById('cancel-edit-btn').classList.remove('hidden');
-            document.getElementById('addQuestion').textContent = 'Update Question 🔄';
-            console.log('Editing question:', { id, level, question });
-        };
-
-        window.cancelEdit = function() {
-            editQuestionId = null;
-            editQuestionLevel = null;
-            document.getElementById('admin-form-title').textContent = 'Add New Question';
-            document.getElementById('admin-question-text').value = '';
-            document.getElementById('admin-question-type').value = 'text';
-            document.getElementById('admin-question-level').value = 'Level-1';
-            document.getElementById('admin-question-category').value = '';
-            document.getElementById('admin-answer-text').value = '';
-            [1, 2, 3, 4].forEach(i => {
-                document.getElementById(`admin-option-${i}`).value = '';
-                document.getElementById(`correct-option-${i}`).checked = false;
-            });
-            toggleAnswerFields();
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
-            document.getElementById('addQuestion').textContent = 'Add Question ➕';
-            console.log('Edit cancelled');
-        };
-
         window.addQuestion = function() {
             const questionText = document.getElementById('admin-question-text')?.value?.trim() || '';
             const level = document.getElementById('admin-question-level')?.value || '';
@@ -814,7 +736,7 @@
                 answer = document.getElementById('admin-answer-text')?.value?.trim() || '';
             }
 
-            console.log('Processing question:', { questionText, level, type, category, answer, options, optionCount: options.length, editQuestionId });
+            console.log('Adding question:', { questionText, level, type, category, answer, options, optionCount: options.length });
 
             if (!questionText) {
                 alert('Please fill in the question text.');
@@ -858,57 +780,21 @@
                 return;
             }
 
-            if (editQuestionId) {
-                // Update existing question
-                if (editQuestionLevel !== level) {
-                    // Remove from old level
-                    quizQuestions[editQuestionLevel] = quizQuestions[editQuestionLevel].filter(q => q.id !== editQuestionId);
-                    quizQuestions[level] = quizQuestions[level] || [];
-                    quizQuestions[level].push({
-                        id: editQuestionId,
-                        type,
-                        question: questionText,
-                        answer,
-                        category,
-                        ...(type === 'multiple' && { options })
-                    });
-                } else {
-                    // Update in place
-                    const question = quizQuestions[level].find(q => q.id === editQuestionId);
-                    question.question = questionText;
-                    question.type = type;
-                    question.answer = answer;
-                    question.category = category;
-                    if (type === 'multiple') {
-                        question.options = options;
-                    } else {
-                        delete question.options;
-                    }
-                }
-                saveQuizQuestions();
-                displayQuestions();
-                alert('Question updated successfully!');
-                console.log('Question updated:', { id: editQuestionId, level, questionText, type, category, answer, options });
-                cancelEdit();
-            } else {
-                // Add new question
-                const id = `q${Date.now()}`;
-                quizQuestions[level] = quizQuestions[level] || [];
-                quizQuestions[level].push({
-                    id,
-                    type,
-                    question: questionText,
-                    answer,
-                    category,
-                    ...(type === 'multiple' && { options })
-                });
-                saveQuizQuestions();
-                displayQuestions();
-                alert('Question added successfully!');
-                console.log('Question added:', { id, questionText, level, type, category, answer, options });
-            }
+            const id = `q${Date.now()}`;
+            quizQuestions[level] = quizQuestions[level] || [];
+            quizQuestions[level].push({
+                id,
+                type,
+                question: questionText,
+                answer,
+                category,
+                ...(type === 'multiple' && { options })
+            });
 
-            // Reset form
+            saveQuizQuestions();
+            displayQuestions();
+            alert('Question added successfully!');
+            console.log('Question added:', { id, questionText, level, type, category, answer, options });
             document.getElementById('admin-question-text').value = '';
             document.getElementById('admin-question-category').value = '';
             if (type === 'text') {
@@ -948,8 +834,8 @@
             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             const filteredQuestions = {};
             Object.keys(quizQuestions).forEach(level => {
-                filteredQuestions[level] = quizQuestions[level].filter(q =>
-                    q.question.toLowerCase().includes(searchTerm) ||
+                filteredQuestions[level] = quizQuestions[level].filter(q => 
+                    q.question.toLowerCase().includes(searchTerm) || 
                     q.answer.toLowerCase().includes(searchTerm) ||
                     (q.options && q.options.some(opt => opt.toLowerCase().includes(searchTerm))) ||
                     q.category.toLowerCase().includes(searchTerm)
@@ -993,7 +879,6 @@
                             <p><strong>Category:</strong> ${q.category}</p>
                             <p><strong>Answer:</strong> ${q.answer}</p>
                             ${q.options ? `<p><strong>Options:</strong> ${q.options.join(', ')}</p>` : ''}
-                            <button class="btn mt-2 bg-blue-500 hover:bg-blue-700" onclick="editQuestion('${level}', '${q.id}')">Edit ✏️</button>
                             <button class="btn mt-2 bg-red-500 hover:bg-red-700" onclick="removeQuestion('${level}', '${q.id}')">Remove 🗑️</button>
                         `;
                         questionsContainer.appendChild(qDiv);
@@ -1027,8 +912,9 @@
         function updateWelcomeCardGrid() {
             const cardGrid = document.getElementById('welcome-card-grid');
             if (!cardGrid) return;
-            cardGrid.innerHTML = '';
+            cardGrid.innerHTML = ''; // Clear existing cards
             if (isAdmin) {
+                // Only show Admin Quiz Management for admins
                 const adminCard = document.createElement('div');
                 adminCard.className = 'card';
                 adminCard.onclick = () => showSection('admin-quiz');
@@ -1038,6 +924,7 @@
                 `;
                 cardGrid.appendChild(adminCard);
             } else {
+                // Show all cards except Admin Quiz Management for non-admins
                 const cards = [
                     { id: 'missions', title: 'Missions', desc: 'Daily Tasks ⭐' },
                     { id: 'profile', title: 'Profile', desc: 'Your Journey 🏡' },
@@ -1100,8 +987,6 @@
                         userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                         isAdmin = false;
                         selectedQuizCategory = null;
-                        editQuestionId = null;
-                        editQuestionLevel = null;
                         localStorage.removeItem('userData');
                         const hero = document.getElementById('hero');
                         const welcome = document.getElementById('welcome');
@@ -1160,8 +1045,8 @@
                 }
             });
         });
-    </script>
-    <style>
+</script>
+<style>
         body {
             font-family: 'Fredoka', sans-serif;
             margin: 0;
@@ -1263,7 +1148,7 @@
             background: none;
         }
         .content {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem;
             color: #000;
@@ -1607,158 +1492,101 @@
                 padding: 1rem;
             }
         }
-    </style>
+</style>
 </head>
 <body>
-    <div class="background-layer">
-        <div class="tree" style="bottom: 10%; left: 10%;">🌳</div>
-        <div class="tree" style="bottom: 15%; right: 15%;">🌳</div>
-        <div class="cloud" style="top: 20%; left: 20%;">☁️</div>
-        <div class="cloud" style="top: 30%; right: 30%;">☁️</div>
-        <div class="star" style="top: 10%; left: 40%;">⭐</div>
-        <div class="star" style="top: 15%; right: 20%;">⭐</div>
-        <div class="moon" style="top: 10%; left: 10%;">🌙</div>
-    </div>
-    <div class="ui-container">
-        <div class="header-bar">
-            <h1>Shia Islamic Adventure Quest</h1>
-        </div>
-        <img id="avatar-display" class="avatar-display hidden" src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar"/>
-        <div id="star-count" class="star-counter">0 ⭐</div>
-        <div id="hero" class="hero">
-            <div class="content">
-                <h1>Welcome to the Adventure!</h1>
-                <p>Join us on a fun journey of learning and discovery!</p>
-                <button class="btn" onclick="showLoginModal()">Login 🚪</button>
-                <button class="btn" onclick="showSignupModal()">Sign Up 🌟</button>
-                <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔑</button>
-            </div>
-        </div>
-        <div id="landing-page" class="section hidden">
-            <div class="content">
-                <h2>Choose Your Path</h2>
-                <div class="card-grid">
-                    <div class="card" onclick="showSection('missions')">
-                        <h3>Missions</h3>
-                        <p>Daily Tasks ⭐</p>
-                    </div>
-                    <div class="card" onclick="showSection('profile')">
-                        <h3>Profile</h3>
-                        <p>Your Journey 🏡</p>
-                    </div>
-                    <div class="card" onclick="showSection('matching-game')">
-                        <h3>Matching Game</h3>
-                        <p>Match Holy Individuals 🧠</p>
-                    </div>
-                    <div class="card" onclick="showSection('quiz')">
-                        <h3>Quiz</h3>
-                        <p>Test Your Knowledge 📚</p>
-                    </div>
-                    <div class="card" onclick="showSection('admin-quiz')">
-                        <h3>Admin Quiz Management</h3>
-                        <p>Manage Quiz Questions 🔧</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="welcome" class="section hidden">
-            <div class="content">
-                <h2>Welcome, <span id="welcome-name">Adventurer</span>!</h2>
-                <div class="progress-bar">
-                    <div id="progress"></div>
-                </div>
-                <div class="badge">🏅 Badge: Explorer</div>
-                <div id="welcome-card-grid" class="card-grid"></div>
-            </div>
-        </
+<div class="background-layer"></div>
+<div class="ui-container">
+<div class="header-bar">
+<h1>Shia Islamic Adventure Quest</h1>
 </div>
-        <div id="profile" class="section hidden">
-            <div class="content">
-                <!-- Profile content will be dynamically generated -->
-            </div>
-        </div>
-        <div id="missions" class="section hidden">
-            <div class="content">
-                <!-- Missions content will be dynamically generated -->
-            </div>
-        </div>
-        <div id="matching-game" class="section hidden">
-            <div class="content">
-                <!-- Matching game content will be dynamically generated -->
-            </div>
-        </div>
-        <div id="quiz" class="section hidden">
-            <div class="content">
-                <!-- Quiz content will be dynamically generated -->
-            </div>
-        </div>
-        <div id="admin-quiz" class="section hidden">
-            <div class="content admin-content">
-                <!-- Admin quiz management content will be dynamically generated -->
-            </div>
-        </div>
-        <div id="login-modal" class="modal" onclick="closeModal(event)">
-            <div class="modal-content">
-                <h2>Login</h2>
-                <input id="login-email" type="email" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Email">
-                <input id="login-password" type="password" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Password">
-                <button class="btn mt-4" onclick="login()">Login 🚪</button>
-                <button class="btn mt-2" onclick="showSection('reset-password-modal')">Forgot Password? 🔑</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Cancel ❌</button>
-            </div>
-        </div>
-        <div id="signup-modal" class="modal" onclick="closeModal(event)">
-            <div class="modal-content">
-                <h2>Sign Up</h2>
-                <input id="signup-name" type="text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Your Name">
-                <input id="signup-email" type="email" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Email">
-                <input id="signup-password" type="password" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Password">
-                <div class="mt-4">
-                    <h3>Choose Gender</h3>
-                    <label><input type="radio" name="gender" value="boy" checked> Boy</label>
-                    <label><input type="radio" name="gender" value="girl"> Girl</label>
-                </div>
-                <div class="mt-4">
-                    <h3>Choose Level</h3>
-                    <select id="year-select" class="border rounded-lg p-2 bg-white text-black w-full">
-                        <option value="Level-1">Level-1</option>
-                        <option value="Level-2">Level-2</option>
-                        <option value="Level-3">Level-3</option>
-                        <option value="Level-4">Level-4</option>
-                        <option value="Level-5">Level-5</option>
-                        <option value="Level-6">Level-6</option>
-                        <option value="Level-7">Level-7</option>
-                    </select>
-                </div>
-                <div class="mt-4">
-                    <h3>Choose Your Character</h3>
-                    <div class="placeholder-images">
-                        <img src="https://yourusername.github.io/your-repo/images/character1.png" alt="Character 1" class="character w-24 h-24 rounded-full cursor-pointer">
-                        <img src="https://yourusername.github.io/your-repo/images/character2.png" alt="Character 2" class="character w-24 h-24 rounded-full cursor-pointer">
-                        <img src="https://yourusername.github.io/your-repo/images/character3.png" alt="Character 3" class="character w-24 h-24 rounded-full cursor-pointer">
-                    </div>
-                </div>
-                <button class="btn mt-4" onclick="signupUser()">Sign Up 🌟</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Cancel ❌</button>
-            </div>
-        </div>
-        <div id="admin-login-modal" class="modal" onclick="closeModal(event)">
-            <div class="modal-content">
-                <h2>Admin Login</h2>
-                <input id="admin-username" type="email" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Admin Email">
-                <input id="admin-password" type="password" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Password">
-                <button class="btn mt-4" onclick="loginAdmin()">Login 🔑</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Cancel ❌</button>
-            </div>
-        </div>
-        <div id="reset-password-modal" class="modal" onclick="closeModal(event)">
-            <div class="modal-content">
-                <h2>Reset Password</h2>
-                <input id="reset-email" type="email" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Enter your email">
-                <button class="btn mt-4" onclick="resetPassword()">Send Reset Email 📧</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Cancel ❌</button>
-            </div>
-        </div>
-    </div>
+<div class="star-counter" id="star-count">0 ⭐</div>
+<img alt="Avatar" class="avatar-display" id="avatar-display" src="https://yourusername.github.io/your-repo/images/mascot.png" style="display: none;"/>
+<div class="tree" style="top: 20%; left: 5%;"></div>
+<div class="cloud" style="top: 10%; right: 10%;"></div>
+<div class="star" style="top: 15%; left: 20%;"></div>
+<div class="moon" style="top: 10%; left: 10%;"></div>
+<div class="hero" id="hero">
+<h1>Welcome to Your Adventure!</h1>
+<p>Explore, learn, and grow with Shia Islamic teachings.</p>
+<button class="btn" onclick="showLoginModal()">Login 🚪</button>
+<button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
+<button class="btn" onclick="showAdminLoginModal()">Admin Login 🔐</button>
+<div class="placeholder-images">
+<img alt="Madinah" class="placeholder-image" src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg"/>
+<img alt="Najaf" class="placeholder-image" src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/najaf.jpg"/>
+</div>
+</div>
+<div class="section hidden" id="welcome">
+<div class="content">
+<h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
+<div class="progress-bar">
+<div id="progress"></div>
+</div>
+<p class="badge"></p>
+<div class="card-grid" id="welcome-card-grid">
+</div>
+<button class="btn mt-4" onclick="logout()">Logout 🚪</button>
+</div>
+</div>
+<div class="section hidden" id="missions"></div>
+<div class="section hidden" id="profile"></div>
+<div class="section hidden" id="matching-game"></div>
+<div class="section hidden" id="quiz"></div>
+<div class="section hidden" id="admin-quiz"></div>
+<div class="modal" id="login-modal">
+<div class="modal-content">
+<h2>Login 🚪</h2>
+<input class="border rounded-lg p-2 bg-white text-black mt-4 w-full" id="login-email" placeholder="Email" type="email"/>
+<input class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="login-password" placeholder="Password" type="password"/>
+<button class="btn mt-4" onclick="login()">Login 🎉</button>
+<button class="btn mt-2" onclick="showResetPasswordModal()">Forgot Password? 🔑</button>
+<button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
+</div>
+</div>
+<div class="modal" id="signup-modal">
+<div class="modal-content">
+<h2>Sign Up ✨</h2>
+<input class="border rounded-lg p-2 bg-white text-black mt-4 w-full" id="signup-name" placeholder="Name"/>
+<div class="mt-2">
+<label><input checked="" name="gender" type="radio" value="boy"/> Boy 👦</label>
+<label class="ml-4"><input name="gender" type="radio" value="girl"/> Girl 👧</label>
+</div>
+<select class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="year-select">
+<option value="Level-1">Level 1</option>
+<option value="Level-2">Level 2</option>
+<option value="Level-3">Level 3</option>
+<option value="Level-4">Level 4</option>
+<option value="Level-5">Level 5</option>
+<option value="Level-6">Level 6</option>
+<option value="Level-7">Level 7</option>
+</select>
+<div class="character-select mt-2">
+<img alt="Boy" class="character w-16 h-16 mr-2" src="https://yourusername.github.io/your-repo/images/mascot.png"/>
+<img alt="Girl" class="character w-16 h-16" src="https://yourusername.github.io/your-repo/images/girl.png"/>
+</div>
+<input class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="signup-email" placeholder="Email" type="email"/>
+<input class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="signup-password" placeholder="Password" type="password"/>
+<button class="btn mt-4" onclick="signupUser()">Sign Up 🎉</button>
+<button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
+</div>
+</div>
+<div class="modal" id="admin-login-modal">
+<div class="modal-content">
+<h2>Admin Login 🔐</h2>
+<input class="border rounded-lg p-2 bg-white text-black mt-4 w-full" id="admin-username" placeholder="Email" type="email"/>
+<input class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="admin-password" placeholder="Password" type="password"/>
+<button class="btn mt-4" onclick="loginAdmin()">Login 🎉</button>
+<button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
+</div>
+</div>
+<div class="modal" id="reset-password-modal">
+<div class="modal-content">
+<h2>Reset Password 🔑</h2>
+<input class="border rounded-lg p-2 bg-white text-black mt-4 w-full" id="reset-email" placeholder="Email" type="email"/>
+<button class="btn mt-4" onclick="resetPassword()">Send Reset Email 📧</button>
+<button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
+</div>
+</div>
 </body>
 </html>
