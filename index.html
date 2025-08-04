@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Shia Islamic Adventure Quest</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;family=Fredoka:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-<script defer="" type="module">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Shia Islamic Adventure Quest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;family=Fredoka:wght@400;500&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
+    <script defer="" type="module">
         // Import Firebase libraries
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -33,7 +33,7 @@
         const auth = getAuth(app);
 
         // Global variables
-        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
+        let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], quiz: {}, artwork: {}, storyPath: [] };
         let isAdmin = false;
         let selectedQuizCategory = null;
 
@@ -92,11 +92,11 @@
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
-                gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 1.50, y: 50, duration: 0.5, ease: 'power2.out' });
-                if (sectionId === 'missions' && !isAdmin) showMissions();
+                gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
                 if (sectionId === 'profile' && !isAdmin) showProfile();
                 if (sectionId === 'matching-game' && !isAdmin) initMatchingGame();
                 if (sectionId === 'quiz') showQuiz();
+                if (sectionId === 'wudhu-challenge' && !isAdmin) initWudhuChallenge();
                 if (sectionId === 'admin-quiz' && isAdmin) showAdminQuiz();
                 updateProgress();
                 updateBadges();
@@ -186,11 +186,11 @@
         window.logout = function() {
             signOut(auth).then(() => {
                 alert("✅ Logged out successfully!");
-                userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
+                userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], quiz: {}, artwork: {}, storyPath: [] };
                 isAdmin = false;
                 selectedQuizCategory = null;
                 localStorage.removeItem('userData');
-                const sections = ['landing-page', 'welcome', 'profile', 'avatar-display', 'missions', 'matching-game', 'quiz', 'admin-quiz'];
+                const sections = ['landing-page', 'welcome', 'profile', 'avatar-display', 'matching-game', 'quiz', 'wudhu-challenge', 'admin-quiz'];
                 sections.forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.classList.add('hidden');
@@ -271,53 +271,6 @@
             }
         };
 
-        function showMissions() {
-            const container = document.getElementById('missions');
-            if (!container) return;
-            container.innerHTML = '';
-            const content = document.createElement('div');
-            content.className = 'content';
-            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
-                <div class="story-card mb-4">
-                    <h3 class="text-xl">Daily Salah</h3>
-                    <p>How many daily prayers?</p>
-                    <input id="mission-salah-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
-                    <button class="btn mt-2" onclick="checkMission('salah', '5')">Submit 🎉</button>
-                </div>
-                <div class="story-card mb-4">
-                    <h3 class="text-xl">Learn Dua</h3>
-                    <p>Dua before eating?</p>
-                    <input id="mission-dua-input" class="border rounded-lg p-2 bg-white text-black mt-2" placeholder="Type your answer">
-                    <button class="btn mt-2" onclick="checkMission('dua', 'Bismillah')">Submit 🎉</button>
-                </div>
-                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
-            container.appendChild(content);
-        }
-
-        function checkMission(id, answer) {
-            const input = document.getElementById(`mission-${id}-input`);
-            if (!input) return;
-            const userAnswer = input.value.toLowerCase();
-            if (userAnswer === answer.toLowerCase()) {
-                userData.stars += 2;
-                userData.progress = Math.min(userData.progress + 1, 10);
-                userData.missions[id] = true;
-                updateStarCounter();
-                updateProgress();
-                confetti();
-                const feedback = document.createElement('p');
-                feedback.className = 'text-green-600 mt-2';
-                feedback.textContent = 'Mission Complete! +2 Stars! 🎉';
-                input.parentElement.appendChild(feedback);
-            } else {
-                const feedback = document.createElement('p');
-                feedback.className = 'text-red-600 mt-2';
-                feedback.textContent = 'Wrong! Try again! 😕';
-                input.parentElement.appendChild(feedback);
-            }
-        }
-
         function showProfile() {
             if (!userData.email) {
                 alert("Please log in to view your profile!");
@@ -332,7 +285,13 @@
             content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
                 <p>Email: ${userData.email || 'Not set'}</p>
                 <p>Name: ${userData.name}</p>
-                <p>Level: ${userData.year}</p>
+                <div class="mt-2">
+                    <label for="profile-year-select" class="block text-lg">Level:</label>
+                    <select id="profile-year-select" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
+                        ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}" ${userData.year === level ? 'selected' : ''}>${level}</option>`).join('')}
+                    </select>
+                    <button class="btn mt-2" onclick="updateUserLevel()">Update Level 🔄</button>
+                </div>
                 <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
                 <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
                 <p>Badges: ${userData.badges.join(', ')}</p>
@@ -343,6 +302,16 @@
             updateStarCounter();
             updateProgress();
         }
+
+        window.updateUserLevel = function() {
+            const newLevel = document.getElementById('profile-year-select')?.value;
+            if (newLevel && newLevel !== userData.year) {
+                userData.year = newLevel;
+                saveUserData();
+                alert(`Level updated to ${newLevel}!`);
+                showProfile();
+            }
+        };
 
         function updateStarCounter() {
             const starCount = document.getElementById('star-count');
@@ -484,6 +453,137 @@
             console.log('Game reset');
         };
 
+        // Wudhu Challenge Logic
+        const wudhuActs = [
+            { name: 'Rinse mouth', type: 'Mustahab', order: 1 },
+            { name: 'Rinse nose', type: 'Mustahab', order: 2 },
+            { name: 'Wash hands', type: 'Mustahab', order: 3 },
+            { name: 'Niyyah (Intention)', type: 'Obligatory', order: 4 },
+            { name: 'Wash Face', type: 'Obligatory', order: 5 },
+            { name: 'Wash Right Arm', type: 'Obligatory', order: 6 },
+            { name: 'Wash Left Arm', type: 'Obligatory', order: 7 },
+            { name: 'Wipe Head', type: 'Obligatory', order: 8 },
+            { name: 'Wipe Right Foot', type: 'Obligatory', order: 9 },
+            { name: 'Wipe Left Foot', type: 'Obligatory', order: 10 }
+        ];
+
+        function initWudhuChallenge() {
+            if (!userData.email) {
+                alert("Please log in to play the Wudhu Challenge!");
+                showSection('welcome');
+                return;
+            }
+            const container = document.getElementById('wudhu-challenge');
+            if (!container) return;
+            container.innerHTML = '';
+            const content = document.createElement('div');
+            content.className = 'content';
+            content.innerHTML = `
+                <h2 class="text-3xl text-orange-600 mb-4">Wudhu Challenge 💧</h2>
+                <p>Drag the Wudhu steps into the correct order and choose if each is Obligatory or Mustahab!</p>
+                <div id="wudhu-grid" class="wudhu-grid"></div>
+                <p id="wudhu-feedback" class="mt-4"></p>
+                <button class="btn mt-4" onclick="checkWudhuOrder()">Submit 🎉</button>
+                <button class="btn mt-4" onclick="initWudhuChallenge()">Reset Game 🔄</button>
+                <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
+                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+            `;
+            container.appendChild(content);
+
+            const wudhuGrid = document.getElementById('wudhu-grid');
+            const shuffledActs = [...wudhuActs].sort(() => Math.random() - 0.5);
+            wudhuGrid.innerHTML = '';
+            shuffledActs.forEach((act, index) => {
+                const actDiv = document.createElement('div');
+                actDiv.className = 'wudhu-act';
+                actDiv.draggable = true;
+                actDiv.dataset.name = act.name;
+                actDiv.innerHTML = `
+                    <div class="wudhu-act-content">
+                        <span class="wudhu-act-number">${index + 1}</span>
+                        <span>${act.name}</span>
+                        <select class="wudhu-type-select border rounded-lg p-1 bg-white text-black ml-2">
+                            <option value="">Select Type</option>
+                            <option value="Obligatory">Obligatory</option>
+                            <option value="Mustahab">Mustahab</option>
+                        </select>
+                    </div>
+                `;
+                wudhuGrid.appendChild(actDiv);
+            });
+
+            // Drag and Drop functionality
+            const acts = document.querySelectorAll('.wudhu-act');
+            acts.forEach(act => {
+                act.addEventListener('dragstart', dragStart);
+                act.addEventListener('dragover', dragOver);
+                act.addEventListener('drop', drop);
+            });
+
+            function dragStart(e) {
+                e.dataTransfer.setData('text/plain', e.target.dataset.name);
+            }
+
+            function dragOver(e) {
+                e.preventDefault();
+            }
+
+            function drop(e) {
+                e.preventDefault();
+                const draggedName = e.dataTransfer.getData('text/plain');
+                const draggedAct = Array.from(acts).find(act => act.dataset.name === draggedName);
+                const targetAct = e.target.closest('.wudhu-act');
+                if (draggedAct && targetAct && draggedAct !== targetAct) {
+                    const draggedIndex = Array.from(wudhuGrid.children).indexOf(draggedAct);
+                    const targetIndex = Array.from(wudhuGrid.children).indexOf(targetAct);
+                    if (draggedIndex < targetIndex) {
+                        wudhuGrid.insertBefore(draggedAct, targetAct.nextSibling);
+                    } else {
+                        wudhuGrid.insertBefore(draggedAct, targetAct);
+                    }
+                    updateActNumbers();
+                }
+            }
+
+            function updateActNumbers() {
+                document.querySelectorAll('.wudhu-act-number').forEach((num, index) => {
+                    num.textContent = index + 1;
+                });
+            }
+
+            console.log('Wudhu Challenge initialized');
+        }
+
+        window.checkWudhuOrder = function() {
+            const wudhuGrid = document.getElementById('wudhu-grid');
+            const feedback = document.getElementById('wudhu-feedback');
+            if (!wudhuGrid || !feedback) return;
+
+            const acts = Array.from(wudhuGrid.children);
+            let correct = true;
+            acts.forEach((act, index) => {
+                const actName = act.dataset.name;
+                const selectedType = act.querySelector('.wudhu-type-select').value;
+                const correctAct = wudhuActs[index];
+                if (actName !== correctAct.name || selectedType !== correctAct.type) {
+                    correct = false;
+                }
+            });
+
+            if (correct) {
+                userData.stars += 10;
+                userData.progress = Math.min(userData.progress + 1, 10);
+                updateStarCounter();
+                updateProgress();
+                confetti();
+                feedback.className = 'text-green-600 mt-2';
+                feedback.textContent = 'Correct! +10 Stars! 🎉';
+            } else {
+                feedback.className = 'text-red-600 mt-2';
+                feedback.textContent = 'Wrong order or type! Try again! 😕';
+            }
+        };
+
         // Quiz Logic
         let currentQuestionIndex = 0;
         let quizCompleted = false;
@@ -538,7 +638,7 @@
             if (!quizContent || !feedback) return;
             feedback.textContent = '';
             const questions = (quizQuestions[userData.year] || []).filter(q => q.category === selectedQuizCategory);
-            
+
             if (questions.length === 0) {
                 quizContent.innerHTML = `
                     <h3 class="text-xl">No Questions Available</h3>
@@ -626,6 +726,7 @@
         // Admin Quiz Management
         let currentPage = 1;
         const questionsPerPage = 10;
+        let amendingQuestion = null;
 
         function showAdminQuiz() {
             if (!isAdmin) {
@@ -641,45 +742,46 @@
             content.innerHTML = `
                 <h2 class="text-3xl text-orange-600 mb-4">Admin Quiz Management 🔧</h2>
                 <div class="story-card mb-4">
-                    <h3 class="text-xl">Add New Question</h3>
-                    <input id="admin-question-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Question text">
+                    <h3 class="text-xl">${amendingQuestion ? 'Amend Question' : 'Add New Question'}</h3>
+                    <input id="admin-question-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Question text" value="${amendingQuestion ? amendingQuestion.question : ''}">
                     <select id="admin-question-type" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" onchange="toggleAnswerFields()">
-                        <option value="text">Free Text</option>
-                        <option value="multiple">Multiple Choice</option>
+                        <option value="text" ${amendingQuestion && amendingQuestion.type === 'text' ? 'selected' : ''}>Free Text</option>
+                        <option value="multiple" ${amendingQuestion && amendingQuestion.type === 'multiple' ? 'selected' : ''}>Multiple Choice</option>
                     </select>
                     <select id="admin-question-level" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
-                        ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}">${level}</option>`).join('')}
+                        ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}" ${amendingQuestion && amendingQuestion.level === level ? 'selected' : ''}>${level}</option>`).join('')}
                     </select>
                     <select id="admin-question-category" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
                         <option value="">Select a category</option>
-                        <option value="Islamic Laws">Islamic Laws</option>
-                        <option value="Islamic Beliefs">Islamic Beliefs</option>
-                        <option value="Quran">Quran</option>
-                        <option value="Islamic Personalities">Islamic Personalities</option>
-                        <option value="Islamic History">Islamic History</option>
+                        <option value="Islamic Laws" ${amendingQuestion && amendingQuestion.category === 'Islamic Laws' ? 'selected' : ''}>Islamic Laws</option>
+                        <option value="Islamic Beliefs" ${amendingQuestion && amendingQuestion.category === 'Islamic Beliefs' ? 'selected' : ''}>Islamic Beliefs</option>
+                        <option value="Quran" ${amendingQuestion && amendingQuestion.category === 'Quran' ? 'selected' : ''}>Quran</option>
+                        <option value="Islamic Personalities" ${amendingQuestion && amendingQuestion.category === 'Islamic Personalities' ? 'selected' : ''}>Islamic Personalities</option>
+                        <option value="Islamic History" ${amendingQuestion && amendingQuestion.category === 'Islamic History' ? 'selected' : ''}>Islamic History</option>
                     </select>
-                    <div id="answer-fields">
-                        <input id="admin-answer-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Correct answer">
+                    <div id="answer-fields" class="${amendingQuestion && amendingQuestion.type === 'multiple' ? 'hidden' : ''}">
+                        <input id="admin-answer-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Correct answer" value="${amendingQuestion && amendingQuestion.type === 'text' ? amendingQuestion.answer : ''}">
                     </div>
-                    <div id="multiple-choice-fields" class="hidden">
+                    <div id="multiple-choice-fields" class="${amendingQuestion && amendingQuestion.type === 'text' ? 'hidden' : ''}">
                         <div class="mt-2">
-                            <input id="admin-option-1" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 1">
-                            <label class="ml-2"><input type="checkbox" id="correct-option-1" onchange="ensureSingleCorrectAnswer(1)"> Correct</label>
+                            <input id="admin-option-1" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 1" value="${amendingQuestion && amendingQuestion.options ? amendingQuestion.options[0] || '' : ''}">
+                            <label class="ml-2"><input type="checkbox" id="correct-option-1" ${amendingQuestion && amendingQuestion.options && amendingQuestion.answer === amendingQuestion.options[0] ? 'checked' : ''} onchange="ensureSingleCorrectAnswer(1)"> Correct</label>
                         </div>
                         <div class="mt-2">
-                            <input id="admin-option-2" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 2">
-                            <label class="ml-2"><input type="checkbox" id="correct-option-2" onchange="ensureSingleCorrectAnswer(2)"> Correct</label>
+                            <input id="admin-option-2" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 2" value="${amendingQuestion && amendingQuestion.options ? amendingQuestion.options[1] || '' : ''}">
+                            <label class="ml-2"><input type="checkbox" id="correct-option-2" ${amendingQuestion && amendingQuestion.options && amendingQuestion.answer === amendingQuestion.options[1] ? 'checked' : ''} onchange="ensureSingleCorrectAnswer(2)"> Correct</label>
                         </div>
                         <div class="mt-2">
-                            <input id="admin-option-3" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 3 (optional)">
-                            <label class="ml-2"><input type="checkbox" id="correct-option-3" onchange="ensureSingleCorrectAnswer(3)"> Correct</label>
+                            <input id="admin-option-3" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 3 (optional)" value="${amendingQuestion && amendingQuestion.options ? amendingQuestion.options[2] || '' : ''}">
+                            <label class="ml-2"><input type="checkbox" id="correct-option-3" ${amendingQuestion && amendingQuestion.options && amendingQuestion.answer === amendingQuestion.options[2] ? 'checked' : ''} onchange="ensureSingleCorrectAnswer(3)"> Correct</label>
                         </div>
                         <div class="mt-2">
-                            <input id="admin-option-4" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 4 (optional)">
-                            <label class="ml-2"><input type="checkbox" id="correct-option-4" onchange="ensureSingleCorrectAnswer(4)"> Correct</label>
+                            <input id="admin-option-4" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 4 (optional)" value="${amendingQuestion && amendingQuestion.options ? amendingQuestion.options[3] || '' : ''}">
+                            <label class="ml-2"><input type="checkbox" id="correct-option-4" ${amendingQuestion && amendingQuestion.options && amendingQuestion.answer === amendingQuestion.options[3] ? 'checked' : ''} onchange="ensureSingleCorrectAnswer(4)"> Correct</label>
                         </div>
                     </div>
-                    <button class="btn mt-2" onclick="addQuestion()">Add Question ➕</button>
+                    <button class="btn mt-2" onclick="${amendingQuestion ? `amendQuestion('${amendingQuestion.level}', '${amendingQuestion.id}')` : 'addQuestion()'}">${amendingQuestion ? 'Save Changes 💾' : 'Add Question ➕'}</button>
+                    ${amendingQuestion ? '<button class="btn mt-2 bg-gray-500 hover:bg-gray-700" onclick="cancelAmend()">Cancel Amend ❌</button>' : ''}
                 </div>
                 <div id="question-list" class="story-card mb-4">
                     <h3 class="text-xl">Existing Questions</h3>
@@ -807,6 +909,122 @@
             }
         };
 
+        window.amendQuestion = function(level, id) {
+            const questionText = document.getElementById('admin-question-text')?.value?.trim() || '';
+            const newLevel = document.getElementById('admin-question-level')?.value || '';
+            const type = document.getElementById('admin-question-type')?.value || '';
+            const category = document.getElementById('admin-question-category')?.value || '';
+            let answer = '';
+            let options = [];
+
+            if (type === 'multiple') {
+                options = [
+                    document.getElementById('admin-option-1')?.value?.trim() || '',
+                    document.getElementById('admin-option-2')?.value?.trim() || '',
+                    document.getElementById('admin-option-3')?.value?.trim() || '',
+                    document.getElementById('admin-option-4')?.value?.trim() || ''
+                ].filter(opt => opt.length > 0);
+                const correctCheckboxes = [1, 2, 3, 4].map(i => document.getElementById(`correct-option-${i}`)?.checked);
+                const correctIndex = correctCheckboxes.findIndex(checked => checked);
+                answer = correctIndex >= 0 ? options[correctIndex] : '';
+            } else {
+                answer = document.getElementById('admin-answer-text')?.value?.trim() || '';
+            }
+
+            if (!questionText) {
+                alert('Please fill in the question text.');
+                return;
+            }
+
+            if (!newLevel) {
+                alert('Please select a level.');
+                return;
+            }
+
+            if (!type) {
+                alert('Please select a question type.');
+                return;
+            }
+
+            if (!category) {
+                alert('Please select a category.');
+                return;
+            }
+
+            if (!answer) {
+                alert('Please provide a correct answer' + (type === 'multiple' ? ' by selecting one option.' : '.'));
+                return;
+            }
+
+            if (type === 'multiple' && options.length < 2) {
+                alert('Please provide at least 2 non-empty options for multiple choice.');
+                return;
+            }
+
+            if (type === 'multiple' && !options.includes(answer)) {
+                alert('The correct answer must be one of the multiple-choice options.');
+                return;
+            }
+
+            // Remove from old level if level changed
+            if (level !== newLevel) {
+                quizQuestions[level] = quizQuestions[level].filter(q => q.id !== id);
+            }
+
+            // Update or add to new level
+            quizQuestions[newLevel] = quizQuestions[newLevel] || [];
+            const questionIndex = quizQuestions[newLevel].findIndex(q => q.id === id);
+            const updatedQuestion = {
+                id,
+                type,
+                question: questionText,
+                answer,
+                category,
+                level: newLevel,
+                ...(type === 'multiple' && { options })
+            };
+
+            if (questionIndex >= 0) {
+                quizQuestions[newLevel][questionIndex] = updatedQuestion;
+            } else {
+                quizQuestions[newLevel].push(updatedQuestion);
+            }
+
+            // Update user quiz data if necessary
+            if (level !== newLevel) {
+                Object.keys(userData.quiz).forEach(lvl => {
+                    Object.keys(userData.quiz[lvl] || {}).forEach(cat => {
+                        if (userData.quiz[lvl][cat]?.[id]) {
+                            delete userData.quiz[lvl][cat][id];
+                            if (Object.keys(userData.quiz[lvl][cat]).length === 1 && userData.quiz[lvl][cat].completed) {
+                                delete userData.quiz[lvl][cat].completed;
+                            }
+                        }
+                    });
+                });
+            }
+
+            saveQuizQuestions();
+            saveUserData();
+            amendingQuestion = null;
+            displayQuestions();
+            showAdminQuiz();
+            alert('Question amended successfully!');
+        };
+
+        window.cancelAmend = function() {
+            amendingQuestion = null;
+            showAdminQuiz();
+        };
+
+        window.startAmendQuestion = function(level, id) {
+            const question = quizQuestions[level].find(q => q.id === id);
+            if (question) {
+                amendingQuestion = { ...question, level };
+                showAdminQuiz();
+            }
+        };
+
         window.removeQuestion = function(level, id) {
             quizQuestions[level] = quizQuestions[level].filter(q => q.id !== id);
             Object.keys(userData.quiz).forEach(lvl => {
@@ -879,6 +1097,7 @@
                             <p><strong>Category:</strong> ${q.category}</p>
                             <p><strong>Answer:</strong> ${q.answer}</p>
                             ${q.options ? `<p><strong>Options:</strong> ${q.options.join(', ')}</p>` : ''}
+                            <button class="btn mt-2 bg-blue-500 hover:bg-blue-700" onclick="startAmendQuestion('${level}', '${q.id}')">Amend ✏️</button>
                             <button class="btn mt-2 bg-red-500 hover:bg-red-700" onclick="removeQuestion('${level}', '${q.id}')">Remove 🗑️</button>
                         `;
                         questionsContainer.appendChild(qDiv);
@@ -926,10 +1145,10 @@
             } else {
                 // Show all cards except Admin Quiz Management for non-admins
                 const cards = [
-                    { id: 'missions', title: 'Missions', desc: 'Daily Tasks ⭐' },
                     { id: 'profile', title: 'Profile', desc: 'Your Journey 🏡' },
                     { id: 'matching-game', title: 'Matching Game', desc: 'Match Holy Individuals 🧠' },
-                    { id: 'quiz', title: 'Quiz', desc: 'Test Your Knowledge 📚' }
+                    { id: 'quiz', title: 'Quiz', desc: 'Test Your Knowledge 📚' },
+                    { id: 'wudhu-challenge', title: 'Wudhu Challenge', desc: 'Learn Wudhu Steps 💧' }
                 ];
                 cards.forEach(card => {
                     const cardElement = document.createElement('div');
@@ -953,12 +1172,14 @@
             const profile = document.getElementById('profile');
             const matchingGame = document.getElementById('matching-game');
             const quiz = document.getElementById('quiz');
+            const wudhuChallenge = document.getElementById('wudhu-challenge');
             const adminQuiz = document.getElementById('admin-quiz');
             if (hero) hero.classList.remove('hidden');
             if (welcome) welcome.classList.add('hidden');
             if (profile) profile.classList.add('hidden');
             if (matchingGame) matchingGame.classList.add('hidden');
             if (quiz) quiz.classList.add('hidden');
+            if (wudhuChallenge) wudhuChallenge.classList.add('hidden');
             if (adminQuiz) adminQuiz.classList.add('hidden');
 
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
@@ -984,7 +1205,7 @@
                         if (welcome) welcome.classList.remove('hidden');
                         showSection('welcome');
                     } else {
-                        userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
+                        userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], quiz: {}, artwork: {}, storyPath: [] };
                         isAdmin = false;
                         selectedQuizCategory = null;
                         localStorage.removeItem('userData');
@@ -993,12 +1214,14 @@
                         const profile = document.getElementById('profile');
                         const matchingGame = document.getElementById('matching-game');
                         const quiz = document.getElementById('quiz');
+                        const wudhuChallenge = document.getElementById('wudhu-challenge');
                         const adminQuiz = document.getElementById('admin-quiz');
                         if (hero) hero.classList.remove('hidden');
                         if (welcome) welcome.classList.add('hidden');
                         if (profile) profile.classList.add('hidden');
                         if (matchingGame) matchingGame.classList.add('hidden');
                         if (quiz) quiz.classList.add('hidden');
+                        if (wudhuChallenge) wudhuChallenge.classList.add('hidden');
                         if (adminQuiz) adminQuiz.classList.add('hidden');
                         ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
                             const modal = document.getElementById(id);
@@ -1028,12 +1251,14 @@
                 const profile = document.getElementById('profile');
                 const matchingGame = document.getElementById('matching-game');
                 const quiz = document.getElementById('quiz');
+                const wudhuChallenge = document.getElementById('wudhu-challenge');
                 const adminQuiz = document.getElementById('admin-quiz');
                 if (hero) hero.classList.remove('hidden');
                 if (welcome) welcome.classList.add('hidden');
                 if (profile) profile.classList.add('hidden');
                 if (matchingGame) matchingGame.classList.add('hidden');
                 if (quiz) quiz.classList.add('hidden');
+                if (wudhuChallenge) wudhuChallenge.classList.add('hidden');
                 if (adminQuiz) adminQuiz.classList.add('hidden');
             });
 
@@ -1045,8 +1270,8 @@
                 }
             });
         });
-</script>
-<style>
+    </script>
+    <style>
         body {
             font-family: 'Fredoka', sans-serif;
             margin: 0;
@@ -1396,197 +1621,112 @@
             transform: rotateY(180deg);
             font-size: 0.8rem;
         }
-        .level-section .level-questions.hidden {
-            display: none;
-        }
-        .pagination {
+        .wudhu-grid {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 600px;
+            margin: 2rem auto;
         }
-        .hidden {
-            display: none;
-        }
-        @keyframes float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0); }
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        @keyframes shine {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        @media (max-width: 768px) {
-            .card-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            }
-            .card {
-                width: 120px;
-                padding: 0.5rem;
-            }
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            .hero .btn {
-                padding: 1rem 2rem;
-                font-size: 1.5rem;
-            }
-            .section {
-                padding: 2rem 1rem;
-            }
-            .btn {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
-            }
-            .placeholder-images {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .placeholder-image {
-                width: 100%;
-                height: 200px;
-            }
-            .game-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 5px;
-            }
-            .game-card {
-                width: 70px;
-                height: 70px;
-                font-size: 0.7rem;
-            }
-            .card-back {
-                font-size: 0.6rem;
-            }
-            .admin-content {
-                max-height: 75vh;
-            }
-            .content {
-                max-width: 100%;
-                padding: 1rem;
-            }
-        }
-</style>
-</head>
-<body>
-<div class="background-layer"></div>
-<div class="ui-container">
-<div class="header-bar">
-<h1>Shia Islamic Adventure Quest</h1>
-</div>
-<div class="star-counter" id="star-count">0 ⭐</div>
-<img alt="Avatar" class="avatar-display" id="avatar-display" src="https://yourusername.github.io/your-repo/images/mascot.png" style="display: none;"/>
-<div class="tree" style="top: 20%; left: 5%;"></div>
-<div class="cloud" style="top: 10%; right: 10%;"></div>
-<div class="star" style="top: 15%; left: 20%;"></div>
-<div class="moon" style="top: 10%; left: 10%;"></div>
-<div class="hero" id="hero">
-<h1>Welcome to Your Adventure!</h1>
-<p>Explore, learn, and grow with Shia Islamic teachings.</p>
-<button class="btn" onclick="showLoginModal()">Login 🚪</button>
-<button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
-<button class="btn" onclick="showAdminLoginModal()">Admin Login 🔐</button>
-<div class="placeholder-images">
-<img alt="Madinah" class="placeholder-image" src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg"/>
-<img alt="Najaf" class="placeholder-image" src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/najaf.jpg"/>
-</div>
-</div>
-<div class="section hidden" id="welcome">
-<div class="content">
-<h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
-<div class="progress-bar">
-<div id="progress"></div>
-</div>
-<p class="badge"></p>
-<div class="card-grid" id="welcome-card-grid">
-</div>
-<button class="btn mt-4" onclick="logout()">Logout 🚪</button>
-</div>
-</div>
-<div class="section hidden" id="missions"></div>
-<div class="section hidden" id="profile"></div>
-<div class="section hidden" id="matching-game"></div>
-<div class="section hidden" id="quiz"></div>
-<div class="section hidden" id="admin-quiz"></div>
-<div class="modal" id="login-modal">
-<div class="modal-content">
-<h2>Login 🚪</h2>
-<input class="border rounded-lg p-2 bg-white text-black mt-4 w-full" id="login-email" placeholder="Email" type="email"/>
-<input class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="login-password" placeholder="Password" type="password"/>
-<button class="btn mt-4" onclick="login()">Login 🎉</button>
-<button class="btn mt-2" onclick="showResetPasswordModal()">Forgot Password? 🔑</button>
-<button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
-</div>
-</div>
-<div class="modal" id="signup-modal">
-<div class="modal-content">
-<h2>Sign Up ✨</h2>
-<input class="border rounded-lg p-2 bg-white text-black mt-4 w-full" id="signup-name" placeholder="Name"/>
-<div class="mt-2">
-<label><input checked="" name="gender" type="radio" value="boy"/> Boy 👦</label>
-<label class="ml-4"><input name="gender" type="radio" value="girl"/> Girl 👧</label>
-</div>
-<select class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="year-select">
-<option value="Level-1">Level 1</option>
-<option value="Level-2">Level 2</option>
-<option value="Level-3">Level 3</option>
-<option value="Level-4">Level 4</option>
-<option value="Level-5">Level 5</option>
-<option value="Level-6">Level 6</option>
-<option value="Level-7">Level 7</option>
-</select>
-<div class="character-select mt-2">
-<img alt="Boy" class="character w-16 h-16 mr-2" src="https://yourusername.github.io/your-repo/images/mascot.png"/>
-<img alt="Girl" class="character w-16 h-16" src="https://yourusername.github.io/your-repo/images/girl.png"/>
-</div>
-<input class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="signup-email" placeholder="Email" type="email"/>
-<input class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="signup-password" placeholder="Password" type="password"/>
-<button class="btn mt-4" onclick="signupUser()">Sign Up 🎉</button>
-<button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
-</div>
-</div>
-<div class="modal" id="admin-login-modal">
-<div class="modal-content">
-<h2>Admin Login 🔐</h2>
-<input class="border rounded-lg p-2 bg-white text-black mt-4 w-full" id="admin-username" placeholder="Email" type="email"/>
-<input class="border rounded-lg p-2 bg-white text-black mt-2 w-full" id="admin-password" placeholder="Password" type="password"/>
-<button class="btn mt-4" onclick="loginAdmin()">Login 🎉</button>
-<button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
-</div>
-</div>
-<div class="modal" id="reset-password-modal">
-<div class="modal-content">
-<h2>Reset Password 🔑</h2>
-<input class="border rounded-lg p-2 bg-white text-black mt-4 w-full" id="reset-email" placeholder="Email" type="email"/>
-<button class="btn mt-4" onclick="resetPassword()">Send Reset Email 📧</button>
-<button class="btn mt-2" onclick="closeModal(event)">Close ❌</button>
-</div>
-</div>
-</body>
-</html>
+        .wudhu-act {
+.wudhu-act {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.wudhu-act-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.wudhu-act-number {
+    background: #FFA500;
+    color: #fff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+.wudhu-type-select {
+    width: 150px;
+}
+.level-section {
+    margin-bottom: 1rem;
+}
+.level-section h4 {
+    background: #FFA500;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 10px;
+}
+.level-questions {
+    display: block;
+}
+.level-questions.hidden {
+    display: none;
+}
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-30px); }
+    60% { transform: translateY(-15px); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+}
+@keyframes twinkle {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+@keyframes shine {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.hidden { display: none; }
+@media (max-width: 768px) {
+    .hero h1 { font-size: 2rem; }
+    .hero .btn { padding: 1rem 2rem; font-size: 1.2rem; }
+    .card-grid { flex-direction: column; align-items: center; }
+    .card { width: 80%; max-width: 300px; }
+    .game-grid { grid-template-columns: repeat(4, 1fr); }
+    .game-card { width: 80px; height: 80px; }
+    .card-front, .card-back { font-size: 0.8rem; }
+}
+@media (max-width: 480px) {
+    .hero h1 { font-size: 1.5rem; }
+    .hero p { font-size: 1rem; }
+    .hero .btn { padding: 0.8rem 1.5rem; font-size: 1rem; }
+    .section { padding: 2rem 1rem; }
+    .content { padding: 1rem; }
+    .game-grid { grid-template-columns: repeat(3, 1fr); }
+    .game-card { width: 60px; height: 60px; }
+    .card-front, .card-back { font-size: 0.7rem; }
+    .avatar-display { width: 80px; height: 80px; }
+}
