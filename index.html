@@ -1532,24 +1532,29 @@
             gap: 20px;
             margin-top: 20px;
             padding: 10px 0;
+        }       
+landmark-images {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start; /* aligns images to the left */
+    gap: 1.5rem; /* increases space between images */
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    z-index: 20;
+    flex-wrap: wrap; /* allows wrapping on smaller screens */
         }
-        .landmark-images {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            gap: 1rem;
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            z-index: 20;
-        }
-        .landmark-image {
-            width: 450px;
-            height: 450px;
-            object-fit: cover;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease-in-out;
+        
+landmark-image {
+    width: 450px;
+    height: 450px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    margin-right: 1rem; /* optional: adds extra spacing if needed */
+}
+
         }
         .landmark-image:hover {
             transform: scale(1.05);
