@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+f<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -1534,25 +1534,29 @@
             padding: 10px 0;
         }       
 landmark-images {
+   
+.landmark-images {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap; /* allows wrapping on smaller screens */
     justify-content: flex-start; /* aligns images to the left */
-    gap: 1.5rem; /* increases space between images */
-    max-width: 1200px;
+    gap: 1rem; /* space between images */
+    max-width: 100%; /* allow full width */
     margin: 2rem auto;
     padding: 0 1rem;
     z-index: 20;
-    flex-wrap: wrap; /* allows wrapping on smaller screens */
+
         }
         
+
 landmark-image {
-    width: 450px;
-    height: 450px;
+    width: 100%;
+    max-width: 280px; /* smaller width to fit multiple images */
+    height: auto;
     object-fit: cover;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease-in-out;
-    margin-right: 1rem; /* optional: adds extra spacing if needed */
+
 }
 
         }
