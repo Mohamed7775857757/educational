@@ -722,8 +722,23 @@
             if (multipleChoiceFields) multipleChoiceFields.classList.toggle('hidden', type === 'text');
         };
 
+        window.toggleAmendAnswerFields = function() {
+            const type = document.getElementById('amend-question-type')?.value;
+            const answerFields = document.getElementById('amend-answer-fields');
+            const multipleChoiceFields = document.getElementById('amend-multiple-choice-fields');
+            if (answerFields) answerFields.classList.toggle('hidden', type === 'multiple');
+            if (multipleChoiceFields) multipleChoiceFields.classList.toggle('hidden', type === 'text');
+        };
+
         window.ensureSingleCorrectAnswer = function(index) {
             const checkboxes = [1, 2, 3, 4].map(i => document.getElementById(`correct-option-${i}`));
+            checkboxes.forEach((cb, i) => {
+                if (i + 1 !== index) cb.checked = false;
+            });
+        };
+
+        window.ensureSingleCorrectAmendAnswer = function(index) {
+            const checkboxes = [1, 2, 3, 4].map(i => document.getElementById(`amend-correct-option-${i}`));
             checkboxes.forEach((cb, i) => {
                 if (i + 1 !== index) cb.checked = false;
             });
@@ -823,6 +838,157 @@
             }
         };
 
+        window.openAmendModal = function(level, id) {
+            const question = quizQuestions[level].find(q => q.id === id);
+            if (!question) {
+                alert('Question not found!');
+                console.error('Question not found for id:', id, 'in level:', level);
+                return;
+            }
+
+            console.log('Opening amend modal for question:', question);
+
+            document.getElementById('amend-question-id').value = id;
+            document.getElementById('amend-question-level-original').value = level;
+            document.getElementById('amend-question-text').value = question.question;
+            document.getElementById('amend-question-type').value = question.type;
+            document.getElementById('amend-question-level').value = level;
+            document.getElementById('amend-question-category').value = question.category;
+
+            if (question.type === 'text') {
+                document.getElementById('amend-answer-text').value = question.answer;
+            } else {
+                [1, 2, 3, 4].forEach(i => {
+                    const optionInput = document.getElementById(`amend-option-${i}`);
+                    const correctCheckbox = document.getElementById(`amend-correct-option-${i}`);
+                    if (question.options && question.options[i - 1]) {
+                        optionInput.value = question.options[i - 1];
+                        correctCheckbox.checked = question.options[i - 1] === question.answer;
+                    } else {
+                        optionInput.value = '';
+                        correctCheckbox.checked = false;
+                    }
+                });
+            }
+
+            toggleAmendAnswerFields();
+            document.getElementById('amend-question-modal').style.display = 'flex';
+        };
+
+        window.amendQuestion = function() {
+            const id = document.getElementById('amend-question-id')?.value;
+            const originalLevel = document.getElementById('amend-question-level-original')?.value;
+            const questionText = document.getElementById('amend-question-text')?.value?.trim() || '';
+            const level = document.getElementById('amend-question-level')?.value || '';
+            const type = document.getElementById('amend-question-type')?.value || '';
+            const category = document.getElementById('amend-question-category')?.value || '';
+            let answer = '';
+            let options = [];
+
+            if (type === 'multiple') {
+                options = [
+                    document.getElementById('amend-option-1')?.value?.trim() || '',
+                    document.getElementById('amend-option-2')?.value?.trim() || '',
+                    document.getElementById('amend-option-3')?.value?.trim() || '',
+                    document.getElementById('amend-option-4')?.value?.trim() || ''
+                ].filter(opt => opt.length > 0);
+                const correctCheckboxes = [1, 2, 3, 4].map(i => document.getElementById(`amend-correct-option-${i}`)?.checked);
+                const correctIndex = correctCheckboxes.findIndex(checked => checked);
+                answer = correctIndex >= 0 ? options[correctIndex] : '';
+            } else {
+                answer = document.getElementById('amend-answer-text')?.value?.trim() || '';
+            }
+
+            console.log('Amending question:', { id, originalLevel, questionText, level, type, category, answer, options });
+
+            if (!questionText) {
+                alert('Please fill in the question text.');
+                console.log('Validation failed: Missing question text');
+                return;
+            }
+
+            if (!level) {
+                alert('Please select a level.');
+                console.log('Validation failed: Missing level');
+                return;
+            }
+
+            if (!type) {
+                alert('Please select a question type.');
+                console.log('Validation failed: Missing type');
+                return;
+            }
+
+            if (!category) {
+                alert('Please select a category.');
+                console.log('Validation failed: Missing category');
+                return;
+            }
+
+            if (!answer) {
+                alert('Please provide a correct answer' + (type === 'multiple' ? ' by selecting one option.' : '.'));
+                console.log('Validation failed: Missing answer');
+                return;
+            }
+
+            if (type === 'multiple' && options.length < 2) {
+                alert('Please provide at least 2 non-empty options for multiple choice.');
+                console.log('Validation failed: Fewer than 2 options');
+                return;
+            }
+
+            if (type === 'multiple' && !options.includes(answer)) {
+                alert('The correct answer must be one of the multiple-choice options.');
+                console.log('Validation failed: Answer not in options');
+                return;
+            }
+
+            // Remove question from original level if level has changed
+            if (originalLevel !== level) {
+                quizQuestions[originalLevel] = quizQuestions[originalLevel].filter(q => q.id !== id);
+                quizQuestions[level] = quizQuestions[level] || [];
+                quizQuestions[level].push({
+                    id,
+                    type,
+                    question: questionText,
+                    answer,
+                    category,
+                    ...(type === 'multiple' && { options })
+                });
+            } else {
+                // Update question in the same level
+                const questionIndex = quizQuestions[level].findIndex(q => q.id === id);
+                if (questionIndex >= 0) {
+                    quizQuestions[level][questionIndex] = {
+                        id,
+                        type,
+                        question: questionText,
+                        answer,
+                        category,
+                        ...(type === 'multiple' && { options })
+                    };
+                }
+            }
+
+            // Update userData.quiz if level or category changed
+            Object.keys(userData.quiz).forEach(lvl => {
+                Object.keys(userData.quiz[lvl] || {}).forEach(cat => {
+                    if (userData.quiz[lvl][cat]?.[id] && (lvl !== level || cat !== category)) {
+                        delete userData.quiz[lvl][cat][id];
+                        if (Object.keys(userData.quiz[lvl][cat]).length === 1 && userData.quiz[lvl][cat].completed) {
+                            delete userData.quiz[lvl][cat].completed;
+                        }
+                    }
+                });
+            });
+
+            saveQuizQuestions();
+            saveUserData();
+            displayQuestions();
+            document.getElementById('amend-question-modal').style.display = 'none';
+            alert('Question amended successfully!');
+        };
+
         window.removeQuestion = function(level, id) {
             quizQuestions[level] = quizQuestions[level].filter(q => q.id !== id);
             Object.keys(userData.quiz).forEach(lvl => {
@@ -912,6 +1078,7 @@
                             <p><strong>Category:</strong> ${q.category}</p>
                             <p><strong>Answer:</strong> ${q.answer}</p>
                             ${q.options ? `<p><strong>Options:</strong> ${q.options.join(', ')}</p>` : ''}
+                            <button class="btn mt-2 bg-blue-500 hover:bg-blue-700 mr-2" onclick="openAmendModal('${level}', '${q.id}')">Amend ✏️</button>
                             <button class="btn mt-2 bg-red-500 hover:bg-red-700" onclick="removeQuestion('${level}', '${q.id}')">Remove 🗑️</button>
                         `;
                         questionsContainer.appendChild(qDiv);
@@ -997,7 +1164,7 @@
             if (quiz) quiz.classList.add('hidden');
             if (adminQuiz) adminQuiz.classList.add('hidden');
 
-            ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
+            ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal', 'amend-question-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
             });
@@ -1036,7 +1203,7 @@
                         if (matchingGame) matchingGame.classList.add('hidden');
                         if (quiz) quiz.classList.add('hidden');
                         if (adminQuiz) adminQuiz.classList.add('hidden');
-                        ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal'].forEach(id => {
+                        ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal', 'amend-question-modal'].forEach(id => {
                             const modal = document.getElementById(id);
                             if (modal) modal.style.display = 'none';
                         });
@@ -1460,18 +1627,18 @@
         @keyframes rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+@keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
         }
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
         @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -1479,166 +1646,226 @@
             100% { transform: scale(1); }
         }
         @media (max-width: 768px) {
-            .card-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            }
-            .card {
-                width: 120px;
-                padding: 0.5rem;
-            }
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2rem;
             }
             .hero .btn {
                 padding: 1rem 2rem;
-                font-size: 1.5rem;
+                font-size: 1.2rem;
+            }
+            .card-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+            .card {
+                width: 80%;
+                max-width: 300px;
+            }
+            .game-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            .game-card {
+                width: 80px;
+                height: 80px;
+                font-size: 0.7rem;
             }
             .section {
                 padding: 2rem 1rem;
             }
-            .btn {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
-            }
-            .placeholder-images {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .placeholder-image {
-                width: 100%;
-                height: 200px;
-            }
-            .game-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 5px;
-            }
-            .game-card {
-                width: 70px;
-                height: 70px;
-                font-size: 0.7rem;
-            }
-            .card-back {
-                font-size: 0.6rem;
-            }
-            .admin-content {
-                max-height: 75vh;
-            }
             .content {
-                max-width: 100%;
+                padding: 1rem;
+            }
+            .modal-content {
+                width: 95%;
                 padding: 1rem;
             }
         }
-</style>
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .game-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .game-card {
+                width: 60px;
+                height: 60px;
+                font-size: 0.6rem;
+            }
+            .card-front {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="background-layer"></div>
-<div class="ui-container">
-<div class="header-bar">
-<h1>Shia Islamic Adventure Quest</h1>
-</div>
-<div class="star-counter" id="star-count">0 ⭐</div>
-<img alt="Avatar" class="avatar-display" id="avatar-display" src="https://yourusername.github.io/your-repo/images/mascot.png" style="display: none;"/>
-<div class="tree" style="top: 20%; left: 5%;"></div>
-<div class="cloud" style="top: 10%; right: 10%;"></div>
-<div class="star" style="top: 15%; left: 20%;"></div>
-<div class="moon" style="top: 10%; left: 10%;"></div>
-<div class="hero" id="hero">
-<h1>Welcome to Your Adventure!</h1>
-<p>Explore, learn, and grow with Shia Islamic teachings.</p>
-<button class="btn" onclick="showLoginModal()">Login 🚪</button>
-<button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
-<button
-
-<button class="btn" onclick="showAdminLoginModal()">Admin Login 🔧</button>
-</div>
-<div class="modal" id="login-modal" onclick="closeModal(event)">
-<div class="modal-content">
-<h2 class="text-2xl text-orange-600 mb-4">Login 🚪</h2>
-<input id="login-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email"/>
-<input id="login-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password" type="password"/>
-<button class="btn" onclick="login()">Login</button>
-<button class="btn mt-2" onclick="document.getElementById('reset-password-modal').style.display='flex'; document.getElementById('login-modal').style.display='none'">Forgot Password?</button>
-<button class="btn mt-2" onclick="closeModal(event)">Close</button>
-</div>
-</div>
-<div class="modal" id="signup-modal" onclick="closeModal(event)">
-<div class="modal-content">
-<h2 class="text-2xl text-orange-600 mb-4">Sign Up ✨</h2>
-<input id="signup-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email"/>
-<input id="signup-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password" type="password"/>
-<input id="signup-name" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Your Name"/>
-<div class="mb-2">
-<label><input name="gender" type="radio" value="boy" checked/> Boy</label>
-<label class="ml-4"><input name="gender" type="radio" value="girl"/> Girl</label>
-</div>
-<select id="year-select" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
-<option value="Level-1">Level 1</option>
-<option value="Level-2">Level 2</option>
-<option value="Level-3">Level 3</option>
-<option value="Level-4">Level 4</option>
-<option value="Level-5">Level 5</option>
-<option value="Level-6">Level 6</option>
-<option value="Level-7">Level 7</option>
-</select>
-<div class="placeholder-images">
-<img alt="Character 1" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character1.png"/>
-<img alt="Character 2" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character2.png"/>
-<img alt="Character 3" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character3.png"/>
-</div>
-<button class="btn mt-2" onclick="signupUser()">Sign Up</button>
-<button class="btn mt-2" onclick="closeModal(event)">Close</button>
-</div>
-</div>
-<div class="modal" id="admin-login-modal" onclick="closeModal(event)">
-<div class="modal-content">
-<h2 class="text-2xl text-orange-600 mb-4">Admin Login 🔧</h2>
-<input id="admin-username" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Email"/>
-<input id="admin-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Password" type="password"/>
-<button class="btn" onclick="loginAdmin()">Login</button>
-<button class="btn mt-2" onclick="closeModal(event)">Close</button>
-</div>
-</div>
-<div class="modal" id="reset-password-modal" onclick="closeModal(event)">
-<div class="modal-content">
-<h2 class="text-2xl text-orange-600 mb-4">Reset Password 🔑</h2>
-<input id="reset-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Enter your email"/>
-<button class="btn" onclick="resetPassword()">Send Reset Email</button>
-<button class="btn mt-2" onclick="closeModal(event)">Close</button>
-</div>
-</div>
-<div class="section hidden" id="welcome">
-<div class="content">
-<h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
-<div class="progress-bar">
-<div id="progress"></div>
-</div>
-<div class="badge">🏅 Badge: Explorer</div>
-<div class="card-grid" id="welcome-card-grid">
-<div class="card" onclick="showSection('missions')">
-<h3>Missions</h3>
-<p>Daily Tasks ⭐</p>
-</div>
-<div class="card" onclick="showSection('profile')">
-<h3>Profile</h3>
-<p>Your Journey 🏡</p>
-</div>
-<div class="card" onclick="showSection('matching-game')">
-<h3>Matching Game</h3>
-<p>Match Holy Individuals 🧠</p>
-</div>
-<div class="card" onclick="showSection('quiz')">
-<h3>Quiz</h3>
-<p>Test Your Knowledge 📚</p>
-</div>
-</div>
-<button class="btn mt-4" onclick="logout()">Logout 🚪</button>
-</div>
-</div>
-<div class="section hidden" id="missions"></div>
-<div class="section hidden" id="profile"></div>
-<div class="section hidden" id="matching-game"></div>
-<div class="section hidden" id="quiz"></div>
-<div class="section hidden" id="admin-quiz"></div>
-</div>
+    <div class="background-layer"></div>
+    <div class="ui-container">
+        <div class="header-bar">
+            <h1>Shia Islamic Adventure Quest</h1>
+        </div>
+        <div class="star-counter" id="star-count">0 ⭐</div>
+        <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display hidden" id="avatar-display">
+        <div class="tree" style="bottom: 10%; left: 5%;">🌳</div>
+        <div class="tree" style="bottom: 5%; right: 5%;">🌳</div>
+        <div class="cloud" style="top: 15%; left: 20%;">☁️</div>
+        <div class="cloud" style="top: 25%; right: 15%;">☁️</div>
+        <div class="star" style="top: 10%; left: 30%;">⭐</div>
+        <div class="star" style="top: 20%; right: 25%;">⭐</div>
+        <div class="moon">🌙</div>
+        <div class="hero" id="hero">
+            <h1>Embark on a Learning Adventure! 🚀</h1>
+            <p>Join us to explore Islamic teachings through fun missions and games!</p>
+            <div class="card-grid">
+                <button class="btn" onclick="showLoginModal()">Login 🚪</button>
+                <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
+                <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔧</button>
+            </div>
+        </div>
+        <div class="modal" id="login-modal" onclick="closeModal(event)">
+            <div class="modal-content">
+                <h2 class="text-2xl text-orange-600 mb-4">Login 🚪</h2>
+                <input id="login-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email"/>
+                <input id="login-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password" type="password"/>
+                <button class="btn" onclick="login()">Login</button>
+                <button class="btn mt-2" onclick="document.getElementById('reset-password-modal').style.display='flex'; document.getElementById('login-modal').style.display='none'">Forgot Password?</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+            </div>
+        </div>
+        <div class="modal" id="signup-modal" onclick="closeModal(event)">
+            <div class="modal-content">
+                <h2 class="text-2xl text-orange-600 mb-4">Sign Up ✨</h2>
+                <input id="signup-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email"/>
+                <input id="signup-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password" type="password"/>
+                <input id="signup-name" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Your Name"/>
+                <div class="mb-2">
+                    <label><input name="gender" type="radio" value="boy" checked/> Boy</label>
+                    <label class="ml-4"><input name="gender" type="radio" value="girl"/> Girl</label>
+                </div>
+                <select id="year-select" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
+                    <option value="Level-1">Level 1</option>
+                    <option value="Level-2">Level 2</option>
+                    <option value="Level-3">Level 3</option>
+                    <option value="Level-4">Level 4</option>
+                    <option value="Level-5">Level 5</option>
+                    <option value="Level-6">Level 6</option>
+                    <option value="Level-7">Level 7</option>
+                </select>
+                <div class="placeholder-images">
+                    <img alt="Character 1" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character1.png"/>
+                    <img alt="Character 2" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character2.png"/>
+                    <img alt="Character 3" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character3.png"/>
+                </div>
+                <button class="btn mt-2" onclick="signupUser()">Sign Up</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+            </div>
+        </div>
+        <div class="modal" id="admin-login-modal" onclick="closeModal(event)">
+            <div class="modal-content">
+                <h2 class="text-2xl text-orange-600 mb-4">Admin Login 🔧</h2>
+                <input id="admin-username" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Email"/>
+                <input id="admin-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Password" type="password"/>
+                <button class="btn" onclick="loginAdmin()">Login</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+            </div>
+        </div>
+        <div class="modal" id="reset-password-modal" onclick="closeModal(event)">
+            <div class="modal-content">
+                <h2 class="text-2xl text-orange-600 mb-4">Reset Password 🔑</h2>
+                <input id="reset-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Enter your email"/>
+                <button class="btn" onclick="resetPassword()">Send Reset Email</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+            </div>
+        </div>
+        <div class="modal" id="amend-question-modal" onclick="closeModal(event)">
+            <div class="modal-content">
+                <h2 class="text-2xl text-orange-600 mb-4">Amend Question ✏️</h2>
+                <input id="amend-question-id" type="hidden">
+                <input id="amend-question-level-original" type="hidden">
+                <input id="amend-question-text" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Question text"/>
+                <select id="amend-question-type" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" onchange="toggleAmendAnswerFields()">
+                    <option value="text">Free Text</option>
+                    <option value="multiple">Multiple Choice</option>
+                </select>
+                <select id="amend-question-level" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
+                    <option value="Level-1">Level 1</option>
+                    <option value="Level-2">Level 2</option>
+                    <option value="Level-3">Level 3</option>
+                    <option value="Level-4">Level 4</option>
+                    <option value="Level-5">Level 5</option>
+                    <option value="Level-6">Level 6</option>
+                    <option value="Level-7">Level 7</option>
+                </select>
+                <select id="amend-question-category" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
+                    <option value="">Select a category</option>
+                    <option value="Islamic Laws">Islamic Laws</option>
+                    <option value="Islamic Beliefs">Islamic Beliefs</option>
+                    <option value="Quran">Quran</option>
+                    <option value="Islamic Personalities">Islamic Personalities</option>
+                    <option value="Islamic History">Islamic History</option>
+                </select>
+                <div id="amend-answer-fields">
+                    <input id="amend-answer-text" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Correct answer"/>
+                </div>
+                <div id="amend-multiple-choice-fields" class="hidden">
+                    <div class="mt-2">
+                        <input id="amend-option-1" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 1"/>
+                        <label class="ml-2"><input type="checkbox" id="amend-correct-option-1" onchange="ensureSingleCorrectAmendAnswer(1)"> Correct</label>
+                    </div>
+                    <div class="mt-2">
+                        <input id="amend-option-2" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 2"/>
+                        <label class="ml-2"><input type="checkbox" id="amend-correct-option-2" onchange="ensureSingleCorrectAmendAnswer(2)"> Correct</label>
+                    </div>
+                    <div class="mt-2">
+                        <input id="amend-option-3" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 3 (optional)"/>
+                        <label class="ml-2"><input type="checkbox" id="amend-correct-option-3" onchange="ensureSingleCorrectAmendAnswer(3)"> Correct</label>
+                    </div>
+                    <div class="mt-2">
+                        <input id="amend-option-4" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 4 (optional)"/>
+                        <label class="ml-2"><input type="checkbox" id="amend-correct-option-4" onchange="ensureSingleCorrectAmendAnswer(4)"> Correct</label>
+                    </div>
+                </div>
+                <button class="btn mt-2" onclick="amendQuestion()">Save Changes 💾</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+            </div>
+        </div>
+        <div class="section hidden" id="welcome">
+            <div class="content">
+                <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
+                <div class="progress-bar">
+                    <div id="progress"></div>
+                </div>
+                <div class="badge">🏅 Badge: Explorer</div>
+                <div class="card-grid" id="welcome-card-grid">
+                    <div class="card" onclick="showSection('missions')">
+                        <h3>Missions</h3>
+                        <p>Daily Tasks ⭐</p>
+                    </div>
+                    <div class="card" onclick="showSection('profile')">
+                        <h3>Profile</h3>
+                        <p>Your Journey 🏡</p>
+                    </div>
+                    <div class="card" onclick="showSection('matching-game')">
+                        <h3>Matching Game</h3>
+                        <p>Match Holy Individuals 🧠</p>
+                    </div>
+                    <div class="card" onclick="showSection('quiz')">
+                        <h3>Quiz</h3>
+                        <p>Test Your Knowledge 📚</p>
+                    </div>
+                </div>
+                <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
+            </div>
+        </div>
+        <div class="section hidden" id="missions"></div>
+        <div class="section hidden" id="profile"></div>
+        <div class="section hidden" id="matching-game"></div>
+        <div class="section hidden" id="quiz"></div>
+        <div class="section hidden" id="admin-quiz"></div>
+    </div>
 </body>
 </html>
