@@ -1535,27 +1535,24 @@ f<!DOCTYPE html>
         }       
 landmark-images {
    
-.landmark-images {
-    display: flex;
-    flex-wrap: wrap; /* allows wrapping on smaller screens */
-    justify-content: flex-start; /* aligns images to the left */
-    gap: 1rem; /* space between images */
-    max-width: 100%; /* allow full width */
-    margin: 2rem auto;
-    padding: 0 1rem;
-    z-index: 20;
-
+ }
+        .landmark-images {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            z-index: 20;
         }
-        
-
-landmark-image {
-    width: 100%;
-    max-width: 280px; /* smaller width to fit multiple images */
-    height: auto;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease-in-out;
+        .landmark-image {
+            width: 450px;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
 
 }
 
