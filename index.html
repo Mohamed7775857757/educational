@@ -104,7 +104,8 @@
             document.querySelectorAll('.section, #landing-page, #hero').forEach(el => {
                 if (el) el.classList.add('hidden');
             });
-            const section = document.getElementById(sectionId);
+            const section']],
+        const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
                 gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 1.50, y: 50, duration: 0.5, ease: 'power2.out' });
@@ -125,12 +126,23 @@
             userData.gender = document.querySelector('input[name="gender"]:checked')?.value || 'boy';
             userData.year = document.getElementById('year-select')?.value || 'Level-1';
             const selected = document.querySelector('.character.selected');
-            userData.character = selected ? selected.src : document.querySelector('.character')?.src老
-
-System: * The code was cut off again. I'll provide the remaining code to complete the HTML file, including the new placeholder images for Makkah, Madinah, Najaf, and Karbala on the landing page, while preserving all existing functionality (amend question feature, bug fixes, etc.). Below is the continuation from where the previous response ended, starting from the middle of the `signupUser` function, and completing the `<script>`, `<style>`, and `<body>` sections.
-
-### Remaining Code
-```html
+            userData.character = selected ? selected.src : document.querySelector('.character')?.src;
+            const email = document.getElementById('signup-email')?.value;
+            const password = document.getElementById('signup-password')?.value;
+            if (!email || !password) {
+                alert('❌ Please enter email and password');
+                return;
+            }
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    alert("✅ Sign up successful!");
+                    userData.email = email;
+                    isAdmin = email === 'melzein1987@gmail.com';
+                    const signupModal = document.getElementById('signup-modal');
+                    if (signupModal) signupModal.style.display = 'none';
+                    saveUserData();
+                    showSection('welcome');
+                })
                 .catch(error => alert("❌ " + error.message));
         };
 
@@ -614,7 +626,7 @@ System: * The code was cut off again. I'll provide the remaining code to complet
                     saveUserData();
                 }
                 feedback.className = 'text-green-600 mt-2';
-                feedback.textContent = 'Correct! +2 Stars! 🎉';
+                feedback.textContent = 'Correct!2 Stars! 🎉';
                 setTimeout(() => {
                     currentQuestionIndex++;
                     showQuizQuestion();
@@ -1535,13 +1547,14 @@ System: * The code was cut off again. I'll provide the remaining code to complet
             flex-direction: row;
             justify-content: space-between;
             gap: 1rem;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
+            z-index: 20;
         }
         .landmark-image {
-            width: 150px;
-            height: 150px;
+            width: 450px;
+            height: 450px;
             object-fit: cover;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -1620,7 +1633,7 @@ System: * The code was cut off again. I'll provide the remaining code to complet
             100% { opacity: 1; }
         }
         @keyframes shine {
-0% { opacity: 0.6; }
+            0% { opacity: 0.6; }
             50% { opacity: 1; }
             100% { opacity: 0.6; }
         }
@@ -1629,7 +1642,9 @@ System: * The code was cut off again. I'll provide the remaining code to complet
             100% { transform: rotate(360deg); }
         }
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            0
+
+0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-20px); }
             60% { transform: translateY(-10px); }
         }
@@ -1671,23 +1686,13 @@ System: * The code was cut off again. I'll provide the remaining code to complet
                 height: 80px;
                 font-size: 0.7rem;
             }
-            .section {
-                padding: 2rem 1rem;
-            }
-            .content {
-                padding: 1rem;
-            }
-            .modal-content {
-                width: 95%;
-                padding: 1rem;
-            }
             .landmark-images {
                 flex-direction: column;
                 align-items: center;
             }
             .landmark-image {
-                width: 120px;
-                height: 120px;
+                width: 300px;
+                height: 300px;
             }
         }
         @media (max-width: 480px) {
@@ -1709,8 +1714,8 @@ System: * The code was cut off again. I'll provide the remaining code to complet
                 font-size: 1.5rem;
             }
             .landmark-image {
-                width: 100px;
-                height: 100px;
+                width: 200px;
+                height: 200px;
             }
         }
     </style>
@@ -1733,16 +1738,16 @@ System: * The code was cut off again. I'll provide the remaining code to complet
         <div class="hero" id="hero">
             <h1>Embark on a Learning Adventure! 🚀</h1>
             <p>Join us to explore Islamic teachings through fun missions and games!</p>
-            <div class="landmark-images">
-                <img src="https://source.unsplash.com/150x150/?makkah" alt="Makkah" class="landmark-image" title="Makkah">
-                <img src="https://source.unsplash.com/150x150/?madinah" alt="Madinah" class="landmark-image" title="Madinah">
-                <img src="https://source.unsplash.com/150x150/?najaf" alt="Najaf" class="landmark-image" title="Najaf">
-                <img src="https://source.unsplash.com/150x150/?karbala" alt="Karbala" class="landmark-image" title="Karbala">
-            </div>
             <div class="card-grid">
                 <button class="btn" onclick="showLoginModal()">Login 🚪</button>
                 <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
                 <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔧</button>
+            </div>
+            <div class="landmark-images">
+                <img src="https://source.unsplash.com/450x450/?makkah" alt="Makkah" class="landmark-image" title="Makkah">
+                <img src="https://source.unsplash.com/450x450/?madinah" alt="Madinah" class="landmark-image" title="Madinah">
+                <img src="https://source.unsplash.com/450x450/?najaf" alt="Najaf" class="landmark-image" title="Najaf">
+                <img src="https://source.unsplash.com/450x450/?karbala" alt="Karbala" class="landmark-image" title="Karbala">
             </div>
         </div>
         <div class="modal" id="login-modal" onclick="closeModal(event)">
