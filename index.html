@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Shia Islamic Adventure Quest</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;family=Fredoka:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-<script defer="" type="module">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Shia Islamic Adventure Quest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;family=Fredoka:wght@400;500&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
+    <script defer="" type="module">
         // Import Firebase libraries
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -125,25 +125,12 @@
             userData.gender = document.querySelector('input[name="gender"]:checked')?.value || 'boy';
             userData.year = document.getElementById('year-select')?.value || 'Level-1';
             const selected = document.querySelector('.character.selected');
-            userData.character = selected ? selected.src : document.querySelector('.character')?.src || 'https://yourusername.github.io/your-repo/images/mascot.png';
-            saveUserData();
+            userData.character = selected ? selected.src : document.querySelector('.character')?.src老
 
-            const email = document.getElementById('signup-email')?.value;
-            const password = document.getElementById('signup-password')?.value;
-            if (!email || !password) {
-                alert('❌ Please enter email and password');
-                return;
-            }
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    alert("✅ Sign-up successful!");
-                    userData.email = email;
-                    isAdmin = email === 'melzein1987@gmail.com';
-                    const signupModal = document.getElementById('signup-modal');
-                    if (signupModal) signupModal.style.display = 'none';
-                    loadUserData();
-                    showSection('welcome');
-                })
+System: * The code was cut off again. I'll provide the remaining code to complete the HTML file, including the new placeholder images for Makkah, Madinah, Najaf, and Karbala on the landing page, while preserving all existing functionality (amend question feature, bug fixes, etc.). Below is the continuation from where the previous response ended, starting from the middle of the `signupUser` function, and completing the `<script>`, `<style>`, and `<body>` sections.
+
+### Remaining Code
+```html
                 .catch(error => alert("❌ " + error.message));
         };
 
@@ -1248,8 +1235,8 @@
                 }
             });
         });
-</script>
-<style>
+    </script>
+    <style>
         body {
             font-family: 'Fredoka', sans-serif;
             margin: 0;
@@ -1266,7 +1253,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background:#A5CFCC url('https://yourusername.github.io/your-repo/images/background.jpg') no-repeat center center fixed;
+            background: #A5CFCC url('https://yourusername.github.io/your-repo/images/background.jpg') no-repeat center center fixed;
             background-size: cover;
             z-index: -1;
         }
@@ -1293,6 +1280,15 @@
             text-shadow: 2px 2px #000;
             animation: bounce 1s ease-out infinite;
         }
+        .tree, .cloud, .star, .moon {
+            position: absolute;
+            animation: float 6s infinite ease-in-out;
+            z-index: 1;
+        }
+        .tree { content: '🌳'; font-size: 80px; }
+        .cloud { content: '☁️'; font-size: 50px; animation: float 8s infinite ease-in-out; }
+        .star { content: '⭐'; font-size: 30px; animation: twinkle 2s infinite alternate; }
+        .moon { content: '🌙'; font-size: 60px; animation: shine 4s infinite ease-in-out; top: 10%; left: 10%; }
         .hero {
             height: 100vh;
             position: relative;
@@ -1534,12 +1530,25 @@
             margin-top: 20px;
             padding: 10px 0;
         }
-        .placeholder-image {
-            width: 400px;
-            height: 300px;
-            object-fit: contain;
+        .landmark-images {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .landmark-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+        .landmark-image:hover {
+            transform: scale(1.05);
         }
         .game-grid {
             display: grid;
@@ -1611,14 +1620,15 @@
             100% { opacity: 1; }
         }
         @keyframes shine {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
         }
         @keyframes rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-@keyframes bounce {
+        }
+        @keyframes bounce {
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-20px); }
             60% { transform: translateY(-10px); }
@@ -1671,6 +1681,14 @@
                 width: 95%;
                 padding: 1rem;
             }
+            .landmark-images {
+                flex-direction: column;
+                align-items: center;
+            }
+            .landmark-image {
+                width: 120px;
+                height: 120px;
+            }
         }
         @media (max-width: 480px) {
             .hero h1 {
@@ -1690,6 +1708,10 @@
             .card-front {
                 font-size: 1.5rem;
             }
+            .landmark-image {
+                width: 100px;
+                height: 100px;
+            }
         }
     </style>
 </head>
@@ -1701,9 +1723,22 @@
         </div>
         <div class="star-counter" id="star-count">0 ⭐</div>
         <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display hidden" id="avatar-display">
+        <div class="tree" style="bottom: 10%; left: 5%;">🌳</div>
+        <div class="tree" style="bottom: 5%; right: 5%;">🌳</div>
+        <div class="cloud" style="top: 15%; left: 20%;">☁️</div>
+        <div class="cloud" style="top: 25%; right: 15%;">☁️</div>
+        <div class="star" style="top: 10%; left: 30%;">⭐</div>
+        <div class="star" style="top: 20%; right: 25%;">⭐</div>
+        <div class="moon">🌙</div>
         <div class="hero" id="hero">
             <h1>Embark on a Learning Adventure! 🚀</h1>
             <p>Join us to explore Islamic teachings through fun missions and games!</p>
+            <div class="landmark-images">
+                <img src="https://source.unsplash.com/150x150/?makkah" alt="Makkah" class="landmark-image" title="Makkah">
+                <img src="https://source.unsplash.com/150x150/?madinah" alt="Madinah" class="landmark-image" title="Madinah">
+                <img src="https://source.unsplash.com/150x150/?najaf" alt="Najaf" class="landmark-image" title="Najaf">
+                <img src="https://source.unsplash.com/150x150/?karbala" alt="Karbala" class="landmark-image" title="Karbala">
+            </div>
             <div class="card-grid">
                 <button class="btn" onclick="showLoginModal()">Login 🚪</button>
                 <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
@@ -1740,10 +1775,9 @@
                     <option value="Level-7">Level 7</option>
                 </select>
                 <div class="placeholder-images">
-                    <img alt="Boy1" class="character w-24 h-24 rounded-full cursor-pointer" src="https://github.com/Mohamed7775857757/educational/blob/main/images/boy1.png"/>
-                    <img alt="Boy2" class="character w-24 h-24 rounded-full cursor-pointer" src="https://github.com/Mohamed7775857757/educational/blob/main/images/boy2.png"/>
-                    <img alt="Girl1" class="character w-24 h-24 rounded-full cursor-pointer" src="https://github.com/Mohamed7775857757/educational/blob/main/images/girl1.png"/>
-                    <img alt="Girl2" class="character w-24 h-24 rounded-full cursor-pointer" src="https://github.com/Mohamed7775857757/educational/blob/main/images/girl2.png"/>
+                    <img alt="Character 1" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character1.png"/>
+                    <img alt="Character 2" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character2.png"/>
+                    <img alt="Character 3" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character3.png"/>
                 </div>
                 <button class="btn mt-2" onclick="signupUser()">Sign Up</button>
                 <button class="btn mt-2" onclick="closeModal(event)">Close</button>
