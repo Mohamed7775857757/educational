@@ -1,4 +1,4 @@
-f<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -9,11 +9,9 @@ f<!DOCTYPE html>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-    <script defer="" type="module">
-        // Import Firebase libraries
-        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+    <script>
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBD2asTEG40b4hhVmUZKlGd3ZPe-NJctxM",
@@ -25,12 +23,12 @@ f<!DOCTYPE html>
         };
 
         // Initialize Firebase
-        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+        const app = firebase.getApps().length === 0 ? firebase.initializeApp(firebaseConfig) : firebase.getApps()[0];
         if (!app) {
             console.error('Firebase initialization failed');
             alert('Failed to connect to the app. Please try again later.');
         }
-        const auth = getAuth(app);
+        const auth = firebase.getAuth(app);
 
         // Global variables
         let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
@@ -66,7 +64,7 @@ f<!DOCTYPE html>
             localStorage.setItem('quizQuestions', JSON.stringify(quizQuestions));
         }
 
-        // Define functions globally within the module
+        // Define modal functions globally
         window.showLoginModal = function() {
             console.log('Attempting to show login modal...');
             const modal = document.getElementById('login-modal');
@@ -104,8 +102,7 @@ f<!DOCTYPE html>
             document.querySelectorAll('.section, #landing-page, #hero').forEach(el => {
                 if (el) el.classList.add('hidden');
             });
-            const section']],
-        const section = document.getElementById(sectionId);
+            const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
                 gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 1.50, y: 50, duration: 0.5, ease: 'power2.out' });
@@ -133,7 +130,7 @@ f<!DOCTYPE html>
                 alert('❌ Please enter email and password');
                 return;
             }
-            createUserWithEmailAndPassword(auth, email, password)
+            firebase.auth().createUserWithEmailAndPassword(email, password)
                 .then(() => {
                     alert("✅ Sign up successful!");
                     userData.email = email;
@@ -153,7 +150,7 @@ f<!DOCTYPE html>
                 alert('❌ Please enter email and password');
                 return;
             }
-            signInWithEmailAndPassword(auth, email, password)
+            firebase.auth().signInWithEmailAndPassword(email, password)
                 .then(() => {
                     alert("✅ Login successful!");
                     userData.email = email;
@@ -173,7 +170,7 @@ f<!DOCTYPE html>
                 alert('❌ Please enter email and password');
                 return;
             }
-            signInWithEmailAndPassword(auth, email, password)
+            firebase.auth().signInWithEmailAndPassword(email, password)
                 .then(() => {
                     alert("✅ Admin login successful!");
                     userData.email = email;
@@ -192,13 +189,13 @@ f<!DOCTYPE html>
                 alert('❌ Please enter an email');
                 return;
             }
-            sendPasswordResetEmail(auth, email)
+            firebase.auth().sendPasswordResetEmail(email)
                 .then(() => alert("📧 Password reset email sent!"))
                 .catch(error => alert("❌ " + error.message));
         };
 
         window.logout = function() {
-            signOut(auth).then(() => {
+            firebase.auth().signOut().then(() => {
                 alert("✅ Logged out successfully!");
                 userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                 isAdmin = false;
@@ -1173,7 +1170,7 @@ f<!DOCTYPE html>
                 if (authInitialized) return;
                 authInitialized = true;
 
-                onAuthStateChanged(auth, (user) => {
+                firebase.auth().onAuthStateChanged((user) => {
                     if (user) {
                         userData.email = user.email;
                         isAdmin = user.email === 'melzein1987@gmail.com';
@@ -1233,7 +1230,7 @@ f<!DOCTYPE html>
                 const adminQuiz = document.getElementById('admin-quiz');
                 if (hero) hero.classList.remove('hidden');
                 if (welcome) welcome.classList.add('hidden');
-                if (profile) profile.classList.add('hidden');
+                if (profile) welcome.classList.add('hidden');
                 if (matchingGame) matchingGame.classList.add('hidden');
                 if (quiz) quiz.classList.add('hidden');
                 if (adminQuiz) adminQuiz.classList.add('hidden');
@@ -1494,7 +1491,7 @@ f<!DOCTYPE html>
             width: 100%;
             height: 20px;
             background: #ddd;
-            border-radius: 10px;
+            repair-radius: 10px;
             overflow: hidden;
             margin: 1rem 0;
             z-index: 20;
@@ -1533,9 +1530,6 @@ f<!DOCTYPE html>
             margin-top: 20px;
             padding: 10px 0;
         }       
-landmark-images {
-   
- }
         .landmark-images {
             display: flex;
             flex-direction: row;
@@ -1553,9 +1547,6 @@ landmark-images {
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease-in-out;
-
-}
-
         }
         .landmark-image:hover {
             transform: scale(1.05);
@@ -1639,9 +1630,7 @@ landmark-images {
             100% { transform: rotate(360deg); }
         }
         @keyframes bounce {
-            0
-
-0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-20px); }
             60% { transform: translateY(-10px); }
         }
@@ -1724,42 +1713,73 @@ landmark-images {
             <h1>Shia Islamic Adventure Quest</h1>
         </div>
         <div class="star-counter" id="star-count">0 ⭐</div>
-        <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display hidden" id="avatar-display">
-        <div class="hero" id="hero">
-            <h1>Embark on a Learning Adventure! 🚀</h1>
-            <p>Join us to explore Islamic teachings through fun missions and games!</p>
-            <div class="card-grid">
-                <button class="btn" onclick="showLoginModal()">Login 🚪</button>
-                <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
-                <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔧</button>
+        <img id="avatar-display" class="avatar-display" src="" alt="Avatar" style="display: none;">
+        <div id="hero" class="hero">
+            <h1>Welcome to the Adventure! 🌟</h1>
+            <p>Join the quest to learn about Islamic values and history!</p>
+            <div class="
+<div class="landmark-images">
+                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/makkah.jpg" alt="Makkah" class="landmark-image">
+                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg" alt="Madinah" class="landmark-image">
+                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/karbala.jpg" alt="Karbala" class="landmark-image">
             </div>
-            <div class="landmark-images">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/makkah.jpg?raw=true" alt="Makkah" class="landmark-image" title="Makkah">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg?raw=true" alt="madinah" class="landmark-image" title="madinah">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/najaf.jpg?raw=true" alt="najaf" class="landmark-image" title="najaf">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/karbala.jpg?raw=true" alt="karbala" class="landmark-image" title="karbala">
+            <button class="btn" onclick="showLoginModal()">Login 🚪</button>
+            <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
+            <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔧</button>
+        </div>
+        <div id="welcome" class="section hidden">
+            <div class="content">
+                <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
+                <div class="progress-bar">
+                    <div id="progress"></div>
+                </div>
+                <p class="badge">🏅 Badge: Explorer</p>
+                <div id="welcome-card-grid" class="card-grid">
+                    <!-- Cards will be populated dynamically -->
+                </div>
             </div>
         </div>
-        <div class="modal" id="login-modal" onclick="closeModal(event)">
+        <div id="profile" class="section hidden">
+            <div class="content">
+                <!-- Profile content will be populated dynamically -->
+            </div>
+        </div>
+        <div id="missions" class="section hidden">
+            <div class="content">
+                <!-- Missions content will be populated dynamically -->
+            </div>
+        </div>
+        <div id="matching-game" class="section hidden">
+            <div class="content">
+                <!-- Matching game content will be populated dynamically -->
+            </div>
+        </div>
+        <div id="quiz" class="section hidden">
+            <div class="content">
+                <!-- Quiz content will be populated dynamically -->
+            </div>
+        </div>
+        <div id="admin-quiz" class="section hidden">
+            <div class="content admin-content">
+                <!-- Admin quiz content will be populated dynamically -->
+            </div>
+        </div>
+        <div id="login-modal" class="modal" onclick="closeModal(event)">
             <div class="modal-content">
                 <h2 class="text-2xl text-orange-600 mb-4">Login 🚪</h2>
-                <input id="login-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email"/>
-                <input id="login-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password" type="password"/>
-                <button class="btn" onclick="login()">Login</button>
-                <button class="btn mt-2" onclick="document.getElementById('reset-password-modal').style.display='flex'; document.getElementById('login-modal').style.display='none'">Forgot Password?</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+                <input id="login-email" type="email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email">
+                <input id="login-password" type="password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password">
+                <button class="btn mt-2" onclick="login()">Login</button>
+                <button class="btn mt-2" onclick="document.getElementById('reset-password-modal').style.display = 'flex'; document.getElementById('login-modal').style.display = 'none';">Forgot Password?</button>
+                <button class="btn mt-2" onclick="document.getElementById('login-modal').style.display = 'none'">Close</button>
             </div>
         </div>
-        <div class="modal" id="signup-modal" onclick="closeModal(event)">
+        <div id="signup-modal" class="modal" onclick="closeModal(event)">
             <div class="modal-content">
                 <h2 class="text-2xl text-orange-600 mb-4">Sign Up ✨</h2>
-                <input id="signup-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email"/>
-                <input id="signup-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password" type="password"/>
-                <input id="signup-name" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Your Name"/>
-                <div class="mb-2">
-                    <label><input name="gender" type="radio" value="boy" checked/> Boy</label>
-                    <label class="ml-4"><input name="gender" type="radio" value="girl"/> Girl</label>
-                </div>
+                <input id="signup-name" type="text" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Your Name">
+                <input id="signup-email" type="email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email">
+                <input id="signup-password" type="password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password">
                 <select id="year-select" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
                     <option value="Level-1">Level 1</option>
                     <option value="Level-2">Level 2</option>
@@ -1769,52 +1789,51 @@ landmark-images {
                     <option value="Level-6">Level 6</option>
                     <option value="Level-7">Level 7</option>
                 </select>
+                <div class="mb-2">
+                    <label class="block"><input type="radio" name="gender" value="boy" checked> Boy</label>
+                    <label class="block"><input type="radio" name="gender" value="girl"> Girl</label>
+                </div>
                 <div class="placeholder-images">
-                    <img alt="Character 1" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character1.png"/>
-                    <img alt="Character 2" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character2.png"/>
-                    <img alt="Character 3" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character3.png"/>
+                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy1.png" alt="Boy 1" class="character w-24 h-24 rounded-full cursor-pointer">
+                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy2.png" alt="Boy 2" class="character w-24 h-24 rounded-full cursor-pointer">
+                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/girl1.png" alt="Girl 1" class="character w-24 h-24 rounded-full cursor-pointer">
+                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/girl2.png" alt="Girl 2" class="character w-24 h-24 rounded-full cursor-pointer">
                 </div>
                 <button class="btn mt-2" onclick="signupUser()">Sign Up</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+                <button class="btn mt-2" onclick="document.getElementById('signup-modal').style.display = 'none'">Close</button>
             </div>
         </div>
-        <div class="modal" id="admin-login-modal" onclick="closeModal(event)">
+        <div id="admin-login-modal" class="modal" onclick="closeModal(event)">
             <div class="modal-content">
                 <h2 class="text-2xl text-orange-600 mb-4">Admin Login 🔧</h2>
-                <input id="admin-username" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Email"/>
-                <input id="admin-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Password" type="password"/>
-                <button class="btn" onclick="loginAdmin()">Login</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+                <input id="admin-username" type="email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Email">
+                <input id="admin-password" type="password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Password">
+                <button class="btn mt-2" onclick="loginAdmin()">Login</button>
+                <button class="btn mt-2" onclick="document.getElementById('admin-login-modal').style.display = 'none'">Close</button>
             </div>
         </div>
-        <div class="modal" id="reset-password-modal" onclick="closeModal(event)">
+        <div id="reset-password-modal" class="modal" onclick="closeModal(event)">
             <div class="modal-content">
-                <h2 class="text-2xl text-orange-600 mb-4">Reset Password 🔑</h2>
-                <input id="reset-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Enter your email"/>
-                <button class="btn" onclick="resetPassword()">Send Reset Email</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+                <h2 class="text-2xl text-orange-600 mb-4">Reset Password 📧</h2>
+                <input id="reset-email" type="email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Enter your email">
+                <button class="btn mt-2" onclick="resetPassword()">Send Reset Email</button>
+                <button class="btn mt-2" onclick="document.getElementById('reset-password-modal').style.display = 'none'">Close</button>
             </div>
         </div>
-        <div class="modal" id="amend-question-modal" onclick="closeModal(event)">
+        <div id="amend-question-modal" class="modal" onclick="closeModal(event)">
             <div class="modal-content">
                 <h2 class="text-2xl text-orange-600 mb-4">Amend Question ✏️</h2>
                 <input id="amend-question-id" type="hidden">
                 <input id="amend-question-level-original" type="hidden">
-                <input id="amend-question-text" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Question text"/>
-                <select id="amend-question-type" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" onchange="toggleAmendAnswerFields()">
+                <input id="amend-question-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Question text">
+                <select id="amend-question-type" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" onchange="toggleAmendAnswerFields()">
                     <option value="text">Free Text</option>
                     <option value="multiple">Multiple Choice</option>
                 </select>
-                <select id="amend-question-level" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
-                    <option value="Level-1">Level 1</option>
-                    <option value="Level-2">Level 2</option>
-                    <option value="Level-3">Level 3</option>
-                    <option value="Level-4">Level 4</option>
-                    <option value="Level-5">Level 5</option>
-                    <option value="Level-6">Level 6</option>
-                    <option value="Level-7">Level 7</option>
+                <select id="amend-question-level" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
+                    ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}">${level}</option>`).join('')}
                 </select>
-                <select id="amend-question-category" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
+                <select id="amend-question-category" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
                     <option value="">Select a category</option>
                     <option value="Islamic Laws">Islamic Laws</option>
                     <option value="Islamic Beliefs">Islamic Beliefs</option>
@@ -1823,63 +1842,30 @@ landmark-images {
                     <option value="Islamic History">Islamic History</option>
                 </select>
                 <div id="amend-answer-fields">
-                    <input id="amend-answer-text" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Correct answer"/>
+                    <input id="amend-answer-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Correct answer">
                 </div>
                 <div id="amend-multiple-choice-fields" class="hidden">
                     <div class="mt-2">
-                        <input id="amend-option-1" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 1"/>
+                        <input id="amend-option-1" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 1">
                         <label class="ml-2"><input type="checkbox" id="amend-correct-option-1" onchange="ensureSingleCorrectAmendAnswer(1)"> Correct</label>
                     </div>
                     <div class="mt-2">
-                        <input id="amend-option-2" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 2"/>
+                        <input id="amend-option-2" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 2">
                         <label class="ml-2"><input type="checkbox" id="amend-correct-option-2" onchange="ensureSingleCorrectAmendAnswer(2)"> Correct</label>
                     </div>
                     <div class="mt-2">
-                        <input id="amend-option-3" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 3 (optional)"/>
+                        <input id="amend-option-3" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 3 (optional)">
                         <label class="ml-2"><input type="checkbox" id="amend-correct-option-3" onchange="ensureSingleCorrectAmendAnswer(3)"> Correct</label>
                     </div>
                     <div class="mt-2">
-                        <input id="amend-option-4" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 4 (optional)"/>
+                        <input id="amend-option-4" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 4 (optional)">
                         <label class="ml-2"><input type="checkbox" id="amend-correct-option-4" onchange="ensureSingleCorrectAmendAnswer(4)"> Correct</label>
                     </div>
                 </div>
-                <button class="btn mt-2" onclick="amendQuestion()">Save Changes 💾</button>
-                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
+                <button class="btn mt-2" onclick="amendQuestion()">Save Changes</button>
+                <button class="btn mt-2" onclick="document.getElementById('amend-question-modal').style.display = 'none'">Close</button>
             </div>
         </div>
-        <div class="section hidden" id="welcome">
-            <div class="content">
-                <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
-                <div class="progress-bar">
-                    <div id="progress"></div>
-                </div>
-                <div class="badge">🏅 Badge: Explorer</div>
-                <div class="card-grid" id="welcome-card-grid">
-                    <div class="card" onclick="showSection('missions')">
-                        <h3>Missions</h3>
-                        <p>Daily Tasks ⭐</p>
-                    </div>
-                    <div class="card" onclick="showSection('profile')">
-                        <h3>Profile</h3>
-                        <p>Your Journey 🏡</p>
-                    </div>
-                    <div class="card" onclick="showSection('matching-game')">
-                        <h3>Matching Game</h3>
-                        <p>Match Holy Individuals 🧠</p>
-                    </div>
-                    <div class="card" onclick="showSection('quiz')">
-                        <h3>Quiz</h3>
-                        <p>Test Your Knowledge 📚</p>
-                    </div>
-                </div>
-                <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
-            </div>
-        </div>
-        <div class="section hidden" id="missions"></div>
-        <div class="section hidden" id="profile"></div>
-        <div class="section hidden" id="matching-game"></div>
-        <div class="section hidden" id="quiz"></div>
-        <div class="section hidden" id="admin-quiz"></div>
     </div>
 </body>
 </html>
