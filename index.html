@@ -623,7 +623,7 @@
                     saveUserData();
                 }
                 feedback.className = 'text-green-600 mt-2';
-                feedback.textContent = 'Correct!2 Stars! 🎉';
+                feedback.textContent = 'Correct! 2 Stars! 🎉';
                 setTimeout(() => {
                     currentQuestionIndex++;
                     showQuizQuestion();
@@ -1147,6 +1147,7 @@
             // Sanitize quizQuestions on load
             sanitizeQuizQuestions();
 
+            // Ensure hero section is visible by default
             const hero = document.getElementById('hero');
             const welcome = document.getElementById('welcome');
             const profile = document.getElementById('profile');
@@ -1160,6 +1161,7 @@
             if (quiz) quiz.classList.add('hidden');
             if (adminQuiz) adminQuiz.classList.add('hidden');
 
+            // Hide all modals initially
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal', 'amend-question-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
@@ -1230,7 +1232,7 @@
                 const adminQuiz = document.getElementById('admin-quiz');
                 if (hero) hero.classList.remove('hidden');
                 if (welcome) welcome.classList.add('hidden');
-                if (profile) welcome.classList.add('hidden');
+                if (profile) profile.classList.add('hidden');
                 if (matchingGame) matchingGame.classList.add('hidden');
                 if (quiz) quiz.classList.add('hidden');
                 if (adminQuiz) adminQuiz.classList.add('hidden');
@@ -1491,7 +1493,7 @@
             width: 100%;
             height: 20px;
             background: #ddd;
-            repair-radius: 10px;
+            border-radius: 10px;
             overflow: hidden;
             margin: 1rem 0;
             z-index: 20;
@@ -1713,12 +1715,12 @@
             <h1>Shia Islamic Adventure Quest</h1>
         </div>
         <div class="star-counter" id="star-count">0 ⭐</div>
-        <img id="avatar-display" class="avatar-display" src="" alt="Avatar" style="display: none;">
+        <img id="avatar-display" class="avatar-display" src="" alt="Avatar" style
+="display: none;">
         <div id="hero" class="hero">
             <h1>Welcome to the Adventure! 🌟</h1>
             <p>Join the quest to learn about Islamic values and history!</p>
-            <div class="
-<div class="landmark-images">
+            <div class="landmark-images">
                 <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/makkah.jpg" alt="Makkah" class="landmark-image">
                 <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg" alt="Madinah" class="landmark-image">
                 <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/karbala.jpg" alt="Karbala" class="landmark-image">
@@ -1831,7 +1833,13 @@
                     <option value="multiple">Multiple Choice</option>
                 </select>
                 <select id="amend-question-level" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
-                    ${['Level-1', 'Level-2', 'Level-3', 'Level-4', 'Level-5', 'Level-6', 'Level-7'].map(level => `<option value="${level}">${level}</option>`).join('')}
+                    <option value="Level-1">Level 1</option>
+                    <option value="Level-2">Level 2</option>
+                    <option value="Level-3">Level 3</option>
+                    <option value="Level-4">Level 4</option>
+                    <option value="Level-5">Level 5</option>
+                    <option value="Level-6">Level 6</option>
+                    <option value="Level-7">Level 7</option>
                 </select>
                 <select id="amend-question-category" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
                     <option value="">Select a category</option>
