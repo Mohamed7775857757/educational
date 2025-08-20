@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Shia Islamic Adventure Quest</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Fredoka:wght@400;500&display=swap" rel="stylesheet"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
-    <script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shia Islamic Adventure Quest</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;family=Fredoka:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
+<script defer="" type="module">
+        // Import Firebase libraries
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBD2asTEG40b4hhVmUZKlGd3ZPe-NJctxM",
@@ -23,16 +25,12 @@
         };
 
         // Initialize Firebase
-        console.log('Initializing Firebase...');
-        let app;
-        try {
-            app = firebase.getApps().length === 0 ? firebase.initializeApp(firebaseConfig) : firebase.getApps()[0];
-            console.log('Firebase initialized successfully:', app);
-        } catch (error) {
-            console.error('Firebase initialization failed:', error);
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+        if (!app) {
+            console.error('Firebase initialization failed');
             alert('Failed to connect to the app. Please try again later.');
         }
-        const auth = firebase.auth();
+        const auth = getAuth(app);
 
         // Global variables
         let userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
@@ -55,7 +53,9 @@
                 quizQuestions[level] = quizQuestions[level].filter(q => {
                     const isValid = q.id && q.type && q.question && q.answer && q.category &&
                         (q.type !== 'multiple' || (Array.isArray(q.options) && q.options.length >= 2 && q.options.includes(q.answer)));
-                    if (!isValid) console.warn('Removed invalid question:', q);
+                    if (!isValid) {
+                        console.warn('Removed invalid question:', q);
+                    }
                     return isValid;
                 });
             });
@@ -66,49 +66,48 @@
             localStorage.setItem('quizQuestions', JSON.stringify(quizQuestions));
         }
 
-        // Define modal functions globally
+        // Define functions globally within the module
         window.showLoginModal = function() {
-            console.log('Showing login modal...');
+            console.log('Attempting to show login modal...');
             const modal = document.getElementById('login-modal');
             if (modal) {
                 modal.style.display = 'flex';
                 console.log('Login modal displayed');
             } else {
-                console.error('Login modal not found');
+                console.error('Login modal element not found');
             }
         };
 
         window.showSignupModal = function() {
-            console.log('Showing signup modal...');
+            console.log('Attempting to show signup modal...');
             const modal = document.getElementById('signup-modal');
             if (modal) {
                 modal.style.display = 'flex';
                 console.log('Signup modal displayed');
             } else {
-                console.error('Signup modal not found');
+                console.error('Signup modal element not found');
             }
         };
 
         window.showAdminLoginModal = function() {
-            console.log('Showing admin login modal...');
+            console.log('Attempting to show admin login modal...');
             const modal = document.getElementById('admin-login-modal');
             if (modal) {
                 modal.style.display = 'flex';
                 console.log('Admin login modal displayed');
             } else {
-                console.error('Admin login modal not found');
+                console.error('Admin login modal element not found');
             }
         };
 
         window.showSection = function(sectionId) {
-            console.log('Showing section:', sectionId);
-            document.querySelectorAll('.section, #hero').forEach(el => {
+            document.querySelectorAll('.section, #landing-page, #hero').forEach(el => {
                 if (el) el.classList.add('hidden');
             });
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.remove('hidden');
-                gsap.from(`#${sectionId}`, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out' });
+                gsap.from(`#${sectionId.replace(/ /g, '-')}`, { opacity: 1.50, y: 50, duration: 0.5, ease: 'power2.out' });
                 if (sectionId === 'missions' && !isAdmin) showMissions();
                 if (sectionId === 'profile' && !isAdmin) showProfile();
                 if (sectionId === 'matching-game' && !isAdmin) initMatchingGame();
@@ -122,25 +121,27 @@
         };
 
         window.signupUser = function() {
-            const name = document.getElementById('signup-name')?.value || 'Young Explorer';
-            const email = document.getElementById('signup-email')?.value;
-            const password = document.getElementById('signup-password')?.value;
+            userData.name = document.getElementById('signup-name')?.value || 'Young Explorer';
             userData.gender = document.querySelector('input[name="gender"]:checked')?.value || 'boy';
             userData.year = document.getElementById('year-select')?.value || 'Level-1';
             const selected = document.querySelector('.character.selected');
-            userData.character = selected ? selected.src : document.querySelector('.character')?.src;
+            userData.character = selected ? selected.src : document.querySelector('.character')?.src || 'https://yourusername.github.io/your-repo/images/mascot.png';
+            saveUserData();
+
+            const email = document.getElementById('signup-email')?.value;
+            const password = document.getElementById('signup-password')?.value;
             if (!email || !password) {
                 alert('❌ Please enter email and password');
                 return;
             }
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    alert("✅ Sign up successful!");
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert("✅ Sign-up successful!");
                     userData.email = email;
-                    userData.name = name;
                     isAdmin = email === 'melzein1987@gmail.com';
-                    document.getElementById('signup-modal').style.display = 'none';
-                    saveUserData();
+                    const signupModal = document.getElementById('signup-modal');
+                    if (signupModal) signupModal.style.display = 'none';
+                    loadUserData();
                     showSection('welcome');
                 })
                 .catch(error => alert("❌ " + error.message));
@@ -153,12 +154,13 @@
                 alert('❌ Please enter email and password');
                 return;
             }
-            auth.signInWithEmailAndPassword(email, password)
+            signInWithEmailAndPassword(auth, email, password)
                 .then(() => {
                     alert("✅ Login successful!");
                     userData.email = email;
                     isAdmin = email === 'melzein1987@gmail.com';
-                    document.getElementById('login-modal').style.display = 'none';
+                    const loginModal = document.getElementById('login-modal');
+                    if (loginModal) loginModal.style.display = 'none';
                     loadUserData();
                     showSection('welcome');
                 })
@@ -172,12 +174,13 @@
                 alert('❌ Please enter email and password');
                 return;
             }
-            auth.signInWithEmailAndPassword(email, password)
+            signInWithEmailAndPassword(auth, email, password)
                 .then(() => {
                     alert("✅ Admin login successful!");
                     userData.email = email;
                     isAdmin = email === 'melzein1987@gmail.com';
-                    document.getElementById('admin-login-modal').style.display = 'none';
+                    const adminModal = document.getElementById('admin-login-modal');
+                    if (adminModal) adminModal.style.display = 'none';
                     loadUserData();
                     showSection('welcome');
                 })
@@ -190,22 +193,25 @@
                 alert('❌ Please enter an email');
                 return;
             }
-            auth.sendPasswordResetEmail(email)
+            sendPasswordResetEmail(auth, email)
                 .then(() => alert("📧 Password reset email sent!"))
                 .catch(error => alert("❌ " + error.message));
         };
 
         window.logout = function() {
-            auth.signOut().then(() => {
+            signOut(auth).then(() => {
                 alert("✅ Logged out successfully!");
                 userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                 isAdmin = false;
                 selectedQuizCategory = null;
                 localStorage.removeItem('userData');
-                document.querySelectorAll('.section, #hero').forEach(el => {
+                const sections = ['landing-page', 'welcome', 'profile', 'avatar-display', 'missions', 'matching-game', 'quiz', 'admin-quiz'];
+                sections.forEach(id => {
+                    const el = document.getElementById(id);
                     if (el) el.classList.add('hidden');
                 });
-                document.getElementById('avatar-display').style.display = 'none';
+                const avatar = document.getElementById('avatar-display');
+                if (avatar) avatar.style.display = 'none';
                 document.getElementById('star-count').textContent = '0 ⭐';
                 document.getElementById('hero').classList.remove('hidden');
             }).catch(error => alert("❌ " + error.message));
@@ -219,17 +225,29 @@
                 if (!userData.quiz) userData.quiz = {};
                 const avatar = document.getElementById('avatar-display');
                 if (avatar) {
-                    avatar.src = userData.character || 'https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/mascot.png';
+                    avatar.src = userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png';
                     avatar.style.display = 'block';
                 }
-                document.getElementById('welcome-name').textContent = userData.name || 'Young Explorer';
+                const welcomeName = document.getElementById('welcome-name');
+                if (welcomeName) welcomeName.textContent = userData.name || 'Young Explorer';
                 updateStarCounter();
                 updateProgress();
                 updateBadges();
-                document.getElementById('hero').classList.add('hidden');
-                document.getElementById('welcome').classList.remove('hidden');
+                const landingPage = document.getElementById('landing-page');
+                const welcome = document.getElementById('welcome');
+                const profile = document.getElementById('profile');
+                if (landingPage) landingPage.classList.add('hidden');
+                if (welcome) welcome.classList.remove('hidden');
+                if (profile) profile.classList.add('hidden');
                 showSection('welcome');
                 updateWelcomeCardGrid();
+            } else {
+                const hero = document.getElementById('hero');
+                const welcome = document.getElementById('welcome');
+                const profile = document.getElementById('profile');
+                if (hero) hero.classList.remove('hidden');
+                if (welcome) welcome.classList.add('hidden');
+                if (profile) profile.classList.add('hidden');
             }
         }
 
@@ -237,26 +255,34 @@
             localStorage.setItem('userData', JSON.stringify(userData));
         }
 
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('character')) {
+        document.querySelectorAll('.character').forEach(img => {
+            img.addEventListener('click', () => {
                 document.querySelectorAll('.character').forEach(i => i.classList.remove('selected'));
-                e.target.classList.add('selected');
-                userData.character = e.target.src;
-                document.getElementById('avatar-display').src = userData.character;
+                img.classList.add('selected');
+                userData.character = img.src;
+                const avatar = document.getElementById('avatar-display');
+                if (avatar) avatar.src = userData.character;
                 saveUserData();
-            }
+            });
         });
 
         window.closeModal = function(event) {
             if (!event || !event.target) return;
-            if (event.target.className.includes('modal') || event.target.className.includes('btn')) {
+            const className = event.target.className || '';
+            if (className.includes('modal') || className.includes('btn')) {
                 const modal = event.target.closest('.modal');
-                if (modal) modal.style.display = 'none';
-                if (!userData.email) {
-                    document.getElementById('hero').classList.remove('hidden');
-                    document.getElementById('welcome').classList.add('hidden');
-                    document.getElementById('profile').classList.add('hidden');
+                if (modal && modal.id) {
+                    document.getElementById(modal.id).style.display = 'none';
                 }
+                if (!userData.email) {
+                    const hero = document.getElementById('hero');
+                    const welcome = document.getElementById('welcome');
+                    const profile = document.getElementById('profile');
+                    if (hero) hero.classList.remove('hidden');
+                    if (welcome) welcome.classList.add('hidden');
+                    if (profile) profile.classList.add('hidden');
+                }
+                console.log('Modal closed via backdrop or button');
             }
         };
 
@@ -266,8 +292,7 @@
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
-            content.innerHTML = `
-                <h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
+            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Mission Board ⭐</h2>
                 <div class="story-card mb-4">
                     <h3 class="text-xl">Daily Salah</h3>
                     <p>How many daily prayers?</p>
@@ -296,9 +321,15 @@
                 updateStarCounter();
                 updateProgress();
                 confetti();
-                input.parentElement.innerHTML += '<p class="text-green-600 mt-2">Mission Complete! +2 Stars! 🎉</p>';
+                const feedback = document.createElement('p');
+                feedback.className = 'text-green-600 mt-2';
+                feedback.textContent = 'Mission Complete! +2 Stars! 🎉';
+                input.parentElement.appendChild(feedback);
             } else {
-                input.parentElement.innerHTML += '<p class="text-red-600 mt-2">Wrong! Try again! 😕</p>';
+                const feedback = document.createElement('p');
+                feedback.className = 'text-red-600 mt-2';
+                feedback.textContent = 'Wrong! Try again! 😕';
+                input.parentElement.appendChild(feedback);
             }
         }
 
@@ -313,15 +344,14 @@
             container.innerHTML = '';
             const content = document.createElement('div');
             content.className = 'content';
-            content.innerHTML = `
-                <h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
+            content.innerHTML = `<h2 class="text-3xl text-orange-600 mb-4">Profile 🏡</h2>
                 <p>Email: ${userData.email || 'Not set'}</p>
                 <p>Name: ${userData.name}</p>
                 <p>Level: ${userData.year}</p>
                 <p>Stars: <span id="profile-star-count">${userData.stars}</span> ⭐</p>
                 <p>Progress: <span id="profile-progress">${userData.progress}/10</span></p>
                 <p>Badges: ${userData.badges.join(', ')}</p>
-                <img src="${userData.character || 'https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/mascot.png'}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
+                <img src="${userData.character || 'https://yourusername.github.io/your-repo/images/mascot.png'}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto mt-4">
                 <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
                 <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
             container.appendChild(content);
@@ -355,7 +385,7 @@
         }
 
         function confetti() {
-            window.confetti({
+            confetti({
                 particleCount: 100,
                 spread: 70,
                 origin: { y: 0.6 }
@@ -387,7 +417,8 @@
                 <p id="game-feedback" class="mt-4"></p>
                 <button class="btn mt-4" onclick="resetMatchingGame()">Reset Game 🔄</button>
                 <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+            `;
             container.appendChild(content);
 
             const gameGrid = document.getElementById('game-grid');
@@ -401,7 +432,8 @@
                 card.dataset.name = name;
                 card.innerHTML = `
                     <div class="card-front">?</div>
-                    <div class="card-back">${name}</div>`;
+                    <div class="card-back">${name}</div>
+                `;
                 card.addEventListener('click', () => flipCard(card));
                 gameGrid.appendChild(card);
             });
@@ -410,17 +442,26 @@
             matchedPairs = 0;
             canFlip = true;
             document.getElementById('game-feedback').textContent = '';
+            console.log('Matching game initialized');
         }
 
         function flipCard(card) {
-            if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+            if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                console.log('Card flip blocked: canFlip=', canFlip, 'flipped=', card.classList.contains('flipped'), 'matched=', card.classList.contains('matched'));
+                return;
+            }
+
+            console.log('Flipping card:', card.dataset.name);
             card.classList.add('flipped');
             flippedCards.push(card);
 
             if (flippedCards.length === 2) {
                 canFlip = false;
                 const [card1, card2] = flippedCards;
+                console.log('Comparing:', card1.dataset.name, 'and', card2.dataset.name);
+
                 if (card1.dataset.name === card2.dataset.name) {
+                    console.log('Match found!');
                     card1.classList.add('matched');
                     card2.classList.add('matched');
                     matchedPairs++;
@@ -432,23 +473,30 @@
                         updateProgress();
                         confetti();
                         document.getElementById('game-feedback').innerHTML = '<span class="text-green-600 text-xl">Congratulations! All pairs matched! +14 Stars! 🎉</span>';
+                        console.log('Game completed! Stars awarded:', userData.stars);
                     }
                     flippedCards = [];
                     canFlip = true;
+                    console.log('Flipping enabled after match, matchedPairs:', matchedPairs);
                 } else {
+                    console.log('No match.');
                     document.getElementById('game-feedback').textContent = 'No match. Try again!';
                     setTimeout(() => {
                         card1.classList.remove('flipped');
                         card2.classList.remove('flipped');
                         flippedCards = [];
                         canFlip = true;
+                        console.log('Flipping enabled after non-match');
                     }, 1000);
                 }
+            } else {
+                console.log('Waiting for second card, flippedCards:', flippedCards.length);
             }
         }
 
         window.resetMatchingGame = function() {
             initMatchingGame();
+            console.log('Game reset');
         };
 
         // Quiz Logic
@@ -505,12 +553,13 @@
             if (!quizContent || !feedback) return;
             feedback.textContent = '';
             const questions = (quizQuestions[userData.year] || []).filter(q => q.category === selectedQuizCategory);
-
+            
             if (questions.length === 0) {
                 quizContent.innerHTML = `
                     <h3 class="text-xl">No Questions Available</h3>
                     <p>No questions found for ${selectedQuizCategory} in ${userData.year}. Try another category!</p>
-                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>`;
+                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>
+                `;
                 return;
             }
 
@@ -518,7 +567,8 @@
                 quizContent.innerHTML = `
                     <h3 class="text-xl">Quiz Completed!</h3>
                     <p>You've already completed the ${selectedQuizCategory} quiz for ${userData.year}. Try another category!</p>
-                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>`;
+                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>
+                `;
                 return;
             }
 
@@ -534,7 +584,8 @@
                 quizContent.innerHTML = `
                     <h3 class="text-xl">Congratulations!</h3>
                     <p class="text-green-600 text-xl">You've completed the ${selectedQuizCategory} quiz for ${userData.year}! 🎉</p>
-                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>`;
+                    <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>
+                `;
                 return;
             }
 
@@ -548,7 +599,8 @@
                         <label class="block"><input type="radio" name="quiz-${question.id}" value="${option}" class="mr-2">${option}</label>
                     `).join('')}</div>`}
                 <button class="btn mt-2" onclick="checkQuizAnswer('${question.id}', '${question.answer}')">Submit 🎉</button>
-                <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>`;
+                <button class="btn mt-2" onclick="showQuiz()">Change Category 🔄</button>
+            `;
         }
 
         window.checkQuizAnswer = function(id, correctAnswer) {
@@ -575,7 +627,7 @@
                     saveUserData();
                 }
                 feedback.className = 'text-green-600 mt-2';
-                feedback.textContent = 'Correct! 2 Stars! 🎉';
+                feedback.textContent = 'Correct! +2 Stars! 🎉';
                 setTimeout(() => {
                     currentQuestionIndex++;
                     showQuizQuestion();
@@ -655,7 +707,8 @@
                     </div>
                 </div>
                 <button class="btn mt-4" onclick="showSection('welcome')">Back to Home 🏡</button>
-                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>`;
+                <button class="btn mt-2" onclick="logout()">Logout 🚪</button>
+            `;
             container.appendChild(content);
             toggleAnswerFields();
             displayQuestions();
@@ -663,57 +716,113 @@
 
         window.toggleAnswerFields = function() {
             const type = document.getElementById('admin-question-type')?.value;
-            document.getElementById('answer-fields')?.classList.toggle('hidden', type === 'multiple');
-            document.getElementById('multiple-choice-fields')?.classList.toggle('hidden', type === 'text');
+            const answerFields = document.getElementById('answer-fields');
+            const multipleChoiceFields = document.getElementById('multiple-choice-fields');
+            if (answerFields) answerFields.classList.toggle('hidden', type === 'multiple');
+            if (multipleChoiceFields) multipleChoiceFields.classList.toggle('hidden', type === 'text');
         };
 
         window.toggleAmendAnswerFields = function() {
             const type = document.getElementById('amend-question-type')?.value;
-            document.getElementById('amend-answer-fields')?.classList.toggle('hidden', type === 'multiple');
-            document.getElementById('amend-multiple-choice-fields')?.classList.toggle('hidden', type === 'text');
+            const answerFields = document.getElementById('amend-answer-fields');
+            const multipleChoiceFields = document.getElementById('amend-multiple-choice-fields');
+            if (answerFields) answerFields.classList.toggle('hidden', type === 'multiple');
+            if (multipleChoiceFields) multipleChoiceFields.classList.toggle('hidden', type === 'text');
         };
 
         window.ensureSingleCorrectAnswer = function(index) {
-            [1, 2, 3, 4].forEach(i => {
-                if (i !== index) document.getElementById(`correct-option-${i}`).checked = false;
+            const checkboxes = [1, 2, 3, 4].map(i => document.getElementById(`correct-option-${i}`));
+            checkboxes.forEach((cb, i) => {
+                if (i + 1 !== index) cb.checked = false;
             });
         };
 
         window.ensureSingleCorrectAmendAnswer = function(index) {
-            [1, 2, 3, 4].forEach(i => {
-                if (i !== index) document.getElementById(`amend-correct-option-${i}`).checked = false;
+            const checkboxes = [1, 2, 3, 4].map(i => document.getElementById(`amend-correct-option-${i}`));
+            checkboxes.forEach((cb, i) => {
+                if (i + 1 !== index) cb.checked = false;
             });
         };
 
         window.addQuestion = function() {
-            const questionText = document.getElementById('admin-question-text')?.value?.trim();
-            const level = document.getElementById('admin-question-level')?.value;
-            const type = document.getElementById('admin-question-type')?.value;
-            const category = document.getElementById('admin-question-category')?.value;
+            const questionText = document.getElementById('admin-question-text')?.value?.trim() || '';
+            const level = document.getElementById('admin-question-level')?.value || '';
+            const type = document.getElementById('admin-question-type')?.value || '';
+            const category = document.getElementById('admin-question-category')?.value || '';
             let answer = '';
             let options = [];
 
             if (type === 'multiple') {
                 options = [
-                    document.getElementById('admin-option-1')?.value?.trim(),
-                    document.getElementById('admin-option-2')?.value?.trim(),
-                    document.getElementById('admin-option-3')?.value?.trim(),
-                    document.getElementById('admin-option-4')?.value?.trim()
-                ].filter(opt => opt);
-                const correctIndex = [1, 2, 3, 4].find(i => document.getElementById(`correct-option-${i}`)?.checked);
-                answer = correctIndex ? options[correctIndex - 1] : '';
+                    document.getElementById('admin-option-1')?.value?.trim() || '',
+                    document.getElementById('admin-option-2')?.value?.trim() || '',
+                    document.getElementById('admin-option-3')?.value?.trim() || '',
+                    document.getElementById('admin-option-4')?.value?.trim() || ''
+                ].filter(opt => opt.length > 0);
+                const correctCheckboxes = [1, 2, 3, 4].map(i => document.getElementById(`correct-option-${i}`)?.checked);
+                const correctIndex = correctCheckboxes.findIndex(checked => checked);
+                answer = correctIndex >= 0 ? options[correctIndex] : '';
             } else {
-                answer = document.getElementById('admin-answer-text')?.value?.trim();
+                answer = document.getElementById('admin-answer-text')?.value?.trim() || '';
             }
 
-            if (!questionText || !level || !type || !category || !answer || (type === 'multiple' && options.length < 2)) {
-                alert('Please fill in all required fields.');
+            console.log('Adding question:', { questionText, level, type, category, answer, options });
+
+            if (!questionText) {
+                alert('Please fill in the question text.');
+                console.log('Validation failed: Missing question text');
+                return;
+            }
+
+            if (!level) {
+                alert('Please select a level.');
+                console.log('Validation failed: Missing level');
+                return;
+            }
+
+            if (!type) {
+                alert('Please select a question type.');
+                console.log('Validation failed: Missing type');
+                return;
+            }
+
+            if (!category) {
+                alert('Please select a category.');
+                console.log('Validation failed: Missing category');
+                return;
+            }
+
+            if (!answer) {
+                alert('Please provide a correct answer' + (type === 'multiple' ? ' by selecting one option.' : '.'));
+                console.log('Validation failed: Missing answer');
+                return;
+            }
+
+            if (type === 'multiple' && options.length < 2) {
+                alert('Please provide at least 2 non-empty options for multiple choice.');
+                console.log('Validation failed: Fewer than 2 options');
+                return;
+            }
+
+            if (type === 'multiple' && !options.includes(answer)) {
+                alert('The correct answer must be one of the multiple-choice options.');
+                console.log('Validation failed: Answer not in options');
                 return;
             }
 
             const id = `q${Date.now()}`;
             quizQuestions[level] = quizQuestions[level] || [];
-            quizQuestions[level].push({ id, type, question: questionText, answer, category, ...(type === 'multiple' && { options }) });
+            const newQuestion = {
+                id,
+                type,
+                question: questionText,
+                answer,
+                category,
+                ...(type === 'multiple' && { options })
+            };
+            quizQuestions[level].push(newQuestion);
+            console.log('Question added to quizQuestions:', newQuestion);
+
             saveQuizQuestions();
             displayQuestions();
             alert('Question added successfully!');
@@ -733,8 +842,11 @@
             const question = quizQuestions[level].find(q => q.id === id);
             if (!question) {
                 alert('Question not found!');
+                console.error('Question not found for id:', id, 'in level:', level);
                 return;
             }
+
+            console.log('Opening amend modal for question:', question);
 
             document.getElementById('amend-question-id').value = id;
             document.getElementById('amend-question-level-original').value = level;
@@ -764,43 +876,111 @@
         };
 
         window.amendQuestion = function() {
-            const id = document.getElementById('amend-question-id').value;
-            const originalLevel = document.getElementById('amend-question-level-original').value;
-            const questionText = document.getElementById('amend-question-text').value.trim();
-            const level = document.getElementById('amend-question-level').value;
-            const type = document.getElementById('amend-question-type').value;
-            const category = document.getElementById('amend-question-category').value;
+            const id = document.getElementById('amend-question-id')?.value;
+            const originalLevel = document.getElementById('amend-question-level-original')?.value;
+            const questionText = document.getElementById('amend-question-text')?.value?.trim() || '';
+            const level = document.getElementById('amend-question-level')?.value || '';
+            const type = document.getElementById('amend-question-type')?.value || '';
+            const category = document.getElementById('amend-question-category')?.value || '';
             let answer = '';
             let options = [];
 
             if (type === 'multiple') {
                 options = [
-                    document.getElementById('amend-option-1').value.trim(),
-                    document.getElementById('amend-option-2').value.trim(),
-                    document.getElementById('amend-option-3').value.trim(),
-                    document.getElementById('amend-option-4').value.trim()
-                ].filter(opt => opt);
-                const correctIndex = [1, 2, 3, 4].find(i => document.getElementById(`amend-correct-option-${i}`).checked);
-                answer = correctIndex ? options[correctIndex - 1] : '';
+                    document.getElementById('amend-option-1')?.value?.trim() || '',
+                    document.getElementById('amend-option-2')?.value?.trim() || '',
+                    document.getElementById('amend-option-3')?.value?.trim() || '',
+                    document.getElementById('amend-option-4')?.value?.trim() || ''
+                ].filter(opt => opt.length > 0);
+                const correctCheckboxes = [1, 2, 3, 4].map(i => document.getElementById(`amend-correct-option-${i}`)?.checked);
+                const correctIndex = correctCheckboxes.findIndex(checked => checked);
+                answer = correctIndex >= 0 ? options[correctIndex] : '';
             } else {
-                answer = document.getElementById('amend-answer-text').value.trim();
+                answer = document.getElementById('amend-answer-text')?.value?.trim() || '';
             }
 
-            if (!questionText || !level || !type || !category || !answer || (type === 'multiple' && options.length < 2)) {
-                alert('Please fill in all required fields.');
+            console.log('Amending question:', { id, originalLevel, questionText, level, type, category, answer, options });
+
+            if (!questionText) {
+                alert('Please fill in the question text.');
+                console.log('Validation failed: Missing question text');
                 return;
             }
 
+            if (!level) {
+                alert('Please select a level.');
+                console.log('Validation failed: Missing level');
+                return;
+            }
+
+            if (!type) {
+                alert('Please select a question type.');
+                console.log('Validation failed: Missing type');
+                return;
+            }
+
+            if (!category) {
+                alert('Please select a category.');
+                console.log('Validation failed: Missing category');
+                return;
+            }
+
+            if (!answer) {
+                alert('Please provide a correct answer' + (type === 'multiple' ? ' by selecting one option.' : '.'));
+                console.log('Validation failed: Missing answer');
+                return;
+            }
+
+            if (type === 'multiple' && options.length < 2) {
+                alert('Please provide at least 2 non-empty options for multiple choice.');
+                console.log('Validation failed: Fewer than 2 options');
+                return;
+            }
+
+            if (type === 'multiple' && !options.includes(answer)) {
+                alert('The correct answer must be one of the multiple-choice options.');
+                console.log('Validation failed: Answer not in options');
+                return;
+            }
+
+            // Remove question from original level if level has changed
             if (originalLevel !== level) {
                 quizQuestions[originalLevel] = quizQuestions[originalLevel].filter(q => q.id !== id);
                 quizQuestions[level] = quizQuestions[level] || [];
-                quizQuestions[level].push({ id, type, question: questionText, answer, category, ...(type === 'multiple' && { options }) });
+                quizQuestions[level].push({
+                    id,
+                    type,
+                    question: questionText,
+                    answer,
+                    category,
+                    ...(type === 'multiple' && { options })
+                });
             } else {
+                // Update question in the same level
                 const questionIndex = quizQuestions[level].findIndex(q => q.id === id);
                 if (questionIndex >= 0) {
-                    quizQuestions[level][questionIndex] = { id, type, question: questionText, answer, category, ...(type === 'multiple' && { options }) };
+                    quizQuestions[level][questionIndex] = {
+                        id,
+                        type,
+                        question: questionText,
+                        answer,
+                        category,
+                        ...(type === 'multiple' && { options })
+                    };
                 }
             }
+
+            // Update userData.quiz if level or category changed
+            Object.keys(userData.quiz).forEach(lvl => {
+                Object.keys(userData.quiz[lvl] || {}).forEach(cat => {
+                    if (userData.quiz[lvl][cat]?.[id] && (lvl !== level || cat !== category)) {
+                        delete userData.quiz[lvl][cat][id];
+                        if (Object.keys(userData.quiz[lvl][cat]).length === 1 && userData.quiz[lvl][cat].completed) {
+                            delete userData.quiz[lvl][cat].completed;
+                        }
+                    }
+                });
+            });
 
             saveQuizQuestions();
             saveUserData();
@@ -811,7 +991,18 @@
 
         window.removeQuestion = function(level, id) {
             quizQuestions[level] = quizQuestions[level].filter(q => q.id !== id);
+            Object.keys(userData.quiz).forEach(lvl => {
+                Object.keys(userData.quiz[lvl] || {}).forEach(cat => {
+                    if (userData.quiz[lvl][cat]?.[id]) {
+                        delete userData.quiz[lvl][cat][id];
+                        if (Object.keys(userData.quiz[lvl][cat]).length === 1 && userData.quiz[lvl][cat].completed) {
+                            delete userData.quiz[lvl][cat].completed;
+                        }
+                    }
+                });
+            });
             saveQuizQuestions();
+            saveUserData();
             displayQuestions();
             alert('Question removed successfully!');
         };
@@ -825,15 +1016,36 @@
             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             const filteredQuestions = {};
             Object.keys(quizQuestions).forEach(level => {
-                filteredQuestions[level] = quizQuestions[level].filter(q =>
-                    q.question.toLowerCase().includes(searchTerm) ||
-                    q.answer.toLowerCase().includes(searchTerm) ||
-                    (q.options && q.options.some(opt => opt.toLowerCase().includes(searchTerm)))
-                );
+                filteredQuestions[level] = quizQuestions[level].filter(q => {
+                    try {
+                        const questionValid = q.question && typeof q.question === 'string';
+                        const answerValid = q.answer && typeof q.answer === 'string';
+                        const categoryValid = q.category && typeof q.category === 'string';
+                        const optionsValid = q.type !== 'multiple' || (Array.isArray(q.options) && q.options.every(opt => typeof opt === 'string'));
+
+                        if (!questionValid || !answerValid || !categoryValid || !optionsValid) {
+                            console.warn('Skipping invalid question in display:', q);
+                            return false;
+                        }
+
+                        return (
+                            q.question.toLowerCase().includes(searchTerm) ||
+                            q.answer.toLowerCase().includes(searchTerm) ||
+                            (q.options && q.options.some(opt => opt.toLowerCase().includes(searchTerm))) ||
+                            q.category.toLowerCase().includes(searchTerm)
+                        );
+                    } catch (error) {
+                        console.error('Error processing question:', q, error);
+                        return false;
+                    }
+                });
             });
 
             display.innerHTML = '';
-            let totalQuestions = Object.values(filteredQuestions).reduce((sum, levelQuestions) => sum + levelQuestions.length, 0);
+            let totalQuestions = 0;
+            Object.values(filteredQuestions).forEach(levelQuestions => {
+                totalQuestions += levelQuestions.length;
+            });
             const totalPages = Math.ceil(totalQuestions / questionsPerPage);
             currentPage = Math.min(currentPage, Math.max(1, totalPages));
 
@@ -848,7 +1060,12 @@
 
                 const levelDiv = document.createElement('div');
                 levelDiv.className = 'level-section';
-                levelDiv.innerHTML = `<h4 class="text-lg mt-4 cursor-pointer flex justify-between items-center" onclick="toggleLevelSection(this)">${level} <span>▼</span></h4><div class="level-questions"></div>`;
+                levelDiv.innerHTML = `
+                    <h4 class="text-lg mt-4 cursor-pointer flex justify-between items-center" onclick="toggleLevelSection(this)">
+                        ${level} <span>▼</span>
+                    </h4>
+                    <div class="level-questions"></div>
+                `;
                 const questionsContainer = levelDiv.querySelector('.level-questions');
 
                 levelQuestions.forEach((q, index) => {
@@ -862,7 +1079,8 @@
                             <p><strong>Answer:</strong> ${q.answer}</p>
                             ${q.options ? `<p><strong>Options:</strong> ${q.options.join(', ')}</p>` : ''}
                             <button class="btn mt-2 bg-blue-500 hover:bg-blue-700 mr-2" onclick="openAmendModal('${level}', '${q.id}')">Amend ✏️</button>
-                            <button class="btn mt-2 bg-red-500 hover:bg-red-700" onclick="removeQuestion('${level}', '${q.id}')">Remove 🗑️</button>`;
+                            <button class="btn mt-2 bg-red-500 hover:bg-red-700" onclick="removeQuestion('${level}', '${q.id}')">Remove 🗑️</button>
+                        `;
                         questionsContainer.appendChild(qDiv);
                         renderedQuestions++;
                     }
@@ -887,20 +1105,26 @@
         window.toggleLevelSection = function(header) {
             const questionsDiv = header.nextElementSibling;
             questionsDiv.classList.toggle('hidden');
-            header.querySelector('span').textContent = questionsDiv.classList.contains('hidden') ? '▼' : '▲';
+            const toggleIcon = header.querySelector('span');
+            toggleIcon.textContent = questionsDiv.classList.contains('hidden') ? '▼' : '▲';
         };
 
         function updateWelcomeCardGrid() {
             const cardGrid = document.getElementById('welcome-card-grid');
             if (!cardGrid) return;
-            cardGrid.innerHTML = '';
+            cardGrid.innerHTML = ''; // Clear existing cards
             if (isAdmin) {
+                // Only show Admin Quiz Management for admins
                 const adminCard = document.createElement('div');
                 adminCard.className = 'card';
                 adminCard.onclick = () => showSection('admin-quiz');
-                adminCard.innerHTML = `<h3>Admin Quiz Management</h3><p>Manage Quiz Questions 🔧</p>`;
+                adminCard.innerHTML = `
+                    <h3>Admin Quiz Management</h3>
+                    <p>Manage Quiz Questions 🔧</p>
+                `;
                 cardGrid.appendChild(adminCard);
             } else {
+                // Show all cards except Admin Quiz Management for non-admins
                 const cards = [
                     { id: 'missions', title: 'Missions', desc: 'Daily Tasks ⭐' },
                     { id: 'profile', title: 'Profile', desc: 'Your Journey 🏡' },
@@ -911,7 +1135,10 @@
                     const cardElement = document.createElement('div');
                     cardElement.className = 'card';
                     cardElement.onclick = () => showSection(card.id);
-                    cardElement.innerHTML = `<h3>${card.title}</h3><p>${card.desc}</p>`;
+                    cardElement.innerHTML = `
+                        <h3>${card.title}</h3>
+                        <p>${card.desc}</p>
+                    `;
                     cardGrid.appendChild(cardElement);
                 });
             }
@@ -919,14 +1146,24 @@
 
         // Initialize on DOM load
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, initializing...');
+            console.log('DOM fully loaded, initializing app...');
+
+            // Sanitize quizQuestions on load
             sanitizeQuizQuestions();
-            document.getElementById('hero').classList.remove('hidden');
-            document.getElementById('welcome').classList.add('hidden');
-            document.getElementById('profile').classList.add('hidden');
-            document.getElementById('matching-game').classList.add('hidden');
-            document.getElementById('quiz').classList.add('hidden');
-            document.getElementById('admin-quiz').classList.add('hidden');
+
+            const hero = document.getElementById('hero');
+            const welcome = document.getElementById('welcome');
+            const profile = document.getElementById('profile');
+            const matchingGame = document.getElementById('matching-game');
+            const quiz = document.getElementById('quiz');
+            const adminQuiz = document.getElementById('admin-quiz');
+            if (hero) hero.classList.remove('hidden');
+            if (welcome) welcome.classList.add('hidden');
+            if (profile) profile.classList.add('hidden');
+            if (matchingGame) matchingGame.classList.add('hidden');
+            if (quiz) quiz.classList.add('hidden');
+            if (adminQuiz) adminQuiz.classList.add('hidden');
+
             ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal', 'amend-question-modal'].forEach(id => {
                 const modal = document.getElementById(id);
                 if (modal) modal.style.display = 'none';
@@ -936,38 +1173,83 @@
             const initAuth = () => {
                 if (authInitialized) return;
                 authInitialized = true;
-                auth.onAuthStateChanged(user => {
+
+                onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userData.email = user.email;
                         isAdmin = user.email === 'melzein1987@gmail.com';
                         loadUserData();
-                        document.getElementById('login-modal').style.display = 'none';
-                        document.getElementById('hero').classList.add('hidden');
-                        document.getElementById('welcome').classList.remove('hidden');
+                        const loginModal = document.getElementById('login-modal');
+                        const hero = document.getElementById('hero');
+                        const welcome = document.getElementById('welcome');
+                        if (loginModal) loginModal.style.display = 'none';
+                        if (hero) hero.classList.add('hidden');
+                        if (welcome) welcome.classList.remove('hidden');
                         showSection('welcome');
                     } else {
                         userData = { name: '', gender: 'boy', year: 'Level-1', character: '', stars: 0, progress: 0, badges: ['Explorer'], missions: {}, quiz: {}, artwork: {}, storyPath: [] };
                         isAdmin = false;
                         selectedQuizCategory = null;
                         localStorage.removeItem('userData');
-                        document.getElementById('hero').classList.remove('hidden');
-                        document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+                        const hero = document.getElementById('hero');
+                        const welcome = document.getElementById('welcome');
+                        const profile = document.getElementById('profile');
+                        const matchingGame = document.getElementById('matching-game');
+                        const quiz = document.getElementById('quiz');
+                        const adminQuiz = document.getElementById('admin-quiz');
+                        if (hero) hero.classList.remove('hidden');
+                        if (welcome) welcome.classList.add('hidden');
+                        if (profile) profile.classList.add('hidden');
+                        if (matchingGame) matchingGame.classList.add('hidden');
+                        if (quiz) quiz.classList.add('hidden');
+                        if (adminQuiz) adminQuiz.classList.add('hidden');
                         ['login-modal', 'signup-modal', 'admin-login-modal', 'reset-password-modal', 'amend-question-modal'].forEach(id => {
                             const modal = document.getElementById(id);
                             if (modal) modal.style.display = 'none';
                         });
                     }
-                }, error => {
-                    console.error('Auth error:', error);
+                }, (error) => {
+                    console.error('Auth error:', error.message);
                     alert('Authentication failed. Please try again or contact support.');
-                    document.getElementById('hero').classList.remove('hidden');
+                    const hero = document.getElementById('hero');
+                    if (hero) hero.classList.remove('hidden');
                 });
             };
 
             initAuth();
+
+            console.log('Functions defined:', {
+                showLoginModal: typeof window.showLoginModal,
+                showSignupModal: typeof window.showSignupModal,
+                showAdminLoginModal: typeof window.showAdminLoginModal
+            });
+
+            window.addEventListener('load', () => {
+                console.log('Window fully loaded, verifying UI...');
+                const hero = document.getElementById('hero');
+                const welcome = document.getElementById('welcome');
+                const profile = document.getElementById('profile');
+                const matchingGame = document.getElementById('matching-game');
+                const quiz = document.getElementById('quiz');
+                const adminQuiz = document.getElementById('admin-quiz');
+                if (hero) hero.classList.remove('hidden');
+                if (welcome) welcome.classList.add('hidden');
+                if (profile) profile.classList.add('hidden');
+                if (matchingGame) matchingGame.classList.add('hidden');
+                if (quiz) quiz.classList.add('hidden');
+                if (adminQuiz) adminQuiz.classList.add('hidden');
+            });
+
+            // Add search functionality
+            document.addEventListener('input', (e) => {
+                if (e.target.id === 'question-search') {
+                    currentPage = 1;
+                    displayQuestions();
+                }
+            });
         });
-    </script>
-    <style>
+</script>
+<style>
         body {
             font-family: 'Fredoka', sans-serif;
             margin: 0;
@@ -976,6 +1258,7 @@
             min-height: 100vh;
             position: relative;
             background: none;
+            overflow: hidden;
         }
         .background-layer {
             position: fixed;
@@ -983,7 +1266,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #A5CFCC url('https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/background.jpg') no-repeat center center fixed;
+            background:#A5CFCC url('https://yourusername.github.io/your-repo/images/background.jpg') no-repeat center center fixed;
             background-size: cover;
             z-index: -1;
         }
@@ -1010,6 +1293,15 @@
             text-shadow: 2px 2px #000;
             animation: bounce 1s ease-out infinite;
         }
+        .tree, .cloud, .star, .moon {
+            position: absolute;
+            animation: float 6s infinite ease-in-out;
+            z-index: 1;
+        }
+        .tree { content: '🌳'; font-size: 80px; }
+        .cloud { content: '☁️'; font-size: 50px; animation: float 8s infinite ease-in-out; }
+        .star { content: '⭐'; font-size: 30px; animation: twinkle 2s infinite alternate; }
+        .moon { content: '🌙'; font-size: 60px; animation: shine 4s infinite ease-in-out; top: 10%; left: 10%; }
         .hero {
             height: 100vh;
             position: relative;
@@ -1122,6 +1414,17 @@
             color: #fff;
             text-shadow: 1px 1px #000;
         }
+        .card:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+            z-index: -1;
+        }
         .btn {
             background: linear-gradient(90deg, #FFA500, #FF69B4);
             color: #fff;
@@ -1139,6 +1442,15 @@
             transform: scale(1.1);
             background: linear-gradient(90deg, #32CD32, #87CEEB);
             box-shadow: 0 6px 15px rgba(50, 205, 50, 0.5);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         .star-counter {
             position: fixed;
@@ -1186,6 +1498,7 @@
             text-align: center;
             animation: slideIn 0.5s ease-out;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 201;
         }
         .progress-bar {
             width: 100%;
@@ -1194,12 +1507,14 @@
             border-radius: 10px;
             overflow: hidden;
             margin: 1rem 0;
+            z-index: 20;
         }
         #progress {
             height: 100%;
             background: linear-gradient(90deg, #FFA500, #FF69B4);
             width: 0%;
             transition: width 0.5s ease-in-out;
+            border-radius: 10px;
         }
         .badge {
             background: #FFD700;
@@ -1209,6 +1524,7 @@
             margin: 0.5rem;
             display: inline-block;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 20;
         }
         .story-card {
             background-color: rgba(255, 255, 255, 0.5);
@@ -1218,6 +1534,7 @@
             max-width: 600px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: left;
+            z-index: 20;
         }
         .placeholder-images {
             display: flex;
@@ -1226,25 +1543,12 @@
             margin-top: 20px;
             padding: 10px 0;
         }
-        .landmark-images {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            gap: 1rem;
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        .landmark-image {
-            width: 450px;
-            height: 450px;
-            object-fit: cover;
+        .placeholder-image {
+            width: 400px;
+            height: 300px;
+            object-fit: contain;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease-in-out;
-        }
-        .landmark-image:hover {
-            transform: scale(1.05);
         }
         .game-grid {
             display: grid;
@@ -1295,6 +1599,14 @@
             transform: rotateY(180deg);
             font-size: 0.8rem;
         }
+        .level-section .level-questions.hidden {
+            display: none;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         .hidden {
             display: none;
         }
@@ -1303,7 +1615,19 @@
             50% { transform: translateY(-20px); }
             100% { transform: translateY(0); }
         }
-        @keyframes bounce {
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        @keyframes shine {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+@keyframes bounce {
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-20px); }
             60% { transform: translateY(-10px); }
@@ -1322,21 +1646,59 @@
             100% { transform: scale(1); }
         }
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .hero .btn { padding: 1rem 2rem; font-size: 1.2rem; }
-            .card-grid { flex-direction: column; align-items: center; }
-            .card { width: 80%; max-width: 300px; }
-            .game-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-            .game-card { width: 80px; height: 80px; font-size: 0.7rem; }
-            .landmark-image { width: 300px; height: 300px; }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero .btn {
+                padding: 1rem 2rem;
+                font-size: 1.2rem;
+            }
+            .card-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+            .card {
+                width: 80%;
+                max-width: 300px;
+            }
+            .game-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            .game-card {
+                width: 80px;
+                height: 80px;
+                font-size: 0.7rem;
+            }
+            .section {
+                padding: 2rem 1rem;
+            }
+            .content {
+                padding: 1rem;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 1rem;
+            }
         }
         @media (max-width: 480px) {
-            .hero h1 { font-size: 1.5rem; }
-            .hero p { font-size: 1rem; }
-            .game-grid { grid-template-columns: repeat(3, 1fr); }
-            .game-card { width: 60px; height: 60px; font-size: 0.6rem; }
-            .card-front { font-size: 1.5rem; }
-            .landmark-image { width: 200px; height: 200px; }
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .game-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .game-card {
+                width: 60px;
+                height: 60px;
+                font-size: 0.6rem;
+            }
+            .card-front {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -1347,60 +1709,43 @@
             <h1>Shia Islamic Adventure Quest</h1>
         </div>
         <div class="star-counter" id="star-count">0 ⭐</div>
-        <img id="avatar-display" class="avatar-display" src="" alt="Avatar" style="display: none;">
-        <div id="hero" class="hero">
-            <h1>Welcome to the Adventure! 🌟</h1>
-            <p>Join the quest to learn about Islamic values and history!</p>
-            <div class="landmark-images">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/makkah.jpg" alt="Makkah" class="landmark-image">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/madinah.jpg" alt="Madinah" class="landmark-image">
-                <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/karbala.jpg" alt="Karbala" class="landmark-image">
-            </div>
-            <button class="btn" onclick="showLoginModal()">Login 🚪</button>
-            <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
-            <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔧</button>
-        </div>
-        <div id="welcome" class="section hidden">
-            <div class="content">
-                <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
-                <div class="progress-bar">
-                    <div id="progress"></div>
-                </div>
-                <p class="badge">🏅 Badge: Explorer</p>
-                <div id="welcome-card-grid" class="card-grid"></div>
+        <img src="https://yourusername.github.io/your-repo/images/mascot.png" alt="Avatar" class="avatar-display hidden" id="avatar-display">
+        <div class="tree" style="bottom: 10%; left: 5%;">🌳</div>
+        <div class="tree" style="bottom: 5%; right: 5%;">🌳</div>
+        <div class="cloud" style="top: 15%; left: 20%;">☁️</div>
+        <div class="cloud" style="top: 25%; right: 15%;">☁️</div>
+        <div class="star" style="top: 10%; left: 30%;">⭐</div>
+        <div class="star" style="top: 20%; right: 25%;">⭐</div>
+        <div class="moon">🌙</div>
+        <div class="hero" id="hero">
+            <h1>Embark on a Learning Adventure! 🚀</h1>
+            <p>Join us to explore Islamic teachings through fun missions and games!</p>
+            <div class="card-grid">
+                <button class="btn" onclick="showLoginModal()">Login 🚪</button>
+                <button class="btn" onclick="showSignupModal()">Sign Up ✨</button>
+                <button class="btn" onclick="showAdminLoginModal()">Admin Login 🔧</button>
             </div>
         </div>
-        <div id="profile" class="section hidden">
-            <div class="content"></div>
-        </div>
-        <div id="missions" class="section hidden">
-            <div class="content"></div>
-        </div>
-        <div id="matching-game" class="section hidden">
-            <div class="content"></div>
-        </div>
-        <div id="quiz" class="section hidden">
-            <div class="content"></div>
-        </div>
-        <div id="admin-quiz" class="section hidden">
-            <div class="content admin-content"></div>
-        </div>
-        <div id="login-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal" id="login-modal" onclick="closeModal(event)">
             <div class="modal-content">
                 <h2 class="text-2xl text-orange-600 mb-4">Login 🚪</h2>
-                <input id="login-email" type="email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email">
-                <input id="login-password" type="password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password">
-                <button class="btn mt-2" onclick="login()">Login</button>
-                <button class="btn mt-2" onclick="document.getElementById('reset-password-modal').style.display = 'flex'; document.getElementById('login-modal').style.display = 'none';">Forgot Password?</button>
-                <button class="btn mt-2" onclick="document.getElementById('login-modal').style.display = 'none'">Close</button>
+                <input id="login-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email"/>
+                <input id="login-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password" type="password"/>
+                <button class="btn" onclick="login()">Login</button>
+                <button class="btn mt-2" onclick="document.getElementById('reset-password-modal').style.display='flex'; document.getElementById('login-modal').style.display='none'">Forgot Password?</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
             </div>
         </div>
-        <div id="signup-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal" id="signup-modal" onclick="closeModal(event)">
             <div class="modal-content">
                 <h2 class="text-2xl text-orange-600 mb-4">Sign Up ✨</h2>
-                <input id="signup-name" type="text" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Your Name">
-                <input id="signup-email" type="email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email">
-                <input id="signup-password" type="password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password">
+                <input id="signup-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Email"/>
+                <input id="signup-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Password" type="password"/>
+                <input id="signup-name" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Your Name"/>
+                <div class="mb-2">
+                    <label><input name="gender" type="radio" value="boy" checked/> Boy</label>
+                    <label class="ml-4"><input name="gender" type="radio" value="girl"/> Girl</label>
+                </div>
                 <select id="year-select" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
                     <option value="Level-1">Level 1</option>
                     <option value="Level-2">Level 2</option>
@@ -1410,48 +1755,43 @@
                     <option value="Level-6">Level 6</option>
                     <option value="Level-7">Level 7</option>
                 </select>
-                <div class="mb-2">
-                    <label class="block"><input type="radio" name="gender" value="boy" checked> Boy</label>
-                    <label class="block"><input type="radio" name="gender" value="girl"> Girl</label>
-                </div>
                 <div class="placeholder-images">
-                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy1.png" alt="Boy 1" class="character w-24 h-24 rounded-full cursor-pointer">
-                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/boy2.png" alt="Boy 2" class="character w-24 h-24 rounded-full cursor-pointer">
-                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/girl1.png" alt="Girl 1" class="character w-24 h-24 rounded-full cursor-pointer">
-                    <img src="https://raw.githubusercontent.com/Mohamed7775857757/educational/main/images/girl2.png" alt="Girl 2" class="character w-24 h-24 rounded-full cursor-pointer">
+                    <img alt="Character 1" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character1.png"/>
+                    <img alt="Character 2" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character2.png"/>
+                    <img alt="Character 3" class="character w-24 h-24 rounded-full cursor-pointer" src="https://yourusername.github.io/your-repo/images/character3.png"/>
                 </div>
                 <button class="btn mt-2" onclick="signupUser()">Sign Up</button>
-                <button class="btn mt-2" onclick="document.getElementById('signup-modal').style.display = 'none'">Close</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
             </div>
         </div>
-        <div id="admin-login-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal" id="admin-login-modal" onclick="closeModal(event)">
             <div class="modal-content">
                 <h2 class="text-2xl text-orange-600 mb-4">Admin Login 🔧</h2>
-                <input id="admin-username" type="email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Email">
-                <input id="admin-password" type="password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Password">
-                <button class="btn mt-2" onclick="loginAdmin()">Login</button>
-                <button class="btn mt-2" onclick="document.getElementById('admin-login-modal').style.display = 'none'">Close</button>
+                <input id="admin-username" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Email"/>
+                <input id="admin-password" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Admin Password" type="password"/>
+                <button class="btn" onclick="loginAdmin()">Login</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
             </div>
         </div>
-        <div id="reset-password-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal" id="reset-password-modal" onclick="closeModal(event)">
             <div class="modal-content">
-                <h2 class="text-2xl text-orange-600 mb-4">Reset Password 📧</h2>
-                <input id="reset-email" type="email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Enter your email">
-                <button class="btn mt-2" onclick="resetPassword()">Send Reset Email</button>
-                <button class="btn mt-2" onclick="document.getElementById('reset-password-modal').style.display = 'none'">Close</button>
+                <h2 class="text-2xl text-orange-600 mb-4">Reset Password 🔑</h2>
+                <input id="reset-email" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Enter your email"/>
+                <button class="btn" onclick="resetPassword()">Send Reset Email</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
             </div>
         </div>
-        <div id="amend-question-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal" id="amend-question-modal" onclick="closeModal(event)">
             <div class="modal-content">
                 <h2 class="text-2xl text-orange-600 mb-4">Amend Question ✏️</h2>
                 <input id="amend-question-id" type="hidden">
                 <input id="amend-question-level-original" type="hidden">
-                <input id="amend-question-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Question text">
-                <select id="amend-question-type" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" onchange="toggleAmendAnswerFields()">
+                <input id="amend-question-text" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Question text"/>
+                <select id="amend-question-type" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" onchange="toggleAmendAnswerFields()">
                     <option value="text">Free Text</option>
                     <option value="multiple">Multiple Choice</option>
                 </select>
-                <select id="amend-question-level" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
+                <select id="amend-question-level" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
                     <option value="Level-1">Level 1</option>
                     <option value="Level-2">Level 2</option>
                     <option value="Level-3">Level 3</option>
@@ -1460,7 +1800,7 @@
                     <option value="Level-6">Level 6</option>
                     <option value="Level-7">Level 7</option>
                 </select>
-                <select id="amend-question-category" class="border rounded-lg p-2 bg-white text-black mt-2 w-full">
+                <select id="amend-question-category" class="border rounded-lg p-2 bg-white text-black mb-2 w-full">
                     <option value="">Select a category</option>
                     <option value="Islamic Laws">Islamic Laws</option>
                     <option value="Islamic Beliefs">Islamic Beliefs</option>
@@ -1469,31 +1809,63 @@
                     <option value="Islamic History">Islamic History</option>
                 </select>
                 <div id="amend-answer-fields">
-                    <input id="amend-answer-text" class="border rounded-lg p-2 bg-white text-black mt-2 w-full" placeholder="Correct answer">
+                    <input id="amend-answer-text" class="border rounded-lg p-2 bg-white text-black mb-2 w-full" placeholder="Correct answer"/>
                 </div>
                 <div id="amend-multiple-choice-fields" class="hidden">
                     <div class="mt-2">
-                        <input id="amend-option-1" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder
-="Option 1">
+                        <input id="amend-option-1" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 1"/>
                         <label class="ml-2"><input type="checkbox" id="amend-correct-option-1" onchange="ensureSingleCorrectAmendAnswer(1)"> Correct</label>
                     </div>
                     <div class="mt-2">
-                        <input id="amend-option-2" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 2">
+                        <input id="amend-option-2" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 2"/>
                         <label class="ml-2"><input type="checkbox" id="amend-correct-option-2" onchange="ensureSingleCorrectAmendAnswer(2)"> Correct</label>
                     </div>
                     <div class="mt-2">
-                        <input id="amend-option-3" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 3 (optional)">
+                        <input id="amend-option-3" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 3 (optional)"/>
                         <label class="ml-2"><input type="checkbox" id="amend-correct-option-3" onchange="ensureSingleCorrectAmendAnswer(3)"> Correct</label>
                     </div>
                     <div class="mt-2">
-                        <input id="amend-option-4" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 4 (optional)">
+                        <input id="amend-option-4" class="border rounded-lg p-2 bg-white text-black w-3/4" placeholder="Option 4 (optional)"/>
                         <label class="ml-2"><input type="checkbox" id="amend-correct-option-4" onchange="ensureSingleCorrectAmendAnswer(4)"> Correct</label>
                     </div>
                 </div>
-                <button class="btn mt-2" onclick="amendQuestion()">Save Changes</button>
-                <button class="btn mt-2" onclick="document.getElementById('amend-question-modal').style.display = 'none'">Close</button>
+                <button class="btn mt-2" onclick="amendQuestion()">Save Changes 💾</button>
+                <button class="btn mt-2" onclick="closeModal(event)">Close</button>
             </div>
         </div>
+        <div class="section hidden" id="welcome">
+            <div class="content">
+                <h2 class="text-3xl text-orange-600 mb-4">Welcome, <span id="welcome-name">Young Explorer</span>! 🌟</h2>
+                <div class="progress-bar">
+                    <div id="progress"></div>
+                </div>
+                <div class="badge">🏅 Badge: Explorer</div>
+                <div class="card-grid" id="welcome-card-grid">
+                    <div class="card" onclick="showSection('missions')">
+                        <h3>Missions</h3>
+                        <p>Daily Tasks ⭐</p>
+                    </div>
+                    <div class="card" onclick="showSection('profile')">
+                        <h3>Profile</h3>
+                        <p>Your Journey 🏡</p>
+                    </div>
+                    <div class="card" onclick="showSection('matching-game')">
+                        <h3>Matching Game</h3>
+                        <p>Match Holy Individuals 🧠</p>
+                    </div>
+                    <div class="card" onclick="showSection('quiz')">
+                        <h3>Quiz</h3>
+                        <p>Test Your Knowledge 📚</p>
+                    </div>
+                </div>
+                <button class="btn mt-4" onclick="logout()">Logout 🚪</button>
+            </div>
+        </div>
+        <div class="section hidden" id="missions"></div>
+        <div class="section hidden" id="profile"></div>
+        <div class="section hidden" id="matching-game"></div>
+        <div class="section hidden" id="quiz"></div>
+        <div class="section hidden" id="admin-quiz"></div>
     </div>
 </body>
 </html>
